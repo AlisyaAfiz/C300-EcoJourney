@@ -1,7 +1,7 @@
 import os
 import sys
 
-if __name__ == "__main__":
+def main():
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ecojourney.settings')
     try:
