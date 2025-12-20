@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .header {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+        .content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 0 0 5px 5px;
+        }
+        .button {
+            display: inline-block;
+            background-color: #f39c12;
+            color: white !important;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            font-size: 12px;
+            color: #666;
+        }
+        .feedback-box {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-left: 4px solid #f39c12;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 Changes Requested</h1>
+        </div>
+        <div class="content">
+            <p>Hello,</p>
+            
+            <p>We've reviewed your submitted content and have requested some changes before it can be approved. Your content has been returned to draft status so you can make the necessary adjustments.</p>
+            
+            <div class="feedback-box">
+                <h3>Requested Changes:</h3>
+                <p>{{ feedback }}</p>
+            </div>
+            
+            <h3>Next Steps:</h3>
+            <ol>
+                <li>Review the requested changes carefully</li>
+                <li>Edit your content in the dashboard</li>
+                <li>Make the recommended improvements</li>
+                <li>Resubmit for approval when ready</li>
+            </ol>
+            
+            <p>We appreciate your flexibility and commitment to maintaining high-quality content standards on our platform.</p>
+            
+            <p style="text-align: center;">
+                <a href="{{ dashboard_url }}" class="button">View Your Content</a>
+            </p>
+            
+            <p>If you need clarification on any of the requested changes, please reach out to our support team.</p>
+            
+            <p>Best regards,<br>The EcoJourney Team</p>
+            
+            <div class="footer">
+                <p>&copy; {{ year }} EcoJourney. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
