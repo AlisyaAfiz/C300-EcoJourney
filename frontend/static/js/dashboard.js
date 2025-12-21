@@ -742,6 +742,17 @@ function handleLogout(e) {
     logout();
 }
 
+function logout() {
+    // Clear all stored data
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user_role');
+    localStorage.removeItem('current_user');
+    localStorage.removeItem('remember_me');
+    localStorage.removeItem('remembered_username');
+
+    window.location.href = 'login.html';
+}
+
 function showAlert(message, type = 'info') {
     // Create alert element
     const alert = document.createElement('div');
