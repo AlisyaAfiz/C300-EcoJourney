@@ -1,10 +1,5 @@
 #!/usr/bin/env node
 
-/**
- * Migration script to transfer data from Django SQLite to Express MongoDB
- * Run this script from the backend-express directory after setting up MongoDB
- */
-
 require('dotenv').config();
 const mongoose = require('mongoose');
 const sqlite3 = require('better-sqlite3');
@@ -15,11 +10,11 @@ const User = require('./models/User');
 const UserRole = require('./models/UserRole');
 const PasswordResetToken = require('./models/PasswordResetToken');
 const ContentCategory = require('./models/ContentCategory');
-const MultimediaContent = require('./models/ContentApprovalWorkflow');
-const ContentApprovalWorkflow = require('./models/ApprovalWorkflow');
+const MultimediaContent = require('./models/MultimediaContent');
+const ContentApprovalWorkflow = require('./models/ContentApprovalWorkflow');
 
 // Path to Django SQLite database
-const DB_PATH = '../backend/db.sqlite3';
+const DB_PATH = path.resolve(__dirname, '../backend/db.sqlite3');
 
 async function migrate() {
   try {
