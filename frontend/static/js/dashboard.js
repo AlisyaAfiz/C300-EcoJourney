@@ -14,6 +14,28 @@ document.addEventListener('DOMContentLoaded', function() {
     loadUserData();
     loadDashboardStats();
     loadCategories();
+
+    const userRole = localStorage.getItem('user_role');
+
+    // Show/hide Content Approvals menu
+    const approvalsMenu = document.getElementById('approvals-menu');
+    if (approvalsMenu) {
+        if (userRole === 'manager') {
+            approvalsMenu.style.display = 'block';  // or '' to use default
+        } else {
+            approvalsMenu.style.display = 'none';
+        }
+    }
+
+    // Show/hide Administration menu
+    const adminMenu = document.getElementById('admin-menu');
+    if (adminMenu) {
+        if (userRole === 'admin') {
+            adminMenu.style.display = 'block';
+        } else {
+            adminMenu.style.display = 'none';
+        }
+    }
 });
 
 // Setup Event Listeners

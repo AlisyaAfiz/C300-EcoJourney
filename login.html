@@ -349,9 +349,17 @@
 
             setTimeout(() => {
                 if (userAccounts.hasOwnProperty(username) && userAccounts[username] === password) {
-                    // Fake success
-                    localStorage.setItem('auth_token', 'fake-token-' + username);
+                    
+                    let userRole = 'producer';
+                    if (username.toLowerCase() === 'admin') {
+                        userRole = 'admin';
+                    } else if (username.toLowerCase() === 'manager') {
+                        userRole = 'manager';
+                    }
+
+                    localStorage.setItem('user_role', userRole);
                     localStorage.setItem('current_user', username);
+
 
                     if (rememberMe) {
                         localStorage.setItem('remember_me', 'true');
