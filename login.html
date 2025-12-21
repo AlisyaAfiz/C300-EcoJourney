@@ -340,7 +340,6 @@
             loginAlert.classList.add('d-none');
             
             try {
-                // Call Django API
                 const response = await fetch(`${API_BASE_URL}/auth/login/`, {
                     method: 'POST',
                     headers: {
@@ -387,10 +386,13 @@
                 }
             } catch (error) {
                 console.error('Login error:', error);
+
                 loginAlert.classList.remove('d-none');
                 loginAlert.classList.add('alert-danger');
-                loginAlert.textContent = 'Connection error. Make sure Django server is running on http://127.0.0.1:8000/';
-                
+
+                loginAlert.textContent =
+                    'Unable to connect to the server. Please try again later.';
+
                 // Reset button
                 loginBtn.disabled = false;
                 loginText.textContent = 'Login';
