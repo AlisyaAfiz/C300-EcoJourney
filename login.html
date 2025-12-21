@@ -324,62 +324,62 @@
                 toggleBtn.innerHTML = '<i class="fas fa-eye"></i>';
             }
         }
-    function handleLogin(event) {
-        event.preventDefault();
+        function handleLogin(event) {
+            event.preventDefault();
 
-        const username = document.getElementById('username').value.trim().toLowerCase();
-        const password = document.getElementById('password').value;
-        const rememberMe = document.getElementById('remember-me').checked;
-        const loginBtn = document.getElementById('login-btn');
-        const loginText = document.getElementById('login-text');
-        const loginSpinner = document.getElementById('login-spinner');
-        const loginAlert = document.getElementById('login-alert');
+            const username = document.getElementById('username').value.trim().toLowerCase();
+            const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('remember-me').checked;
+            const loginBtn = document.getElementById('login-btn');
+            const loginText = document.getElementById('login-text');
+            const loginSpinner = document.getElementById('login-spinner');
+            const loginAlert = document.getElementById('login-alert');
 
-        // Show loading state
-        loginBtn.disabled = true;
-        loginText.textContent = 'Logging in...';
-        loginSpinner.classList.remove('d-none');
-        loginAlert.classList.add('d-none');
+            // Show loading state
+            loginBtn.disabled = true;
+            loginText.textContent = 'Logging in...';
+            loginSpinner.classList.remove('d-none');
+            loginAlert.classList.add('d-none');
 
-        // Hardcoded accounts
-        const hardcodedAccounts = {
-            "admin": "admin123",
-            "user1": "password1",
-            "user2": "password2"
-        };
+            // Hardcoded accounts
+            const hardcodedAccounts = {
+                "admin": "admin123",
+                "user1": "password1",
+                "user2": "password2"
+            };
 
-        // Fake delay to feel realistic
-        setTimeout(() => {
-            if (hardcodedAccounts.hasOwnProperty(username) && hardcodedAccounts[username] === password) {
-                // Fake success
-                localStorage.setItem('auth_token', 'fake-token-' + username);
-                localStorage.setItem('current_user', username);
+            // Fake delay to feel realistic
+            setTimeout(() => {
+                if (hardcodedAccounts.hasOwnProperty(username) && hardcodedAccounts[username] === password) {
+                    // Fake success
+                    localStorage.setItem('auth_token', 'fake-token-' + username);
+                    localStorage.setItem('current_user', username);
 
-                if (rememberMe) {
-                    localStorage.setItem('remember_me', 'true');
-                    localStorage.setItem('remembered_username', username);
+                    if (rememberMe) {
+                        localStorage.setItem('remember_me', 'true');
+                        localStorage.setItem('remembered_username', username);
+                    } else {
+                        localStorage.removeItem('remember_me');
+                        localStorage.removeItem('remembered_username');
+                    }
+
+                    loginAlert.classList.remove('d-none', 'alert-danger');
+                    loginAlert.classList.add('alert-success');
+                    loginAlert.textContent = 'Login successful! Redirecting...';
+
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
                 } else {
-                    localStorage.removeItem('remember_me');
-                    localStorage.removeItem('remembered_username');
+                    loginAlert.classList.remove('d-none');
+                    loginAlert.classList.add('alert-danger');
+                    loginAlert.textContent = 'Invalid username or password.';
+
+                    loginBtn.disabled = false;
+                    loginText.textContent = 'Login';
+                    loginSpinner.classList.add('d-none');
                 }
-
-                loginAlert.classList.remove('d-none', 'alert-danger');
-                loginAlert.classList.add('alert-success');
-                loginAlert.textContent = 'Login successful! Redirecting...';
-
-                setTimeout(() => {
-                    window.location.href = 'index.html'; // Change if your dashboard has a different name
-                }, 1000);
-            } else {
-                loginAlert.classList.remove('d-none');
-                loginAlert.classList.add('alert-danger');
-                loginAlert.textContent = 'Invalid username or password.';
-
-                loginBtn.disabled = false;
-                loginText.textContent = 'Login';
-                loginSpinner.classList.add('d-none');
-            }
-        }, 800);
+            }, 800);
 }
 
         // Pre-fill username if remember-me was used
