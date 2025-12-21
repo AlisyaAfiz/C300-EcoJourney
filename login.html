@@ -341,16 +341,14 @@
             loginSpinner.classList.remove('d-none');
             loginAlert.classList.add('d-none');
 
-            // Hardcoded accounts
-            const hardcodedAccounts = {
+            const userAccounts = {
                 "admin": "admin123",
                 "user1": "password1",
                 "user2": "password2"
             };
 
-            // Fake delay to feel realistic
             setTimeout(() => {
-                if (hardcodedAccounts.hasOwnProperty(username) && hardcodedAccounts[username] === password) {
+                if (userAccounts.hasOwnProperty(username) && userAccounts[username] === password) {
                     // Fake success
                     localStorage.setItem('auth_token', 'fake-token-' + username);
                     localStorage.setItem('current_user', username);
@@ -380,7 +378,7 @@
                     loginSpinner.classList.add('d-none');
                 }
             }, 800);
-}
+        }
 
         // Pre-fill username if remember-me was used
         window.addEventListener('DOMContentLoaded', function() {
