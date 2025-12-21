@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const MultimediaContent = require('../models/ContentApprovalWorkflow');
-const ContentApprovalWorkflow = require('../models/ApprovalWorkflow');
+const MultimediaContent = require('../models/ContentApproval');
+const ContentApprovalWorkflow = require('../models/Approval');
 const { authMiddleware, contentManagerOnly } = require('../middleware/auth');
 const { body, validationResult } = require('express-validator');
 const {
