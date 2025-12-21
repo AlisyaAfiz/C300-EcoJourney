@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const approvalsMenu = document.getElementById('approvals-menu');
     if (approvalsMenu) {
         if (userRole === 'manager') {
-            approvalsMenu.style.display = 'block';  // or '' to use default
+            approvalsMenu.style.display = 'block';
         } else {
             approvalsMenu.style.display = 'none';
         }
