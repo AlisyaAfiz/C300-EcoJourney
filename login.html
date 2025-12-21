@@ -325,83 +325,66 @@
             }
         }
 
-        async function handleLogin(event) {
-            event.preventDefault();
-            
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const rememberMe = document.getElementById('remember-me').checked;
-            const loginBtn = document.getElementById('login-btn');
-            const loginText = document.getElementById('login-text');
-            const loginSpinner = document.getElementById('login-spinner');
-            const loginAlert = document.getElementById('login-alert');
-            
-            // Show loading state
-            loginBtn.disabled = true;
-            loginText.textContent = 'Logging in...';
-            loginSpinner.classList.remove('d-none');
-            loginAlert.classList.add('d-none');
-            
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/auth/login/`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        username: username,
-                        password: password
-                    })
-                });
+        function handleLogin(event) {
+    event.preventDefault();
 
-                const data = await response.json();
+    const username = document.getElementById('username').value.trim().toLowerCase();
+    const password = document.getElementById('password').value;
+    const rememberMe = document.getElementById('remember-me').checked;
+    const loginBtn = document.getElementById('login-btn');
+    const loginText = document.getElementById('login-text');
+    const loginSpinner = document.getElementById('login-spinner');
+    const loginAlert = document.getElementById('login-alert');
 
-                if (response.ok && data.token) {
-                    // Store token
-                    localStorage.setItem(STORAGE_KEY, data.token);
-                    
-                    // Store remember-me preference
-                    if (rememberMe) {
-                        localStorage.setItem('remember_me', 'true');
-                        localStorage.setItem('remembered_username', username);
-                    }
-                    
-                    // Show success
-                    loginAlert.classList.remove('d-none');
-                    loginAlert.classList.remove('alert-danger');
-                    loginAlert.classList.add('alert-success');
-                    loginAlert.textContent = 'Login successful! Redirecting...';
-                    
-                    // Redirect after 1 second
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 1000);
-                } else {
-                    // Show error
-                    loginAlert.classList.remove('d-none');
-                    loginAlert.classList.add('alert-danger');
-                    loginAlert.textContent = data.error || data.detail || 'Login failed. Please check your credentials.';
-                    
-                    // Reset button
-                    loginBtn.disabled = false;
-                    loginText.textContent = 'Login';
-                    loginSpinner.classList.add('d-none');
-                }
-            } catch (error) {
-                console.error('Login error:', error);
+    // Show loading state
+    loginBtn.disabled = true;
+    loginText.textContent = 'Logging in...';
+    loginSpinner.classList.remove('d-none');
+    loginAlert.classList.add('d-none');
 
-                loginAlert.classList.remove('d-none');
-                loginAlert.classList.add('alert-danger');
+    const userAccounts = {
+        "admin": "admin123",
+        "user1": "password1",
+        "user2": "password2"
+    };
 
-                loginAlert.textContent =
-                    'Unable to connect to the server. Please try again later.';
+    // Simulate small delay for realism
+    setTimeout(() => {
+        if (userAccounts.hasOwnProperty(username) && userAccounts[username] === password) {
+            // Success: Store fake token and user info
+            localStorage.setItem('auth_token', 'jwt-token-for-' + username);
+            localStorage.setItem('current_user', username);
 
-                // Reset button
-                loginBtn.disabled = false;
-                loginText.textContent = 'Login';
-                loginSpinner.classList.add('d-none');
+            if (rememberMe) {
+                localStorage.setItem('remember_me', 'true');
+                localStorage.setItem('remembered_username', username);
+            } else {
+                localStorage.removeItem('remember_me');
+                localStorage.removeItem('remembered_username');
             }
+
+            // Show success message
+            loginAlert.classList.remove('d-none', 'alert-danger');
+            loginAlert.classList.add('alert-success');
+            loginAlert.textContent = 'Login successful! Redirecting...';
+
+            // Redirect to dashboard
+            setTimeout(() => {
+                window.location.href = 'index.html'; // or 'dashboard.html'
+            }, 1000);
+        } else {
+            // Failure
+            loginAlert.classList.remove('d-none');
+            loginAlert.classList.add('alert-danger');
+            loginAlert.textContent = 'Invalid username or password.';
+
+            // Reset button
+            loginBtn.disabled = false;
+            loginText.textContent = 'Login';
+            loginSpinner.classList.add('d-none');
         }
+    }, 800);
+}
 
         // Pre-fill username if remember-me was used
         window.addEventListener('DOMContentLoaded', function() {
