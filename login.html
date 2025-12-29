@@ -302,16 +302,12 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // const API_BASE_URL = window.location.hostname === 'localhost'
-        //     ? 'http://localhost:8000/api'  
-        //     : 'https://YOUR-BACKEND-URL.onrender.com/api';  
-
         const STORAGE_KEY = 'auth_token';
 
         function togglePassword() {
             const passwordInput = document.getElementById('password');
             const toggleBtn = document.getElementById('toggle-password');
-            
+
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
                 toggleBtn.innerHTML = '<i class="fas fa-eye-slash"></i>';
@@ -320,106 +316,61 @@
                 toggleBtn.innerHTML = '<i class="fas fa-eye"></i>';
             }
         }
+
         function handleLogin(event) {
             event.preventDefault();
 
             const username = document.getElementById('username').value.trim().toLowerCase();
             const password = document.getElementById('password').value;
             const rememberMe = document.getElementById('remember-me').checked;
-            const loginBtn = document.getElementById('login-btn');
-            const loginText = document.getElementById('login-text');
-            const loginSpinner = document.getElementById('login-spinner');
             const loginAlert = document.getElementById('login-alert');
 
-            // Show loading state
-            loginBtn.disabled = true;
-            loginText.textContent = 'Logging in...';
-            loginSpinner.classList.remove('d-none');
-            loginAlert.classList.add('d-none');
-
             const userAccounts = {
-                "admin": "admin123",
-                "producer": "password1",
-                "manager": "password2"
+                admin: 'admin123',
+                manager: 'password2',
+                producer: 'password1'
             };
 
-            const ROLE_PERMISSIONS = {
-                admin: ['dashboard', 'content', 'approvals', 'admin', 'profile'],
-                manager: ['dashboard', 'content', 'approvals', 'profile'],
-                producer: ['dashboard', 'content', 'profile']
-            };
+            if (userAccounts.hasOwnProperty(username) && userAccounts[username] === password) {
 
-            function applyRolePermissions() {
-                const role = localStorage.getItem('user_role');
+                let userRole = 'producer';
+                if (username === 'admin') userRole = 'admin';
+                else if (username === 'manager') userRole = 'manager';
 
-                if (!role || !ROLE_PERMISSIONS[role]) {
-                    window.location.href = 'login.html';
-                    return;
-                }
+                localStorage.setItem('current_user', username);
+                localStorage.setItem('user_role', userRole);
 
-                document.querySelectorAll('.sidebar .nav-link').forEach(link => {
-                    const tabName = link.id.replace('nav-', '');
-
-                    if (!ROLE_PERMISSIONS[role].includes(tabName)) {
-                        link.style.display = 'none';
-                    }
-                });
-            }
-
-            window.addEventListener('DOMContentLoaded', applyRolePermissions);
-
-
-            setTimeout(() => {
-                if (userAccounts.hasOwnProperty(username) && userAccounts[username] === password) {
-                    
-                    localStorage.setItem('current_user', username);
-
-
-                    if (rememberMe) {
-                        localStorage.setItem('remember_me', 'true');
-                        localStorage.setItem('remembered_username', username);
-                    } else {
-                        localStorage.removeItem('remember_me');
-                        localStorage.removeItem('remembered_username');
-                    }
-
-                    loginAlert.classList.remove('d-none', 'alert-danger');
-                    loginAlert.classList.add('alert-success');
-                    loginAlert.textContent = 'Login successful! Redirecting...';
-
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 1000);
+                if (rememberMe) {
+                    localStorage.setItem('remember_me', 'true');
+                    localStorage.setItem('remembered_username', username);
                 } else {
-                    loginAlert.classList.remove('d-none');
-                    loginAlert.classList.add('alert-danger');
-                    loginAlert.textContent = 'Invalid username or password.';
-
-                    loginBtn.disabled = false;
-                    loginText.textContent = 'Login';
-                    loginSpinner.classList.add('d-none');
+                    localStorage.removeItem('remember_me');
+                    localStorage.removeItem('remembered_username');
                 }
-            }, 800);
+
+                loginAlert.classList.remove('d-none', 'alert-danger');
+                loginAlert.classList.add('alert-success');
+                loginAlert.textContent = 'Login successful! Redirecting...';
+
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+
+            } else {
+                loginAlert.classList.remove('d-none');
+                loginAlert.classList.add('alert-danger');
+                loginAlert.textContent = 'Invalid username or password.';
+            }
         }
 
-        // Pre-fill username if remember-me was used
-        window.addEventListener('DOMContentLoaded', function() {
+        window.addEventListener('DOMContentLoaded', () => {
             if (localStorage.getItem('remember_me') === 'true') {
-                const username = localStorage.getItem('remembered_username');
-                if (username) {
-                    document.getElementById('username').value = username;
+                const savedUsername = localStorage.getItem('remembered_username');
+                if (savedUsername) {
+                    document.getElementById('username').value = savedUsername;
                     document.getElementById('remember-me').checked = true;
                 }
             }
-        });
-
-        // Clear error messages on input
-        document.getElementById('username').addEventListener('input', function() {
-            document.getElementById('username-error').classList.add('d-none');
-        });
-
-        document.getElementById('password').addEventListener('input', function() {
-            document.getElementById('password-error').classList.add('d-none');
         });
     </script>
 </body>

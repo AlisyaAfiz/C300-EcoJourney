@@ -819,6 +819,12 @@
     <script>
         const STORAGE_KEY = 'auth_token';
 
+        const ROLE_PERMISSIONS = {
+            admin: ['dashboard', 'content', 'approvals', 'admin', 'profile'],
+            manager: ['dashboard', 'content', 'approvals', 'profile'],
+            producer: ['dashboard', 'content', 'profile']
+        };
+
         function switchTab(tabName) {
             const role = localStorage.getItem('user_role');
 
@@ -833,16 +839,6 @@
 
             document.getElementById(tabName).style.display = 'block';
 
-            const titles = {
-                dashboard: 'Dashboard',
-                content: 'My Content',
-                approvals: 'Content Approvals',
-                admin: 'Administration',
-                profile: 'My Profile'
-            };
-
-            document.getElementById('page-title').textContent = titles[tabName];
-
             document.querySelectorAll('.sidebar .nav-link').forEach(link => {
                 link.classList.remove('active');
             });
@@ -850,14 +846,34 @@
             document.getElementById('nav-' + tabName).classList.add('active');
         }
 
+        function applyRolePermissions() {
+            const role = localStorage.getItem('user_role');
+
+            if (!role || !ROLE_PERMISSIONS[role]) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                const tabName = link.id.replace('nav-', '');
+
+                if (!ROLE_PERMISSIONS[role].includes(tabName)) {
+                    link.style.display = 'none';
+                }
+            });
+
+            switchTab(ROLE_PERMISSIONS[role][0]);
+        }
+
         function switchAdminTab(tabName) {
             const adminTabs = document.querySelectorAll('[id^="admin-"]');
             adminTabs.forEach(tab => tab.style.display = 'none');
             document.getElementById('admin-' + tabName).style.display = 'block';
-            
+
             document.querySelectorAll('.nav-tabs .nav-link').forEach(link => {
                 link.classList.remove('active');
             });
+
             event.target.closest('.nav-link').classList.add('active');
         }
 
@@ -868,10 +884,14 @@
 
         function logout() {
             localStorage.removeItem(STORAGE_KEY);
+            localStorage.removeItem('user_role');
+            localStorage.removeItem('current_user');
             localStorage.removeItem('remember_me');
             localStorage.removeItem('remembered_username');
             window.location.href = 'login.html';
         }
+
+        window.addEventListener('DOMContentLoaded', applyRolePermissions);
     </script>
 </body>
 </html>
