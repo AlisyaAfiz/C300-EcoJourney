@@ -25,6 +25,8 @@
 
         /* Sidebar */
         .sidebar {
+            display: flex;
+            flex-direction: column;
             width: 250px;
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: white;
@@ -56,6 +58,8 @@
 
         .sidebar .nav {
             margin-top: 20px;
+            flex-grow: 1;
+            overflow-y: auto;
         }
 
         .sidebar .nav-link {
@@ -79,7 +83,7 @@
         }
 
         .sidebar-footer {
-            margin-top: 30px;
+            margin-top: auto;
             border-top: 2px solid rgba(255, 255, 255, 0.2);
             padding-top: 20px;
         }
