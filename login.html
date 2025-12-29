@@ -343,17 +343,35 @@
                 "manager": "password2"
             };
 
+            const ROLE_PERMISSIONS = {
+                admin: ['dashboard', 'content', 'approvals', 'admin', 'profile'],
+                manager: ['dashboard', 'content', 'approvals', 'profile'],
+                producer: ['dashboard', 'content', 'profile']
+            };
+
+            function applyRolePermissions() {
+                const role = localStorage.getItem('user_role');
+
+                if (!role || !ROLE_PERMISSIONS[role]) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                    const tabName = link.id.replace('nav-', '');
+
+                    if (!ROLE_PERMISSIONS[role].includes(tabName)) {
+                        link.style.display = 'none';
+                    }
+                });
+            }
+
+            window.addEventListener('DOMContentLoaded', applyRolePermissions);
+
+
             setTimeout(() => {
                 if (userAccounts.hasOwnProperty(username) && userAccounts[username] === password) {
                     
-                    let userRole = 'producer';
-                    if (username.toLowerCase() === 'admin') {
-                        userRole = 'admin';
-                    } else if (username.toLowerCase() === 'manager') {
-                        userRole = 'manager';
-                    }
-
-                    localStorage.setItem('user_role', userRole);
                     localStorage.setItem('current_user', username);
 
 

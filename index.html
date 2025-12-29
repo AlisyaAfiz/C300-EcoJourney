@@ -382,32 +382,32 @@
             
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link active" onclick="switchTab('dashboard')">
+                    <a id="nav-dashboard" class="nav-link active" onclick="switchTab('dashboard')">
                         <i class="fas fa-chart-line"></i> Dashboard
                     </a>
                 </li>
                 
                 <li class="nav-item">
-                    <a class="nav-link" onclick="switchTab('content')">
+                    <a id="nav-content" class="nav-link" onclick="switchTab('content')">
                         <i class="fas fa-file-upload"></i> My Content
                     </a>
                 </li>
                 
                 <li class="nav-item">
-                    <a class="nav-link" onclick="switchTab('approvals')">
+                    <a id="nav-approvals" class="nav-link" onclick="switchTab('approvals')">
                         <i class="fas fa-check-circle"></i> Approvals
                         <span class="badge bg-warning text-dark ms-2">3</span>
                     </a>
                 </li>
                 
                 <li class="nav-item">
-                    <a class="nav-link" onclick="switchTab('admin')">
+                    <a id="nav-admin" class="nav-link" onclick="switchTab('admin')">
                         <i class="fas fa-cog"></i> Administration
                     </a>
                 </li>
                 
                 <li class="nav-item">
-                    <a class="nav-link" onclick="switchTab('profile')">
+                    <a id="nav-profile" class="nav-link" onclick="switchTab('profile')">
                         <i class="fas fa-user"></i> Profile
                     </a>
                 </li>
@@ -432,7 +432,7 @@
                     <div class="user-info">
                         <div class="user-avatar">A</div>
                         <div class="user-details">
-                            <h6>Alisya Afiz</h6>
+                            <h6>Tom Smith</h6>
                             <small>Administrator</small>
                         </div>
                     </div>
@@ -820,10 +820,19 @@
         const STORAGE_KEY = 'auth_token';
 
         function switchTab(tabName) {
-            const tabs = document.querySelectorAll('.tab-content-area');
-            tabs.forEach(tab => tab.style.display = 'none');
+            const role = localStorage.getItem('user_role');
+
+            if (!ROLE_PERMISSIONS[role]?.includes(tabName)) {
+                alert('Access denied');
+                return;
+            }
+
+            document.querySelectorAll('.tab-content-area').forEach(tab => {
+                tab.style.display = 'none';
+            });
+
             document.getElementById(tabName).style.display = 'block';
-            
+
             const titles = {
                 dashboard: 'Dashboard',
                 content: 'My Content',
@@ -831,12 +840,14 @@
                 admin: 'Administration',
                 profile: 'My Profile'
             };
+
             document.getElementById('page-title').textContent = titles[tabName];
-            
+
             document.querySelectorAll('.sidebar .nav-link').forEach(link => {
                 link.classList.remove('active');
             });
-            event.target.closest('.nav-link').classList.add('active');
+
+            document.getElementById('nav-' + tabName).classList.add('active');
         }
 
         function switchAdminTab(tabName) {
