@@ -433,7 +433,7 @@
                         <div class="user-avatar">A</div>
                         <div class="user-details">
                             <h6>Tom Smith</h6>
-                            <small id="profile-role">Administrator</small>
+                            <small class="profile-role">Administrator</small>
                         </div>
                     </div>
                 </div>
@@ -763,7 +763,7 @@
                                         A
                                     </div>
                                     <h5>Tom Smith</h5>
-                                    <p style="color: #2ecc71; font-weight: 600; margin-bottom: 15px;" id="profile-role">Administrator</p>
+                                    <p style="color: #2ecc71; font-weight: 600; margin-bottom: 15px;" class="profile-role">Administrator</p>
                                     <hr>
                                     <p><strong>Email:</strong><br>tom@ecojourney.com</p>
                                 </div>
@@ -836,7 +836,11 @@
             };
 
             const roleText = roleDisplayNames[role] || '';
-            document.getElementById('profile-role').textContent = roleText;
+
+            const roleElements = document.getElementsByClassName('profile-role');
+            for (let i = 0; i < roleElements.length; i++) {
+                roleElements[i].textContent = roleText;
+            }
         }
 
         const ROLE_PERMISSIONS = {
