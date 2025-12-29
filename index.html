@@ -394,38 +394,24 @@
                 <p>Content Management System</p>
             </div>
             
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a id="nav-dashboard" class="nav-link active" onclick="switchTab('dashboard')">
-                        <i class="fas fa-chart-line"></i> Dashboard
-                    </a>
-                </li>
-                
-                <li class="nav-item">
-                    <a id="nav-content" class="nav-link" onclick="switchTab('content')">
-                        <i class="fas fa-file-upload"></i> My Content
-                    </a>
-                </li>
-                
-                <li class="nav-item">
-                    <a id="nav-approvals" class="nav-link" onclick="switchTab('approvals')">
-                        <i class="fas fa-check-circle"></i> Approvals
-                        <span class="badge bg-warning text-dark ms-2">3</span>
-                    </a>
-                </li>
-                
-                <li class="nav-item">
-                    <a id="nav-admin" class="nav-link" onclick="switchTab('admin')">
-                        <i class="fas fa-cog"></i> Administration
-                    </a>
-                </li>
-                
-                <li class="nav-item">
-                    <a id="nav-profile" class="nav-link" onclick="switchTab('profile')">
-                        <i class="fas fa-user"></i> Profile
-                    </a>
-                </li>
-            </ul>
+            <div class="nav">
+                <a id="nav-dashboard" class="nav-link active" onclick="switchTab('dashboard')">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </a>
+                <a id="nav-content" class="nav-link" onclick="switchTab('content')">
+                    <i class="fas fa-file-upload"></i> My Content
+                </a>
+                <a id="nav-approvals" class="nav-link" onclick="switchTab('approvals')">
+                    <i class="fas fa-check-circle"></i> Approvals
+                    <span class="badge bg-warning text-dark ms-2">3</span>
+                </a>
+                <a id="nav-admin" class="nav-link" onclick="switchTab('admin')">
+                    <i class="fas fa-cog"></i> Administration
+                </a>
+                <a id="nav-profile" class="nav-link" onclick="switchTab('profile')">
+                    <i class="fas fa-user"></i> Profile
+                </a>
+            </div>
             
             <div class="sidebar-footer">
                 <a class="nav-link" onclick="handleLogout(event)">
