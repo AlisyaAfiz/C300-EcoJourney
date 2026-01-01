@@ -1959,23 +1959,34 @@
             // Fetch content with media data from backend
             try {
                 const response = await fetch(`${API_URL}/api/content/${contentData.id}`);
+                console.log('Fetch response status:', response.status);
                 
                 if (response.ok) {
                     const storedContent = await response.json();
+                    console.log('Stored content keys:', Object.keys(storedContent));
+                    console.log('Has mediaData:', !!storedContent.mediaData);
+                    console.log('MediaFileType:', storedContent.mediaFileType);
                     
                     if (storedContent && storedContent.mediaData) {
                         const mediaType = storedContent.mediaFileType || '';
+                        console.log('MediaData starts with:', storedContent.mediaData.substring(0, 50));
                         
                         if (mediaType.startsWith('image/')) {
                             imagePreview.src = storedContent.mediaData;
                             imagePreview.style.display = 'block';
                             mediaPreview.style.display = 'block';
+                            console.log('Showing image preview');
                         } else if (mediaType.startsWith('video/')) {
                             videoPreview.src = storedContent.mediaData;
                             videoPreview.style.display = 'block';
                             mediaPreview.style.display = 'block';
+                            console.log('Showing video preview');
                         }
+                    } else {
+                        console.log('No mediaData found in response');
                     }
+                } else {
+                    console.error('Response not OK:', await response.text());
                 }
             } catch (error) {
                 console.error('Failed to load media:', error);
@@ -2001,15 +2012,23 @@
 
             // Get the content from backend
             try {
+                console.log('Downloading content ID:', currentViewingContentId);
                 const response = await fetch(`${API_URL}/api/content/${currentViewingContentId}`);
+                console.log('Download fetch response status:', response.status);
                 
                 if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Response error:', errorText);
                     throw new Error('Failed to fetch content');
                 }
                 
                 const content = await response.json();
+                console.log('Content keys:', Object.keys(content));
+                console.log('Has fileData:', !!content.fileData);
+                console.log('FileName:', content.fileName);
                 
                 if (content && content.fileData) {
+                    console.log('FileData starts with:', content.fileData.substring(0, 50));
                     // Create a temporary link element
                     const link = document.createElement('a');
                     link.href = content.fileData;
@@ -2047,8 +2066,11 @@
                 document.getElementById('preview-type').textContent = type;
 
                 // Get media from backend
+                console.log('Preview - Fetching content ID:', currentViewingContentId);
                 const response = await fetch(`${API_URL}/api/content/${currentViewingContentId}`);
+                console.log('Preview - Response status:', response.status);
                 const storedContent = response.ok ? await response.json() : null;
+                console.log('Preview - Has mediaData:', storedContent ? !!storedContent.mediaData : false);
 
                 const previewImage = document.getElementById('preview-image');
                 const previewVideo = document.getElementById('preview-video');
@@ -2061,18 +2083,23 @@
 
                 if (storedContent && storedContent.mediaData) {
                     const mediaType = storedContent.mediaFileType || '';
+                    console.log('Preview - MediaType:', mediaType);
 
                     if (mediaType.startsWith('image/')) {
                         previewImage.src = storedContent.mediaData;
                         previewImage.style.display = 'block';
+                        console.log('Preview - Showing image');
                     } else if (mediaType.startsWith('video/')) {
                         previewVideo.src = storedContent.mediaData;
                         previewVideo.style.display = 'block';
+                        console.log('Preview - Showing video');
                     } else {
                         previewNoMedia.style.display = 'block';
+                        console.log('Preview - Unknown media type');
                     }
                 } else {
                     previewNoMedia.style.display = 'block';
+                    console.log('Preview - No media data available');
                 }
 
                 // Show preview overlay
