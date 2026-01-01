@@ -9,6 +9,7 @@ const {
   sendContentApprovedEmail,
   sendContentRejectedEmail,
 } = require('../utils/emailService');
+const { uploadDocument, uploadMedia } = require('../config/cloudinary');
 
 // Get all content (no authentication required for public access)
 router.get('/all', async (req, res) => {
@@ -23,44 +24,48 @@ router.get('/all', async (req, res) => {
   }
 });
 
-// Upload new content (no authentication required for now)
-router.post('/upload', async (req, res) => {
+// Upload new content with Cloudinary (supports both media and document files)
+router.post('/upload', uploadMedia.fields([
+  { name: 'mediaFile', maxCount: 1 },
+  { name: 'documentFile', maxCount: 1 }
+]), async (req, res) => {
   try {
     const { 
       title, 
       description, 
       category, 
-      fileSize, 
-      date, 
-      type,
-      fileName, 
-      fileType, 
-      fileData,
-      mediaFileName,
-      mediaFileType,
-      mediaData
+      type
     } = req.body;
 
     if (!title || !category) {
       return res.status(400).json({ message: 'Title and category are required' });
     }
 
-    // Create content with all fields
+    // Get file URLs from Cloudinary
+    const mediaFile = req.files?.mediaFile?.[0];
+    const documentFile = req.files?.documentFile?.[0];
+
+    console.log('Media file:', mediaFile);
+    console.log('Document file:', documentFile);
+
+    // Create content with Cloudinary URLs
     const contentData = {
       title,
       description: description || '',
       contentType: type === 'PDF' ? 'document' : 'document',
       category: category,
-      file: fileName || 'uploaded-file',
+      file: documentFile?.path || mediaFile?.path || 'no-file',
       status: 'pending',
-      creator: 'system', // Use a system user ID
-      fileData: fileData,
-      mediaData: mediaData,
-      fileSize: fileSize,
-      date: date,
-      type: type,
-      mediaFileName: mediaFileName,
-      mediaFileType: mediaFileType,
+      creator: 'system',
+      fileData: documentFile?.path, // Cloudinary URL for document
+      mediaData: mediaFile?.path, // Cloudinary URL for media
+      fileSize: documentFile?.size || mediaFile?.size || 0,
+      date: new Date().toISOString(),
+      type: type || 'Document',
+      fileName: documentFile?.originalname,
+      fileType: documentFile?.mimetype,
+      mediaFileName: mediaFile?.originalname,
+      mediaFileType: mediaFile?.mimetype,
     };
 
     const content = new MultimediaContent(contentData);

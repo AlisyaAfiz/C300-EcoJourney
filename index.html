@@ -2481,22 +2481,6 @@
                         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
                         submitBtn.disabled = true;
                         
-                        // Read and store the media file
-                        const mediaData = await new Promise((resolve, reject) => {
-                            const reader = new FileReader();
-                            reader.onload = (e) => resolve(e.target.result);
-                            reader.onerror = () => reject(new Error('Failed to read media file'));
-                            reader.readAsDataURL(mediaFile);
-                        });
-                        
-                        // Read and store the document file
-                        const docData = await new Promise((resolve, reject) => {
-                            const reader = new FileReader();
-                            reader.onload = (e) => resolve(e.target.result);
-                            reader.onerror = () => reject(new Error('Failed to read document file'));
-                            reader.readAsDataURL(docFile);
-                        });
-                        
                         // Get file sizes
                         const docSize = docFile.size < 1024*1024 ? 
                             (docFile.size / 1024).toFixed(1) + ' KB' : 
@@ -2517,31 +2501,19 @@
                             docType = 'Document';
                         }
                         
-                        // Create content object
-                        const contentData = {
-                            title: title,
-                            fileSize: docSize,
-                            date: today,
-                            category: category,
-                            description: description,
-                            type: docType,
-                            // Document file info
-                            fileName: docFile.name,
-                            fileType: docFile.type,
-                            fileData: docData,
-                            // Media file info
-                            mediaFileName: mediaFile.name,
-                            mediaFileType: mediaFile.type,
-                            mediaData: mediaData
-                        };
+                        // Create FormData to send files to Cloudinary
+                        const formData = new FormData();
+                        formData.append('title', title);
+                        formData.append('description', description);
+                        formData.append('category', category);
+                        formData.append('type', docType);
+                        formData.append('mediaFile', mediaFile); // Actual file object
+                        formData.append('documentFile', docFile); // Actual file object
                         
-                        // Send to backend API
+                        // Send to backend API with FormData (no Content-Type header needed)
                         const response = await fetch(`${API_URL}/api/content/upload`, {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify(contentData)
+                            body: formData // Send FormData directly
                         });
                         
                         if (!response.ok) {
