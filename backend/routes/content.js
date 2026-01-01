@@ -18,6 +18,7 @@ router.get('/all', async (req, res) => {
 
     res.json(content);
   } catch (error) {
+    console.error('Error fetching all content:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
