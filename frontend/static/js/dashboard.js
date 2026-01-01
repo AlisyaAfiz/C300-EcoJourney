@@ -1,7 +1,5 @@
 // Dashboard JavaScript
 
-const STORAGE_KEY = 'auth_token';
-
 // User Data
 let currentUser = null;
 let userRole = null;
