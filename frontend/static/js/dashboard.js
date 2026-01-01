@@ -1,5 +1,7 @@
 // Dashboard JavaScript
-// Note: API_BASE_URL and STORAGE_KEY are defined in index.html inline script
+
+const API_BASE_URL = '/api';
+const STORAGE_KEY = 'auth_token';
 
 // User Data
 let currentUser = null;
