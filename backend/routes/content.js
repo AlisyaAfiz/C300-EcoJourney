@@ -26,6 +26,9 @@ router.get('/all', async (req, res) => {
 
 // Upload new content with Cloudinary (supports both media and document files)
 router.post('/upload', (req, res, next) => {
+  console.log('📤 Upload endpoint hit!');
+  console.log('Request body fields:', Object.keys(req.body));
+  
   // Wrap multer middleware with error handling
   uploadCombined.fields([
     { name: 'mediaFile', maxCount: 1 },
@@ -33,15 +36,22 @@ router.post('/upload', (req, res, next) => {
   ])(req, res, (err) => {
     if (err) {
       console.error('❌ Multer/Cloudinary error:', err);
+      console.error('Error name:', err.name);
+      console.error('Error message:', err.message);
+      console.error('Error stack:', err.stack);
       return res.status(500).json({ 
         message: 'File upload failed', 
         error: err.message,
+        errorName: err.name,
         details: 'Check if Cloudinary credentials are correct or if file type is allowed'
       });
     }
+    console.log('✅ Multer processing completed, moving to handler...');
     next();
   });
 }, async (req, res) => {
+  console.log('🔄 Inside main upload handler');
+  
   try {
     const { 
       title, 
@@ -50,7 +60,14 @@ router.post('/upload', (req, res, next) => {
       type
     } = req.body;
 
+    console.log('📋 Form data received:');
+    console.log('  - Title:', title);
+    console.log('  - Description:', description?.substring(0, 50));
+    console.log('  - Category:', category);
+    console.log('  - Type:', type);
+
     if (!title || !category) {
+      console.error('❌ Missing required fields');
       return res.status(400).json({ message: 'Title and category are required' });
     }
 
@@ -60,14 +77,24 @@ router.post('/upload', (req, res, next) => {
 
     // Log what we received
     console.log('=== Upload Request ===');
-    console.log('Title:', title);
+    console.log('Files object exists:', !!req.files);
     console.log('Files received:', req.files ? Object.keys(req.files) : 'NO FILES');
-    console.log('Media file:', mediaFile ? 'YES - ' + mediaFile.path : 'NO');
-    console.log('Document file:', documentFile ? 'YES - ' + documentFile.path : 'NO');
+    console.log('Media file:', mediaFile ? {
+      filename: mediaFile.originalname,
+      size: mediaFile.size,
+      mimetype: mediaFile.mimetype,
+      path: mediaFile.path
+    } : 'NO MEDIA FILE');
+    console.log('Document file:', documentFile ? {
+      filename: documentFile.originalname,
+      size: documentFile.size,
+      mimetype: documentFile.mimetype,
+      path: documentFile.path
+    } : 'NO DOCUMENT FILE');
 
     // ✅ Check if at least one file was uploaded
     if (!mediaFile && !documentFile) {
-      console.error('No files received from frontend!');
+      console.error('❌ No files received from frontend!');
       return res.status(400).json({ 
         message: 'No files uploaded. Please upload at least one file.',
         receivedFields: req.files ? Object.keys(req.files) : []
@@ -80,13 +107,15 @@ router.post('/upload', (req, res, next) => {
 
     if (mediaFile && mediaFile.path) {
       mediaCloudURL = mediaFile.path;
-      console.log('✅ Media uploaded to:', mediaCloudURL);
+      console.log('✅ Media uploaded to Cloudinary:', mediaCloudURL);
     }
 
     if (documentFile && documentFile.path) {
       documentCloudURL = documentFile.path;
-      console.log('✅ Document uploaded to:', documentCloudURL);
+      console.log('✅ Document uploaded to Cloudinary:', documentCloudURL);
     }
+
+    console.log('💾 Preparing to save to MongoDB...');
 
     // ✅ Save Cloudinary URLs to MongoDB (NOT base64 strings)
     const contentData = {
@@ -108,21 +137,30 @@ router.post('/upload', (req, res, next) => {
       mediaFileType: mediaFile?.mimetype,
     };
 
+    console.log('📝 Content data prepared:', {
+      title: contentData.title,
+      hasMediaURL: !!contentData.mediaData,
+      hasFileURL: !!contentData.fileData
+    });
+
     const content = new MultimediaContent(contentData);
     await content.save();
 
-    console.log('✅ Content saved to MongoDB with ID:', content._id);
+    console.log('✅✅✅ Content saved to MongoDB successfully! ID:', content._id);
 
     res.status(201).json({
       message: 'Content uploaded successfully',
       content,
     });
   } catch (error) {
-    console.error('❌ Upload error:', error);
+    console.error('❌❌❌ Upload error in main handler:', error);
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
     console.error('Error stack:', error.stack);
     res.status(500).json({ 
       message: 'Server error', 
       error: error.message,
+      errorName: error.name,
       details: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
