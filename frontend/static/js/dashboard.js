@@ -1,5 +1,8 @@
 // Dashboard JavaScript
 
+const API_BASE_URL = '/api';
+const STORAGE_KEY = 'auth_token';
+
 // User Data
 let currentUser = null;
 let userRole = null;
