@@ -151,6 +151,14 @@ router.get('/:id', async (req, res) => {
     }
 
     await content.incrementViewCount();
+    
+    // Log to verify data is present
+    console.log('Content ID:', content._id);
+    console.log('Has mediaData:', !!content.mediaData);
+    console.log('Has fileData:', !!content.fileData);
+    console.log('MediaData length:', content.mediaData ? content.mediaData.length : 0);
+    console.log('FileData length:', content.fileData ? content.fileData.length : 0);
+    
     res.json(content);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
