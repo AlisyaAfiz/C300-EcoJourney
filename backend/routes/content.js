@@ -169,13 +169,13 @@ router.get('/', async (req, res) => {
       ];
     }
 
+    // Don't populate - creator and category are stored as plain strings, not references
     const content = await MultimediaContent.find(query)
-      .populate('creator', 'username email')
-      .populate('category', 'name colorCode')
       .sort({ createdAt: -1 });
 
     res.json(content);
   } catch (error) {
+    console.error('Error fetching all content:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
@@ -220,9 +220,8 @@ router.post('/', authMiddleware, [
 // Get content by ID
 router.get('/:id', async (req, res) => {
   try {
-    const content = await MultimediaContent.findById(req.params.id)
-      .populate('creator', 'username email organization')
-      .populate('category', 'name colorCode');
+    // Don't populate - creator and category are stored as plain strings, not references
+    const content = await MultimediaContent.findById(req.params.id);
 
     if (!content) {
       return res.status(404).json({ message: 'Content not found' });
@@ -239,6 +238,7 @@ router.get('/:id', async (req, res) => {
     
     res.json(content);
   } catch (error) {
+    console.error('Error fetching content by ID:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
