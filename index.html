@@ -1752,7 +1752,8 @@
                 });
                 
                 if (!response.ok) {
-                    throw new Error('Failed to fetch contents from server');
+                    console.error('Failed to fetch contents from server');
+                    return; // Silently fail and show default content
                 }
                 
                 const contents = await response.json();
@@ -1789,7 +1790,7 @@
                 });
             } catch (error) {
                 console.error('Failed to load contents:', error);
-                alert('Failed to load content from server. Please check your connection.');
+                // Silently fail and show default content instead of alerting
             }
         }
 
