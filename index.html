@@ -2133,7 +2133,10 @@
             editNewMediaPreview.style.display = 'none';
             
             // Check if content has stored media data from backend
-            const response = await fetch(`${API_URL}/api/content/${currentViewingContentId}`);\n            const storedContent = response.ok ? await response.json() : null;\n            \n            if (storedContent && storedContent.mediaData) {
+            const response = await fetch(`${API_URL}/api/content/${currentViewingContentId}`);
+            const storedContent = response.ok ? await response.json() : null;
+            
+            if (storedContent && storedContent.mediaData) {
                 const mediaFileType = storedContent.mediaFileType || '';
                 
                 if (mediaFileType.startsWith('image/')) {
