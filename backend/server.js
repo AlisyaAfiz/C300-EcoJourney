@@ -6,12 +6,12 @@ require('dotenv').config();
 const app = express();
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+mongoose.connect("mongodb+srv://adminfyp:TLqTN0XXr7OUDvDS@rpecojourney.meawj2c.mongodb.net/?appName=RPEcoJourney?retryWrites=true&w=majority", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
 })
-.then(() => console.log('MongoDB connected successfully'))
-.catch(err => console.error('MongoDB connection error:', err));
+.then(() => console.log("✅ Connected to MongoDB Atlas"))
+.catch((err) => console.log("❌ Error connecting:", err));
 
 // Middleware
 app.use(cors({
