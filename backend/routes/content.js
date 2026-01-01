@@ -10,6 +10,83 @@ const {
   sendContentRejectedEmail,
 } = require('../utils/emailService');
 
+// Get all content (no authentication required for public access)
+router.get('/all', async (req, res) => {
+  try {
+    const content = await MultimediaContent.find()
+      .sort({ createdAt: -1 });
+
+    res.json(content);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Upload new content (no authentication required for now)
+router.post('/upload', async (req, res) => {
+  try {
+    const { 
+      title, 
+      description, 
+      category, 
+      fileSize, 
+      date, 
+      type,
+      fileName, 
+      fileType, 
+      fileData,
+      mediaFileName,
+      mediaFileType,
+      mediaData
+    } = req.body;
+
+    if (!title || !category) {
+      return res.status(400).json({ message: 'Title and category are required' });
+    }
+
+    const content = new MultimediaContent({
+      title,
+      description: description || '',
+      contentType: type === 'PDF' ? 'document' : 'document',
+      category: category,
+      file: fileName || 'uploaded-file',
+      status: 'pending',
+      creator: 'anonymous', // TODO: Replace with actual user ID when auth is implemented
+      // Store additional data as JSON strings in tags field temporarily
+      tags: [
+        `fileSize:${fileSize}`,
+        `date:${date}`,
+        `type:${type}`,
+        `fileName:${fileName}`,
+        `fileType:${fileType}`,
+        `mediaFileName:${mediaFileName}`,
+        `mediaFileType:${mediaFileType}`
+      ],
+      // Store file data - in production, upload to cloud storage instead
+      thumbnail: mediaData, // Store media preview
+    });
+
+    // Store the actual file data (in production, this should be in cloud storage)
+    content.fileData = fileData;
+    content.mediaData = mediaData;
+    content.fileSize = fileSize;
+    content.date = date;
+    content.type = type;
+    content.mediaFileName = mediaFileName;
+    content.mediaFileType = mediaFileType;
+
+    await content.save();
+
+    res.status(201).json({
+      message: 'Content uploaded successfully',
+      content,
+    });
+  } catch (error) {
+    console.error('Upload error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 // Get all content with filtering
 router.get('/', async (req, res) => {
   try {

@@ -63,6 +63,35 @@ const multimediaContentSchema = new mongoose.Schema({
     type: Date,
     default: null,
   },
+  // Additional fields for file storage
+  fileData: {
+    type: String,
+    default: null,
+  },
+  mediaData: {
+    type: String,
+    default: null,
+  },
+  fileSize: {
+    type: String,
+    default: null,
+  },
+  date: {
+    type: String,
+    default: null,
+  },
+  type: {
+    type: String,
+    default: null,
+  },
+  mediaFileName: {
+    type: String,
+    default: null,
+  },
+  mediaFileType: {
+    type: String,
+    default: null,
+  },
 }, { collection: 'multimedia_content' });
 
 // Create indexes
