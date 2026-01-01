@@ -2027,48 +2027,17 @@
         async function downloadCurrentContent() {
             if (!currentViewingContentId) return;
 
-            // Get the content from backend
             try {
                 console.log('Downloading content ID:', currentViewingContentId);
-                const response = await fetch(`${API_URL}/api/content/${currentViewingContentId}`);
-                console.log('Download fetch response status:', response.status);
                 
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('Response error:', errorText);
-                    throw new Error('Failed to fetch content');
-                }
+                // Use backend download proxy route that handles filename correctly
+                const downloadUrl = `${API_URL}/api/download/${currentViewingContentId}`;
+                console.log('Download URL:', downloadUrl);
                 
-                const content = await response.json();
-                console.log('Content keys:', Object.keys(content));
-                console.log('Has fileData:', !!content.fileData);
-                console.log('FileName:', content.fileName);
+                // Open download in new window/tab
+                window.open(downloadUrl, '_blank');
                 
-                if (content && content.fileData) {
-                    console.log('FileData starts with:', content.fileData.substring(0, 50));
-                    console.log('Original fileName:', content.fileName);
-                    
-                    // For Cloudinary URLs, use fl_attachment flag (works for both images and raw files)
-                    let downloadUrl = content.fileData;
-                    if (downloadUrl.includes('cloudinary.com')) {
-                        // For raw resource type, insert fl_attachment flag
-                        if (downloadUrl.includes('/raw/upload/')) {
-                            downloadUrl = downloadUrl.replace('/raw/upload/', '/raw/upload/fl_attachment/');
-                        } else if (downloadUrl.includes('/image/upload/')) {
-                            downloadUrl = downloadUrl.replace('/image/upload/', '/image/upload/fl_attachment/');
-                        } else if (downloadUrl.includes('/video/upload/')) {
-                            downloadUrl = downloadUrl.replace('/video/upload/', '/video/upload/fl_attachment/');
-                        }
-                        console.log('Modified download URL:', downloadUrl);
-                    }
-                    
-                    // Open in new tab - more reliable for cross-origin downloads
-                    window.open(downloadUrl, '_blank');
-                    
-                    showSuccessPopup('Download started!');
-                } else {
-                    alert('Download not available for this content.');
-                }
+                showSuccessPopup('Download started!');
             } catch (error) {
                 console.error('Download failed:', error);
                 alert('Download failed: ' + error.message);

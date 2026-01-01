@@ -32,11 +32,13 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 const authRoutes = require('./routes/auth');
 const contentRoutes = require('./routes/content');
 const userRoutes = require('./routes/users');
+const downloadRoutes = require('./routes/download');
 
 // Mount routes
 app.use('/api/auth', authRoutes);
 app.use('/api/content', contentRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/download', downloadRoutes);
 
 app.get('/', (req, res) => {
     res.redirect('/login.html');
