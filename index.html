@@ -1605,6 +1605,9 @@
     <script src="frontend/static/js/auth.js"></script>
     <script src="frontend/static/js/dashboard.js"></script>
     <script>
+        // API Configuration
+        const API_URL = 'https://rpecocjourney-backend.onrender.com';
+        
         function showSuccessPopup(message) {
             const popup = document.getElementById('successPopup');
             const messageEl = document.getElementById('successPopupMessage');
@@ -1626,25 +1629,39 @@
             popup.classList.add('show');
         }
 
-        function confirmDelete(confirmed) {
+        async function confirmDelete(confirmed) {
             const popup = document.getElementById('confirmPopup');
             popup.classList.remove('show');
 
             if (confirmed && pendingDeleteId) {
-                // Remove from DOM
-                const contentItem = document.querySelector(`[data-id="${pendingDeleteId}"]`);
-                if (contentItem) {
-                    contentItem.remove();
-                }
+                try {
+                    // Delete from backend
+                    const response = await fetch(`${API_URL}/api/content/${pendingDeleteId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
 
-                // Remove from IndexedDB
-                deleteContentFromStorage(pendingDeleteId).catch(err => {
-                    console.error('Failed to delete from storage:', err);
-                });
+                    if (!response.ok) {
+                        throw new Error('Failed to delete content');
+                    }
 
-                // If viewing this content, go back to list
-                if (currentViewingContentId === pendingDeleteId) {
-                    backToContentList();
+                    // Remove from DOM
+                    const contentItem = document.querySelector(`[data-id="${pendingDeleteId}"]`);
+                    if (contentItem) {
+                        contentItem.remove();
+                    }
+
+                    // If viewing this content, go back to list
+                    if (currentViewingContentId === pendingDeleteId) {
+                        backToContentList();
+                    }
+
+                    showSuccessPopup('Content deleted successfully!');
+                } catch (error) {
+                    console.error('Failed to delete:', error);
+                    alert('Failed to delete content: ' + error.message);
                 }
             }
 
@@ -1727,7 +1744,18 @@
 
         async function loadStoredContents() {
             try {
-                const contents = await getStoredContents();
+                const response = await fetch(`${API_URL}/api/content/all`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch contents from server');
+                }
+                
+                const contents = await response.json();
                 const container = document.getElementById('content-items-container');
                 
                 if (!container) return;
@@ -1735,12 +1763,12 @@
                 contents.forEach(content => {
                     const newRow = document.createElement('div');
                     newRow.className = 'content-item content-item-clickable';
-                    newRow.setAttribute('data-id', content.id);
+                    newRow.setAttribute('data-id', content._id || content.id);
                     newRow.setAttribute('data-title', content.title);
-                    newRow.setAttribute('data-type', 'Document');
+                    newRow.setAttribute('data-type', content.type || 'Document');
                     newRow.setAttribute('data-size', content.fileSize);
                     newRow.setAttribute('data-date', content.date);
-                    newRow.setAttribute('data-status', 'Pending');
+                    newRow.setAttribute('data-status', content.status || 'Pending');
                     newRow.setAttribute('data-category', content.category || 'General');
                     newRow.setAttribute('data-description', content.description || 'No description available.');
                     newRow.onclick = function() { viewContentDetail(this); };
@@ -1748,11 +1776,11 @@
                     newRow.innerHTML = `
                         <div>
                             <div class="content-title">${content.title}</div>
-                            <div class="content-meta">Document | ${content.fileSize} | Modified: ${content.date}</div>
+                            <div class="content-meta">${content.type || 'Document'} | ${content.fileSize} | Modified: ${content.date}</div>
                         </div>
                         <div class="content-item-actions">
-                            <span class="badge badge-warning">Pending</span>
-                            <button class="delete-btn" onclick="event.stopPropagation(); deleteContent('${content.id}')" title="Delete">
+                            <span class="badge badge-warning">${content.status || 'Pending'}</span>
+                            <button class="delete-btn" onclick="event.stopPropagation(); deleteContent('${content._id || content.id}')" title="Delete">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -1761,6 +1789,7 @@
                 });
             } catch (error) {
                 console.error('Failed to load contents:', error);
+                alert('Failed to load content from server. Please check your connection.');
             }
         }
 
@@ -1926,22 +1955,25 @@
             videoPreview.style.display = 'none';
             mediaPreview.style.display = 'none';
             
-            // Check if content has media data stored
+            // Fetch content with media data from backend
             try {
-                const contents = await getStoredContents();
-                const storedContent = contents.find(c => c.id === contentData.id);
+                const response = await fetch(`${API_URL}/api/content/${contentData.id}`);
                 
-                if (storedContent && storedContent.mediaData) {
-                    const mediaType = storedContent.mediaFileType || '';
+                if (response.ok) {
+                    const storedContent = await response.json();
                     
-                    if (mediaType.startsWith('image/')) {
-                        imagePreview.src = storedContent.mediaData;
-                        imagePreview.style.display = 'block';
-                        mediaPreview.style.display = 'block';
-                    } else if (mediaType.startsWith('video/')) {
-                        videoPreview.src = storedContent.mediaData;
-                        videoPreview.style.display = 'block';
-                        mediaPreview.style.display = 'block';
+                    if (storedContent && storedContent.mediaData) {
+                        const mediaType = storedContent.mediaFileType || '';
+                        
+                        if (mediaType.startsWith('image/')) {
+                            imagePreview.src = storedContent.mediaData;
+                            imagePreview.style.display = 'block';
+                            mediaPreview.style.display = 'block';
+                        } else if (mediaType.startsWith('video/')) {
+                            videoPreview.src = storedContent.mediaData;
+                            videoPreview.style.display = 'block';
+                            mediaPreview.style.display = 'block';
+                        }
                     }
                 }
             } catch (error) {
@@ -1966,10 +1998,15 @@
         async function downloadCurrentContent() {
             if (!currentViewingContentId) return;
 
-            // Get the content from IndexedDB
+            // Get the content from backend
             try {
-                const contents = await getStoredContents();
-                const content = contents.find(c => c.id === currentViewingContentId);
+                const response = await fetch(`${API_URL}/api/content/${currentViewingContentId}`);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch content');
+                }
+                
+                const content = await response.json();
                 
                 if (content && content.fileData) {
                     // Create a temporary link element
@@ -1982,8 +2019,7 @@
                     
                     showSuccessPopup('File downloaded successfully!');
                 } else {
-                    // For default content without stored file data
-                    alert('Download not available for this content. Only uploaded files can be downloaded.');
+                    alert('Download not available for this content.');
                 }
             } catch (error) {
                 console.error('Download failed:', error);
@@ -2009,9 +2045,9 @@
                 document.getElementById('preview-date').textContent = date;
                 document.getElementById('preview-type').textContent = type;
 
-                // Get media from IndexedDB
-                const contents = await getStoredContents();
-                const storedContent = contents.find(c => c.id === currentViewingContentId);
+                // Get media from backend
+                const response = await fetch(`${API_URL}/api/content/${currentViewingContentId}`);
+                const storedContent = response.ok ? await response.json() : null;
 
                 const previewImage = document.getElementById('preview-image');
                 const previewVideo = document.getElementById('preview-video');
@@ -2096,11 +2132,8 @@
             editCurrentMedia.style.display = 'none';
             editNewMediaPreview.style.display = 'none';
             
-            // Check if content has stored media data
-            const contents = await getStoredContents();
-            const storedContent = contents.find(c => c.id === currentViewingContentId);
-            
-            if (storedContent && storedContent.mediaData) {
+            // Check if content has stored media data from backend
+            const response = await fetch(`${API_URL}/api/content/${currentViewingContentId}`);\n            const storedContent = response.ok ? await response.json() : null;\n            \n            if (storedContent && storedContent.mediaData) {
                 const mediaFileType = storedContent.mediaFileType || '';
                 
                 if (mediaFileType.startsWith('image/')) {
@@ -2417,9 +2450,6 @@
                         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
                         submitBtn.disabled = true;
                         
-                        // Simulate upload delay
-                        await new Promise(resolve => setTimeout(resolve, 500));
-                        
                         // Read and store the media file
                         const mediaData = await new Promise((resolve, reject) => {
                             const reader = new FileReader();
@@ -2457,14 +2487,13 @@
                         }
                         
                         // Create content object
-                        const contentId = 'content-' + Date.now();
                         const contentData = {
-                            id: contentId,
                             title: title,
                             fileSize: docSize,
                             date: today,
                             category: category,
                             description: description,
+                            type: docType,
                             // Document file info
                             fileName: docFile.name,
                             fileType: docFile.type,
@@ -2475,8 +2504,22 @@
                             mediaData: mediaData
                         };
                         
-                        // Save to IndexedDB
-                        await saveContentToStorage(contentData);
+                        // Send to backend API
+                        const response = await fetch(`${API_URL}/api/content/upload`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(contentData)
+                        });
+                        
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.message || 'Upload failed');
+                        }
+                        
+                        const result = await response.json();
+                        const contentId = result.content._id || result.content.id;
                         
                         // Add new content to the list immediately
                         const contentList = document.getElementById('content-items-container');
