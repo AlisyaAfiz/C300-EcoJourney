@@ -23,55 +23,28 @@ if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !pr
   console.error('⚠️  - CLOUDINARY_API_SECRET');
 }
 
-// Configure Storage for media (images/videos - use 'auto')
-const mediaStorage = new CloudinaryStorage({
+// Configure Storage - one config that handles all files
+const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: {
-    folder: 'eco-journey-media',
-    resource_type: 'auto', // Auto-detect for images/videos
-    // No allowed_formats - let Cloudinary accept anything
-  },
-});
-
-// Configure Storage for documents (PDFs, docs - use 'raw')
-const documentStorage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'eco-journey-documents',
-    resource_type: 'raw', // Required for non-image files like PDFs
-    // No allowed_formats - let Cloudinary accept anything
-  },
-});
-
-// Configure combined storage that accepts everything
-const combinedStorage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'eco-journey-uploads',
-    resource_type: 'auto', // Try auto first
-    // No format restrictions - accept everything
+  params: (req, file) => {
+    // Check if it's a media file or document based on field name
+    const isMediaField = file.fieldname === 'mediaFile';
+    
+    return {
+      folder: isMediaField ? 'eco-journey-media' : 'eco-journey-documents',
+      resource_type: isMediaField ? 'auto' : 'raw',
+      // No format restrictions
+    };
   }
 });
 
-// Create uploaders
-const uploadDocument = multer({ 
-  storage: documentStorage,
-  limits: { fileSize: 50 * 1024 * 1024 } // 50MB limit
-});
-
-const uploadMedia = multer({ 
-  storage: mediaStorage,
-  limits: { fileSize: 50 * 1024 * 1024 } // 50MB limit
-});
-
-const uploadCombined = multer({ 
-  storage: combinedStorage,
+// Create one uploader for all files
+const upload = multer({ 
+  storage: storage,
   limits: { fileSize: 50 * 1024 * 1024 } // 50MB limit
 });
 
 module.exports = {
   cloudinary,
-  uploadDocument,
-  uploadMedia,
-  uploadCombined
+  upload
 };
