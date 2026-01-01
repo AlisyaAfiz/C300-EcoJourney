@@ -298,6 +298,232 @@
             font-weight: 600;
         }
 
+        /* Delete Button */
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+
+        .delete-btn:hover {
+            background-color: rgba(231, 76, 60, 0.1);
+            transform: scale(1.1);
+        }
+
+        .content-item-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Custom Success Popup */
+        .success-popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .success-popup-overlay.show {
+            display: flex;
+        }
+
+        .success-popup {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.4s ease;
+            position: relative;
+        }
+
+        .success-popup-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: scaleUp 0.5s ease;
+        }
+
+        .success-popup-icon i {
+            color: white;
+            font-size: 40px;
+        }
+
+        .success-popup h3 {
+            color: #2c3e50;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .success-popup p {
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+
+        .success-popup-btn {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            border: none;
+            padding: 12px 40px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .success-popup-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(46, 204, 113, 0.4);
+        }
+
+        /* Custom Confirmation Popup */
+        .confirm-popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .confirm-popup-overlay.show {
+            display: flex;
+        }
+
+        .confirm-popup {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.4s ease;
+        }
+
+        .confirm-popup-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: scaleUp 0.5s ease;
+        }
+
+        .confirm-popup-icon i {
+            color: white;
+            font-size: 40px;
+        }
+
+        .confirm-popup h3 {
+            color: #2c3e50;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .confirm-popup p {
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+
+        .confirm-popup-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .confirm-popup-btn {
+            padding: 12px 35px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .confirm-popup-btn.yes {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+        }
+
+        .confirm-popup-btn.yes:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        .confirm-popup-btn.no {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+
+        .confirm-popup-btn.no:hover {
+            background: #bdc3c7;
+            transform: translateY(-2px);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleUp {
+            0% {
+                transform: scale(0);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
         .badge-success { background: #d4edda; color: #155724; }
         .badge-warning { background: #fff3cd; color: #856404; }
         .badge-danger { background: #f8d7da; color: #721c24; }
@@ -565,27 +791,42 @@
                         <div class="card-header">
                             <h5>Your Content</h5>
                         </div>
-                        <div class="card-body">
-                            <div class="content-item">
+                        <div class="card-body" id="content-items-container">
+                            <div class="content-item" data-id="default-1">
                                 <div>
                                     <div class="content-title">Wind Energy Project</div>
                                     <div class="content-meta">Video | 125 MB | Modified: Dec 17, 2025</div>
                                 </div>
-                                <span class="badge badge-success">Published</span>
+                                <div class="content-item-actions">
+                                    <span class="badge badge-success">Published</span>
+                                    <button class="delete-btn" onclick="deleteContent('default-1')" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="content-item">
+                            <div class="content-item" data-id="default-2">
                                 <div>
                                     <div class="content-title">Biodiversity Report 2024</div>
                                     <div class="content-meta">Document | 3.2 MB | Modified: Dec 16, 2025</div>
                                 </div>
-                                <span class="badge badge-warning">Pending</span>
+                                <div class="content-item-actions">
+                                    <span class="badge badge-warning">Pending</span>
+                                    <button class="delete-btn" onclick="deleteContent('default-2')" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="content-item">
+                            <div class="content-item" data-id="default-3">
                                 <div>
                                     <div class="content-title">Carbon Offset Initiative</div>
                                     <div class="content-meta">Article | 256 KB | Modified: Dec 15, 2025</div>
                                 </div>
-                                <span class="badge badge-success">Approved</span>
+                                <div class="content-item-actions">
+                                    <span class="badge badge-success">Approved</span>
+                                    <button class="delete-btn" onclick="deleteContent('default-3')" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -869,10 +1110,121 @@
         </main>
     </div>
 
+    <!-- Confirmation Popup Modal -->
+    <div id="confirmPopup" class="confirm-popup-overlay">
+        <div class="confirm-popup">
+            <div class="confirm-popup-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3>Delete Content?</h3>
+            <p>Are you sure you want to delete this content? This action cannot be undone.</p>
+            <div class="confirm-popup-buttons">
+                <button class="confirm-popup-btn yes" onclick="confirmDelete(true)">Yes, Delete</button>
+                <button class="confirm-popup-btn no" onclick="confirmDelete(false)">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Popup Modal -->
+    <div id="successPopup" class="success-popup-overlay">
+        <div class="success-popup">
+            <div class="success-popup-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            <h3>Success!</h3>
+            <p id="successPopupMessage">Content uploaded successfully!</p>
+            <button class="success-popup-btn" onclick="closeSuccessPopup()">Great!</button>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="frontend/static/js/auth.js"></script>
     <script src="frontend/static/js/dashboard.js"></script>
     <script>
+        function showSuccessPopup(message) {
+            const popup = document.getElementById('successPopup');
+            const messageEl = document.getElementById('successPopupMessage');
+            messageEl.textContent = message;
+            popup.classList.add('show');
+        }
+
+        function closeSuccessPopup() {
+            const popup = document.getElementById('successPopup');
+            popup.classList.remove('show');
+        }
+
+        // Confirmation popup functions
+        let pendingDeleteId = null;
+
+        function showConfirmPopup(contentId) {
+            pendingDeleteId = contentId;
+            const popup = document.getElementById('confirmPopup');
+            popup.classList.add('show');
+        }
+
+        function confirmDelete(confirmed) {
+            const popup = document.getElementById('confirmPopup');
+            popup.classList.remove('show');
+
+            if (confirmed && pendingDeleteId) {
+                // Remove from DOM
+                const contentItem = document.querySelector(`[data-id="${pendingDeleteId}"]`);
+                if (contentItem) {
+                    contentItem.remove();
+                }
+
+                // Remove from localStorage
+                const contents = getStoredContents();
+                const updatedContents = contents.filter(c => c.id !== pendingDeleteId);
+                localStorage.setItem('uploaded_contents', JSON.stringify(updatedContents));
+            }
+
+            pendingDeleteId = null;
+        }
+
+        // Content persistence functions
+        function saveContentToStorage(content) {
+            const contents = getStoredContents();
+            contents.push(content);
+            localStorage.setItem('uploaded_contents', JSON.stringify(contents));
+        }
+
+        function getStoredContents() {
+            const stored = localStorage.getItem('uploaded_contents');
+            return stored ? JSON.parse(stored) : [];
+        }
+
+        function deleteContent(contentId) {
+            showConfirmPopup(contentId);
+        }
+
+        function loadStoredContents() {
+            const contents = getStoredContents();
+            const container = document.getElementById('content-items-container');
+            
+            if (!container) return;
+
+            contents.forEach(content => {
+                const newRow = document.createElement('div');
+                newRow.className = 'content-item';
+                newRow.setAttribute('data-id', content.id);
+                
+                newRow.innerHTML = `
+                    <div>
+                        <div class="content-title">${content.title}</div>
+                        <div class="content-meta">Document | ${content.fileSize} | Modified: ${content.date}</div>
+                    </div>
+                    <div class="content-item-actions">
+                        <span class="badge badge-warning">Pending</span>
+                        <button class="delete-btn" onclick="deleteContent('${content.id}')" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                container.insertBefore(newRow, container.firstChild);
+            });
+        }
+
         function updateProfileRole() {
             const role = localStorage.getItem('user_role');
             if (!role) return;
@@ -989,6 +1341,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             applyRolePermissions();
             updateProfileRole();
+            loadStoredContents(); // Load persisted content
             
             // Handle upload form submission
             const uploadForm = document.getElementById('upload-form');
@@ -1024,29 +1377,47 @@
                         // Simulate upload (add content to list without backend)
                         await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate upload delay
                         
+                        // Get file size
+                        const fileSize = file.size < 1024*1024 ? 
+                            (file.size / 1024).toFixed(1) + ' KB' : 
+                            (file.size / (1024*1024)).toFixed(1) + ' MB';
+                        
+                        const today = new Date().toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric', 
+                            year: 'numeric' 
+                        });
+                        
+                        // Create content object
+                        const contentId = 'content-' + Date.now();
+                        const contentData = {
+                            id: contentId,
+                            title: title,
+                            fileSize: fileSize,
+                            date: today
+                        };
+                        
+                        // Save to localStorage
+                        saveContentToStorage(contentData);
+                        
                         // Add new content to the list immediately
-                        const contentList = document.querySelector('#content-list .card-body');
+                        const contentList = document.getElementById('content-items-container');
                         if (contentList) {
                             const newRow = document.createElement('div');
                             newRow.className = 'content-item';
-                            
-                            // Get file size
-                            const fileSize = file.size < 1024*1024 ? 
-                                (file.size / 1024).toFixed(1) + ' KB' : 
-                                (file.size / (1024*1024)).toFixed(1) + ' MB';
-                            
-                            const today = new Date().toLocaleDateString('en-US', { 
-                                month: 'short', 
-                                day: 'numeric', 
-                                year: 'numeric' 
-                            });
+                            newRow.setAttribute('data-id', contentId);
                             
                             newRow.innerHTML = `
                                 <div>
                                     <div class="content-title">${title}</div>
                                     <div class="content-meta">Document | ${fileSize} | Modified: ${today}</div>
                                 </div>
-                                <span class="badge badge-warning">Pending</span>
+                                <div class="content-item-actions">
+                                    <span class="badge badge-warning">Pending</span>
+                                    <button class="delete-btn" onclick="deleteContent('${contentId}')" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             `;
                             contentList.insertBefore(newRow, contentList.firstChild);
                         }
@@ -1055,8 +1426,8 @@
                         submitBtn.innerHTML = originalText;
                         submitBtn.disabled = false;
                         
-                        // Show success and switch to content tab
-                        alert('Content uploaded successfully!');
+                        // Show success popup and switch to content tab
+                        showSuccessPopup('Content uploaded successfully!');
                         hideUploadForm();
                         switchTab('content');
                     } catch (error) {
