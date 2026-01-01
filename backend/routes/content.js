@@ -26,8 +26,8 @@ router.get('/all', async (req, res) => {
 
 // Upload new content with Cloudinary (supports both media and document files)
 router.post('/upload', uploadCombined.fields([
-  { name: 'mediaFile', maxCount: 1 },
-  { name: 'documentFile', maxCount: 1 }
+  { name: 'mediaFile', maxCount: 1 },      // ✅ MUST match frontend: formData.append('mediaFile', ...)
+  { name: 'documentFile', maxCount: 1 }    // ✅ MUST match frontend: formData.append('documentFile', ...)
 ]), async (req, res) => {
   try {
     const { 
@@ -41,12 +41,39 @@ router.post('/upload', uploadCombined.fields([
       return res.status(400).json({ message: 'Title and category are required' });
     }
 
-    // Get Cloudinary URLs from uploaded files
+    // ✅ Safely check if files were uploaded
     const mediaFile = req.files?.mediaFile?.[0];
     const documentFile = req.files?.documentFile?.[0];
 
-    console.log('Media file uploaded:', mediaFile?.path);
-    console.log('Document file uploaded:', documentFile?.path);
+    // Log what we received
+    console.log('=== Upload Request ===');
+    console.log('Title:', title);
+    console.log('Files received:', req.files ? Object.keys(req.files) : 'NO FILES');
+    console.log('Media file:', mediaFile ? 'YES - ' + mediaFile.path : 'NO');
+    console.log('Document file:', documentFile ? 'YES - ' + documentFile.path : 'NO');
+
+    // ✅ Check if at least one file was uploaded
+    if (!mediaFile && !documentFile) {
+      console.error('No files received from frontend!');
+      return res.status(400).json({ 
+        message: 'No files uploaded. Please upload at least one file.',
+        receivedFields: req.files ? Object.keys(req.files) : []
+      });
+    }
+
+    // ✅ Safely get Cloudinary URLs (only if files exist)
+    let mediaCloudURL = '';
+    let documentCloudURL = '';
+
+    if (mediaFile && mediaFile.path) {
+      mediaCloudURL = mediaFile.path;
+      console.log('✅ Media uploaded to:', mediaCloudURL);
+    }
+
+    if (documentFile && documentFile.path) {
+      documentCloudURL = documentFile.path;
+      console.log('✅ Document uploaded to:', documentCloudURL);
+    }
 
     // ✅ Save Cloudinary URLs to MongoDB (NOT base64 strings)
     const contentData = {
@@ -54,11 +81,11 @@ router.post('/upload', uploadCombined.fields([
       description: description || '',
       contentType: type === 'PDF' ? 'document' : 'document',
       category: category,
-      file: documentFile?.path || mediaFile?.path || 'no-file',
+      file: documentCloudURL || mediaCloudURL || 'no-file',
       status: 'pending',
       creator: 'system',
-      fileData: documentFile?.path || '', // ✅ Cloudinary URL for document
-      mediaData: mediaFile?.path || '', // ✅ Cloudinary URL for media
+      fileData: documentCloudURL, // ✅ Cloudinary URL for document
+      mediaData: mediaCloudURL, // ✅ Cloudinary URL for media
       fileSize: documentFile?.size || mediaFile?.size || 0,
       date: new Date().toISOString(),
       type: type || 'Document',
@@ -71,15 +98,20 @@ router.post('/upload', uploadCombined.fields([
     const content = new MultimediaContent(contentData);
     await content.save();
 
-    console.log('Content saved to MongoDB with Cloudinary URLs');
+    console.log('✅ Content saved to MongoDB with ID:', content._id);
 
     res.status(201).json({
       message: 'Content uploaded successfully',
       content,
     });
   } catch (error) {
-    console.error('Upload error:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error('❌ Upload error:', error);
+    console.error('Error stack:', error.stack);
+    res.status(500).json({ 
+      message: 'Server error', 
+      error: error.message,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 });
 
