@@ -43,20 +43,13 @@ const mediaStorage = new CloudinaryStorage({
   },
 });
 
-// Configure Storage for all files (media + documents)
+// Configure Storage for all files (simplified - one folder for everything)
 const combinedStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: async (req, file) => {
-    // Determine folder and resource type based on file type
-    const isMedia = file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/');
-    
-    return {
-      folder: isMedia ? 'eco-journey-media' : 'eco-journey-documents',
-      resource_type: isMedia ? 'auto' : 'raw',
-      allowed_formats: isMedia 
-        ? ['jpg', 'png', 'jpeg', 'gif', 'mp4', 'mov', 'avi', 'webp']
-        : ['pdf', 'doc', 'docx', 'txt', 'xls', 'xlsx']
-    };
+  params: {
+    folder: 'eco-journey-uploads',
+    resource_type: 'auto', // Let Cloudinary auto-detect
+    allowed_formats: ['jpg', 'png', 'jpeg', 'gif', 'mp4', 'mov', 'avi', 'webp', 'pdf', 'doc', 'docx', 'txt'],
   }
 });
 
