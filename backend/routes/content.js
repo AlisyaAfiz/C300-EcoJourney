@@ -25,10 +25,23 @@ router.get('/all', async (req, res) => {
 });
 
 // Upload new content with Cloudinary (supports both media and document files)
-router.post('/upload', uploadCombined.fields([
-  { name: 'mediaFile', maxCount: 1 },      // ✅ MUST match frontend: formData.append('mediaFile', ...)
-  { name: 'documentFile', maxCount: 1 }    // ✅ MUST match frontend: formData.append('documentFile', ...)
-]), async (req, res) => {
+router.post('/upload', (req, res, next) => {
+  // Wrap multer middleware with error handling
+  uploadCombined.fields([
+    { name: 'mediaFile', maxCount: 1 },
+    { name: 'documentFile', maxCount: 1 }
+  ])(req, res, (err) => {
+    if (err) {
+      console.error('❌ Multer/Cloudinary error:', err);
+      return res.status(500).json({ 
+        message: 'File upload failed', 
+        error: err.message,
+        details: 'Check if Cloudinary credentials are correct or if file type is allowed'
+      });
+    }
+    next();
+  });
+}, async (req, res) => {
   try {
     const { 
       title, 
