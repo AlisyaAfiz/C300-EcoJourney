@@ -45,7 +45,7 @@ const multimediaContentSchema = new mongoose.Schema({
   creator: {
     type: String,
     ref: 'User',
-    required: true,
+    default: 'system',
   },
   viewCount: {
     type: Number,
@@ -92,7 +92,10 @@ const multimediaContentSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
-}, { collection: 'multimedia_content' });
+}, { 
+  collection: 'multimedia_content',
+  strict: false // Allow additional fields not in schema
+});
 
 // Create indexes
 multimediaContentSchema.index({ status: 1 });

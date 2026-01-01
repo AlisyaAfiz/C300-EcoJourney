@@ -44,37 +44,25 @@ router.post('/upload', async (req, res) => {
       return res.status(400).json({ message: 'Title and category are required' });
     }
 
-    const content = new MultimediaContent({
+    // Create content with all fields
+    const contentData = {
       title,
       description: description || '',
       contentType: type === 'PDF' ? 'document' : 'document',
       category: category,
       file: fileName || 'uploaded-file',
       status: 'pending',
-      creator: 'anonymous', // TODO: Replace with actual user ID when auth is implemented
-      // Store additional data as JSON strings in tags field temporarily
-      tags: [
-        `fileSize:${fileSize}`,
-        `date:${date}`,
-        `type:${type}`,
-        `fileName:${fileName}`,
-        `fileType:${fileType}`,
-        `mediaFileName:${mediaFileName}`,
-        `mediaFileType:${mediaFileType}`
-      ],
-      // Store file data - in production, upload to cloud storage instead
-      thumbnail: mediaData, // Store media preview
-    });
+      creator: 'system', // Use a system user ID
+      fileData: fileData,
+      mediaData: mediaData,
+      fileSize: fileSize,
+      date: date,
+      type: type,
+      mediaFileName: mediaFileName,
+      mediaFileType: mediaFileType,
+    };
 
-    // Store the actual file data (in production, this should be in cloud storage)
-    content.fileData = fileData;
-    content.mediaData = mediaData;
-    content.fileSize = fileSize;
-    content.date = date;
-    content.type = type;
-    content.mediaFileName = mediaFileName;
-    content.mediaFileType = mediaFileType;
-
+    const content = new MultimediaContent(contentData);
     await content.save();
 
     res.status(201).json({
