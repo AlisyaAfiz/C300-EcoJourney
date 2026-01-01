@@ -1842,8 +1842,11 @@
         function applyRolePermissions() {
             const role = localStorage.getItem('user_role');
 
+            // Default to 'producer' if no role is set (for testing/demo)
             if (!role || !ROLE_PERMISSIONS[role]) {
-                window.location.href = 'login.html';
+                // Set default role for testing
+                localStorage.setItem('user_role', 'producer');
+                applyRolePermissions(); // Re-run with default role
                 return;
             }
 
