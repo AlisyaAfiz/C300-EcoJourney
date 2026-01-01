@@ -29,6 +29,23 @@ const mediaStorage = new CloudinaryStorage({
   },
 });
 
+// Configure Storage for all files (media + documents)
+const combinedStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: async (req, file) => {
+    // Determine folder and resource type based on file type
+    const isMedia = file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/');
+    
+    return {
+      folder: isMedia ? 'eco-journey-media' : 'eco-journey-documents',
+      resource_type: isMedia ? 'auto' : 'raw',
+      allowed_formats: isMedia 
+        ? ['jpg', 'png', 'jpeg', 'gif', 'mp4', 'mov', 'avi', 'webp']
+        : ['pdf', 'doc', 'docx', 'txt', 'xls', 'xlsx']
+    };
+  }
+});
+
 // Create uploaders
 const uploadDocument = multer({ 
   storage: documentStorage,
@@ -40,8 +57,14 @@ const uploadMedia = multer({
   limits: { fileSize: 50 * 1024 * 1024 } // 50MB limit
 });
 
+const uploadCombined = multer({ 
+  storage: combinedStorage,
+  limits: { fileSize: 50 * 1024 * 1024 } // 50MB limit
+});
+
 module.exports = {
   cloudinary,
   uploadDocument,
-  uploadMedia
+  uploadMedia,
+  uploadCombined
 };

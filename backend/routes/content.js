@@ -9,7 +9,7 @@ const {
   sendContentApprovedEmail,
   sendContentRejectedEmail,
 } = require('../utils/emailService');
-const { uploadDocument, uploadMedia } = require('../config/cloudinary');
+const { uploadCombined } = require('../config/cloudinary');
 
 // Get all content (no authentication required for public access)
 router.get('/all', async (req, res) => {
@@ -25,7 +25,7 @@ router.get('/all', async (req, res) => {
 });
 
 // Upload new content with Cloudinary (supports both media and document files)
-router.post('/upload', uploadMedia.fields([
+router.post('/upload', uploadCombined.fields([
   { name: 'mediaFile', maxCount: 1 },
   { name: 'documentFile', maxCount: 1 }
 ]), async (req, res) => {
@@ -41,14 +41,14 @@ router.post('/upload', uploadMedia.fields([
       return res.status(400).json({ message: 'Title and category are required' });
     }
 
-    // Get file URLs from Cloudinary
+    // Get Cloudinary URLs from uploaded files
     const mediaFile = req.files?.mediaFile?.[0];
     const documentFile = req.files?.documentFile?.[0];
 
-    console.log('Media file:', mediaFile);
-    console.log('Document file:', documentFile);
+    console.log('Media file uploaded:', mediaFile?.path);
+    console.log('Document file uploaded:', documentFile?.path);
 
-    // Create content with Cloudinary URLs
+    // ✅ Save Cloudinary URLs to MongoDB (NOT base64 strings)
     const contentData = {
       title,
       description: description || '',
@@ -57,8 +57,8 @@ router.post('/upload', uploadMedia.fields([
       file: documentFile?.path || mediaFile?.path || 'no-file',
       status: 'pending',
       creator: 'system',
-      fileData: documentFile?.path, // Cloudinary URL for document
-      mediaData: mediaFile?.path, // Cloudinary URL for media
+      fileData: documentFile?.path || '', // ✅ Cloudinary URL for document
+      mediaData: mediaFile?.path || '', // ✅ Cloudinary URL for media
       fileSize: documentFile?.size || mediaFile?.size || 0,
       date: new Date().toISOString(),
       type: type || 'Document',
@@ -70,6 +70,8 @@ router.post('/upload', uploadMedia.fields([
 
     const content = new MultimediaContent(contentData);
     await content.save();
+
+    console.log('Content saved to MongoDB with Cloudinary URLs');
 
     res.status(201).json({
       message: 'Content uploaded successfully',
