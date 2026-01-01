@@ -30,9 +30,15 @@ const storage = new CloudinaryStorage({
     // Check if it's a media file or document based on field name
     const isMediaField = file.fieldname === 'mediaFile';
     
+    // Preserve original filename (without extension) as public_id
+    const filenameWithoutExt = file.originalname.replace(/\.[^/.]+$/, '');
+    const timestamp = Date.now();
+    const publicId = `${filenameWithoutExt}_${timestamp}`;
+    
     return {
       folder: isMediaField ? 'eco-journey-media' : 'eco-journey-documents',
       resource_type: isMediaField ? 'auto' : 'raw',
+      public_id: publicId,
       // No format restrictions
     };
   }

@@ -2029,15 +2029,25 @@
                 
                 if (content && content.fileData) {
                     console.log('FileData starts with:', content.fileData.substring(0, 50));
-                    // Create a temporary link element
-                    const link = document.createElement('a');
-                    link.href = content.fileData;
-                    link.download = content.fileName || 'download';
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
+                    console.log('Original fileName:', content.fileName);
                     
-                    showSuccessPopup('File downloaded successfully!');
+                    // For Cloudinary URLs, add fl_attachment transformation to force proper download
+                    let downloadUrl = content.fileData;
+                    if (downloadUrl.includes('cloudinary.com')) {
+                        // Insert fl_attachment transformation before the file path
+                        // Also set the filename using the original filename
+                        const fileName = content.fileName || 'download';
+                        downloadUrl = downloadUrl.replace(
+                            /\/upload\//,
+                            `/upload/fl_attachment:${encodeURIComponent(fileName)}/`
+                        );
+                        console.log('Modified download URL:', downloadUrl);
+                    }
+                    
+                    // Open in new tab - more reliable for cross-origin downloads
+                    window.open(downloadUrl, '_blank');
+                    
+                    showSuccessPopup('Download started!');
                 } else {
                     alert('Download not available for this content.');
                 }
