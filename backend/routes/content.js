@@ -26,8 +26,14 @@ router.get('/all', async (req, res) => {
 
 // Upload new content with Cloudinary (supports both media and document files)
 router.post('/upload', (req, res, next) => {
-  console.log('📤 Upload endpoint hit!');
-  console.log('Request body fields:', Object.keys(req.body));
+  console.log('========================================');
+  console.log('📤 UPLOAD ENDPOINT HIT!');
+  console.log('========================================');
+  console.log('Request method:', req.method);
+  console.log('Request URL:', req.url);
+  console.log('Request body keys:', Object.keys(req.body));
+  console.log('Request headers Content-Type:', req.headers['content-type']);
+  console.log('========================================');
   
   // Use separate handlers for media (auto) and documents (raw)
   const cpUpload = uploadMedia.fields([
@@ -38,33 +44,64 @@ router.post('/upload', (req, res, next) => {
     { name: 'documentFile', maxCount: 1 }
   ]);
   
+  console.log('🔄 Starting media file upload processing...');
+  
   // First process media files
   cpUpload(req, res, (err1) => {
     if (err1) {
-      console.error('❌ Media upload error:', err1.message);
+      console.error('========================================');
+      console.error('❌ MEDIA UPLOAD ERROR!');
+      console.error('========================================');
+      console.error('Error type:', err1.constructor.name);
+      console.error('Error name:', err1.name);
+      console.error('Error message:', err1.message);
+      console.error('Error code:', err1.code);
+      console.error('Error http_code:', err1.http_code);
+      console.error('Full error object:', JSON.stringify(err1, null, 2));
+      console.error('========================================');
     } else {
-      console.log('✅ Media processing complete');
+      console.log('✅ Media processing complete (no errors)');
+      console.log('Media files in req.files:', req.files?.mediaFile ? 'YES' : 'NO');
     }
+    
+    console.log('🔄 Starting document file upload processing...');
     
     // Then process document files
     cpUploadDoc(req, res, (err2) => {
       if (err2) {
-        console.error('❌ Document upload error:', err2.message);
+        console.error('========================================');
+        console.error('❌ DOCUMENT UPLOAD ERROR!');
+        console.error('========================================');
+        console.error('Error type:', err2.constructor.name);
+        console.error('Error name:', err2.name);
+        console.error('Error message:', err2.message);
+        console.error('Error code:', err2.code);
+        console.error('Error http_code:', err2.http_code);
+        console.error('Full error object:', JSON.stringify(err2, null, 2));
+        console.error('Error stack:', err2.stack);
+        console.error('========================================');
         return res.status(500).json({ 
           message: 'File upload failed', 
           error: err2.message,
           errorName: err2.name,
-          details: 'Cloudinary rejected the file format'
+          errorCode: err2.code,
+          details: 'Cloudinary rejected the file. Check logs for details.'
         });
       }
       
-      console.log('✅ Document processing complete');
-      console.log('✅ All uploads processed, moving to handler...');
+      console.log('✅ Document processing complete (no errors)');
+      console.log('Document files in req.files:', req.files?.documentFile ? 'YES' : 'NO');
+      console.log('========================================');
+      console.log('✅✅ ALL UPLOADS PROCESSED SUCCESSFULLY');
+      console.log('Moving to main handler...');
+      console.log('========================================');
       next();
     });
   });
 }, async (req, res) => {
-  console.log('🔄 Inside main upload handler');
+  console.log('========================================');
+  console.log('🔄 INSIDE MAIN UPLOAD HANDLER');
+  console.log('========================================');
   
   try {
     const { 
