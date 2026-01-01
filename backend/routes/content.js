@@ -9,7 +9,7 @@ const {
   sendContentApprovedEmail,
   sendContentRejectedEmail,
 } = require('../utils/emailService');
-const { uploadCombined } = require('../config/cloudinary');
+const { uploadDocument, uploadMedia } = require('../config/cloudinary');
 
 // Get all content (no authentication required for public access)
 router.get('/all', async (req, res) => {
@@ -29,25 +29,39 @@ router.post('/upload', (req, res, next) => {
   console.log('📤 Upload endpoint hit!');
   console.log('Request body fields:', Object.keys(req.body));
   
-  // Wrap multer middleware with error handling
-  uploadCombined.fields([
-    { name: 'mediaFile', maxCount: 1 },
+  // Use separate handlers for media (auto) and documents (raw)
+  const cpUpload = uploadMedia.fields([
+    { name: 'mediaFile', maxCount: 1 }
+  ]);
+  
+  const cpUploadDoc = uploadDocument.fields([
     { name: 'documentFile', maxCount: 1 }
-  ])(req, res, (err) => {
-    if (err) {
-      console.error('❌ Multer/Cloudinary error:', err);
-      console.error('Error name:', err.name);
-      console.error('Error message:', err.message);
-      console.error('Error stack:', err.stack);
-      return res.status(500).json({ 
-        message: 'File upload failed', 
-        error: err.message,
-        errorName: err.name,
-        details: 'Check if Cloudinary credentials are correct or if file type is allowed'
-      });
+  ]);
+  
+  // First process media files
+  cpUpload(req, res, (err1) => {
+    if (err1) {
+      console.error('❌ Media upload error:', err1.message);
+    } else {
+      console.log('✅ Media processing complete');
     }
-    console.log('✅ Multer processing completed, moving to handler...');
-    next();
+    
+    // Then process document files
+    cpUploadDoc(req, res, (err2) => {
+      if (err2) {
+        console.error('❌ Document upload error:', err2.message);
+        return res.status(500).json({ 
+          message: 'File upload failed', 
+          error: err2.message,
+          errorName: err2.name,
+          details: 'Cloudinary rejected the file format'
+        });
+      }
+      
+      console.log('✅ Document processing complete');
+      console.log('✅ All uploads processed, moving to handler...');
+      next();
+    });
   });
 }, async (req, res) => {
   console.log('🔄 Inside main upload handler');

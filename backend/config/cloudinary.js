@@ -23,33 +23,33 @@ if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !pr
   console.error('⚠️  - CLOUDINARY_API_SECRET');
 }
 
-// Configure Storage for documents (PDFs, etc.)
-const documentStorage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'eco-journey-documents',
-    allowed_formats: ['pdf', 'doc', 'docx', 'txt'],
-    resource_type: 'raw', // For non-image files
-  },
-});
-
-// Configure Storage for media (images, videos)
+// Configure Storage for media (images/videos - use 'auto')
 const mediaStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'eco-journey-media',
-    allowed_formats: ['jpg', 'png', 'jpeg', 'gif', 'mp4', 'mov', 'avi'],
-    resource_type: 'auto', // Automatically detect image or video
+    resource_type: 'auto', // Auto-detect for images/videos
+    // No allowed_formats - let Cloudinary accept anything
   },
 });
 
-// Configure Storage for all files (simplified - one folder for everything)
+// Configure Storage for documents (PDFs, docs - use 'raw')
+const documentStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'eco-journey-documents',
+    resource_type: 'raw', // Required for non-image files like PDFs
+    // No allowed_formats - let Cloudinary accept anything
+  },
+});
+
+// Configure combined storage that accepts everything
 const combinedStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'eco-journey-uploads',
-    resource_type: 'auto', // Let Cloudinary auto-detect
-    allowed_formats: ['jpg', 'png', 'jpeg', 'gif', 'mp4', 'mov', 'avi', 'webp', 'pdf', 'doc', 'docx', 'txt'],
+    resource_type: 'auto', // Try auto first
+    // No format restrictions - accept everything
   }
 });
 
