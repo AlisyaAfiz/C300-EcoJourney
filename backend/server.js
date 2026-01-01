@@ -5,13 +5,18 @@ require('dotenv').config();
 
 const app = express();
 
-// Connect to MongoDB
-mongoose.connect("mongodb+srv://adminfyp:TLqTN0XXr7OUDvDS@rpecojourney.meawj2c.mongodb.net/?appName=RPEcoJourney?retryWrites=true&w=majority", {
+// Connect to MongoDB using environment variable
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/ecojourney';
+
+mongoose.connect(MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
-.then(() => console.log("✅ Connected to MongoDB Atlas"))
-.catch((err) => console.log("❌ Error connecting:", err));
+.then(() => console.log("✅ Connected to MongoDB"))
+.catch((err) => {
+    console.error("❌ Error connecting to MongoDB:", err.message);
+    console.error("Please ensure MONGODB_URI is set in environment variables");
+});
 
 // Middleware
 app.use(cors({
