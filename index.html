@@ -1742,6 +1742,22 @@
             showConfirmPopup(contentId);
         }
 
+        function formatToSGTime(isoString) {
+            if (!isoString) return '-';
+            const date = new Date(isoString);
+            // Singapore is UTC+8
+            const options = {
+                timeZone: 'Asia/Singapore',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            };
+            return date.toLocaleString('en-SG', options);
+        }
+
         async function loadStoredContents() {
             try {
                 const response = await fetch(`${API_URL}/api/content/all`, {
@@ -1774,10 +1790,11 @@
                     newRow.setAttribute('data-description', content.description || 'No description available.');
                     newRow.onclick = function() { viewContentDetail(this); };
                     
+                    const formattedDate = formatToSGTime(content.date);
                     newRow.innerHTML = `
                         <div>
                             <div class="content-title">${content.title}</div>
-                            <div class="content-meta">${content.type || 'Document'} | ${content.fileSize} | Modified: ${content.date}</div>
+                            <div class="content-meta">${content.type || 'Document'} | ${content.fileSize} bytes | Modified: ${formattedDate}</div>
                         </div>
                         <div class="content-item-actions">
                             <span class="badge badge-warning">${content.status || 'Pending'}</span>
@@ -1943,7 +1960,7 @@
             document.getElementById('detail-description').textContent = contentData.description || 'No description available.';
             document.getElementById('detail-id').textContent = contentData.id;
             document.getElementById('detail-format').textContent = contentData.type;
-            document.getElementById('detail-upload-date').textContent = contentData.date;
+            document.getElementById('detail-upload-date').textContent = formatToSGTime(contentData.date);
             document.getElementById('detail-status-info').textContent = contentData.status;
             
             // Display media preview if available
@@ -2031,16 +2048,17 @@
                     console.log('FileData starts with:', content.fileData.substring(0, 50));
                     console.log('Original fileName:', content.fileName);
                     
-                    // For Cloudinary URLs, add fl_attachment transformation to force proper download
+                    // For Cloudinary URLs, use fl_attachment flag (works for both images and raw files)
                     let downloadUrl = content.fileData;
                     if (downloadUrl.includes('cloudinary.com')) {
-                        // Insert fl_attachment transformation before the file path
-                        // Also set the filename using the original filename
-                        const fileName = content.fileName || 'download';
-                        downloadUrl = downloadUrl.replace(
-                            /\/upload\//,
-                            `/upload/fl_attachment:${encodeURIComponent(fileName)}/`
-                        );
+                        // For raw resource type, insert fl_attachment flag
+                        if (downloadUrl.includes('/raw/upload/')) {
+                            downloadUrl = downloadUrl.replace('/raw/upload/', '/raw/upload/fl_attachment/');
+                        } else if (downloadUrl.includes('/image/upload/')) {
+                            downloadUrl = downloadUrl.replace('/image/upload/', '/image/upload/fl_attachment/');
+                        } else if (downloadUrl.includes('/video/upload/')) {
+                            downloadUrl = downloadUrl.replace('/video/upload/', '/video/upload/fl_attachment/');
+                        }
                         console.log('Modified download URL:', downloadUrl);
                     }
                     
