@@ -2091,36 +2091,49 @@
             popup.classList.remove('show');
 
             if (confirmed && pendingDeleteId) {
+                // Optimistic local delete: remove from DOM and local storage first
                 try {
-                    // Delete from backend
-                    const response = await fetch(`${API_URL}/api/content/${pendingDeleteId}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    });
-
-                    if (!response.ok) {
-                        throw new Error('Failed to delete content');
+                    // Remove ALL elements with this data-id (may exist in both lists)
+                    const contentItems = document.querySelectorAll(`[data-id="${pendingDeleteId}"]`);
+                    if (contentItems && contentItems.length) {
+                        contentItems.forEach(ci => ci.remove());
                     }
 
-                    // Remove from DOM
-                    const contentItem = document.querySelector(`[data-id="${pendingDeleteId}"]`);
-                    if (contentItem) {
-                        contentItem.remove();
+                    // Remove from IndexedDB if present
+                    try {
+                        await deleteContentFromStorage(pendingDeleteId);
+                    } catch (e) {
+                        console.warn('Failed to remove from local storage:', e);
                     }
-                    // Update Recent Content after deletion
+
+                    // Update Recent/Dashboard
                     syncRecentFromYourContent();
+                    refreshDashboardStats();
 
                     // If viewing this content, go back to list
-                    if (currentViewingContentId === pendingDeleteId) {
-                        backToContentList();
-                    }
+                    if (currentViewingContentId === pendingDeleteId) backToContentList();
 
                     showSuccessPopup('Content deleted successfully!');
+
+                    // Attempt backend delete but don't block UI
+                    try {
+                        const response = await fetch(`${API_URL}/api/content/${pendingDeleteId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        });
+
+                        if (!response.ok) {
+                            console.error('Server delete failed:', await response.text());
+                            // Optionally notify user later; keep UI consistent for now
+                        }
+                    } catch (err) {
+                        console.error('Failed to reach server for delete:', err);
+                    }
                 } catch (error) {
-                    console.error('Failed to delete:', error);
-                    alert('Failed to delete content: ' + error.message);
+                    console.error('Failed to perform local delete:', error);
+                    alert('Failed to delete content locally: ' + (error.message || error));
                 }
             }
 
@@ -2266,6 +2279,7 @@
                 });
                 // Sync top 3 items from "Your Content" into Recent Content
                 syncRecentFromYourContent();
+                refreshDashboardStats();
             } catch (error) {
                 console.error('Failed to load contents:', error);
                 // Silently fail and show default content instead of alerting
@@ -3010,8 +3024,9 @@
                                 </div>
                             `;
                             contentList.insertBefore(newRow, contentList.firstChild);
-                            // Sync Recent Content to reflect newly uploaded item
+                            // Sync Recent Content and dashboard stats to reflect newly uploaded item
                             syncRecentFromYourContent();
+                            refreshDashboardStats();
                         }
 
                         // Reset button
@@ -3067,7 +3082,21 @@
                     else if (st.includes('rejected')) badgeClass = 'badge-danger';
 
                     const node = document.createElement('div');
-                    node.className = 'content-item';
+                    node.className = 'content-item content-item-clickable';
+                    // Mirror data attributes so viewContentDetail can use them
+                    const srcId = item.getAttribute('data-id') || item.dataset.id || '';
+                    node.setAttribute('data-id', srcId);
+                    node.setAttribute('data-title', item.getAttribute('data-title') || title);
+                    node.setAttribute('data-type', item.getAttribute('data-type') || item.dataset.type || 'Document');
+                    node.setAttribute('data-size', item.getAttribute('data-size') || item.dataset.size || '');
+                    node.setAttribute('data-date', item.getAttribute('data-date') || item.dataset.date || '');
+                    node.setAttribute('data-status', item.getAttribute('data-status') || item.dataset.status || statusText);
+                    node.setAttribute('data-category', item.getAttribute('data-category') || item.dataset.category || '');
+                    node.setAttribute('data-description', item.getAttribute('data-description') || item.dataset.description || '');
+
+                    // When clicked from Dashboard recent list, open preview overlay instead
+                    node.onclick = function () { openPreviewFromElement(this); };
+
                     node.innerHTML = `
                         <div>
                             <div class="content-title">${title}</div>
@@ -3081,6 +3110,120 @@
                 }
             } catch (e) {
                 console.error('syncRecentFromYourContent error:', e);
+            }
+        }
+
+        // Open preview overlay using data attributes from a content element (used on Dashboard recent items)
+        async function openPreviewFromElement(element) {
+            try {
+                if (!element) return;
+                const id = element.getAttribute('data-id') || element.dataset.id;
+                const title = element.getAttribute('data-title') || element.dataset.title || 'No Title';
+                const description = element.getAttribute('data-description') || element.dataset.description || 'No description available.';
+                const category = element.getAttribute('data-category') || element.dataset.category || '-';
+                const date = element.getAttribute('data-date') || element.dataset.date || '-';
+                const type = element.getAttribute('data-type') || element.dataset.type || '-';
+
+                // Set preview text
+                document.getElementById('preview-title').textContent = title;
+                document.getElementById('preview-description').textContent = description;
+                document.getElementById('preview-category').textContent = category;
+                document.getElementById('preview-date').textContent = formatToSGTime(date);
+                document.getElementById('preview-type').textContent = type;
+
+                // Prepare media placeholders
+                const previewImage = document.getElementById('preview-image');
+                const previewVideo = document.getElementById('preview-video');
+                const previewNoMedia = document.getElementById('preview-no-media');
+                previewImage.style.display = 'none';
+                previewVideo.style.display = 'none';
+                previewNoMedia.style.display = 'none';
+
+                // Try fetch media from backend if id available
+                if (id) {
+                    try {
+                        const response = await fetch(`${API_URL}/api/content/${id}`);
+                        if (response.ok) {
+                            const stored = await response.json();
+                            if (stored && stored.mediaData) {
+                                const mediaType = stored.mediaFileType || '';
+                                if (mediaType.startsWith('image/')) {
+                                    previewImage.src = stored.mediaData;
+                                    previewImage.style.display = 'block';
+                                } else if (mediaType.startsWith('video/')) {
+                                    previewVideo.src = stored.mediaData;
+                                    previewVideo.style.display = 'block';
+                                } else {
+                                    previewNoMedia.style.display = 'block';
+                                }
+                            } else {
+                                previewNoMedia.style.display = 'block';
+                            }
+                        } else {
+                            previewNoMedia.style.display = 'block';
+                        }
+                    } catch (err) {
+                        console.error('openPreviewFromElement fetch error:', err);
+                        previewNoMedia.style.display = 'block';
+                    }
+                } else {
+                    previewNoMedia.style.display = 'block';
+                }
+
+                // Show preview overlay
+                document.getElementById('previewOverlay').classList.add('show');
+                document.body.style.overflow = 'hidden';
+                // Set currentViewingContentId for any further actions
+                currentViewingContentId = id || null;
+            } catch (e) {
+                console.error('openPreviewFromElement error:', e);
+            }
+        }
+
+        // Refresh dashboard statistics: Total, Approved, Pending, Rejected
+        function refreshDashboardStats() {
+            try {
+                const container = document.getElementById('content-items-container');
+                if (!container) return;
+
+                const items = Array.from(container.querySelectorAll('.content-item'));
+                const totals = {
+                    total: items.length,
+                    approved: 0,
+                    pending: 0,
+                    rejected: 0
+                };
+
+                items.forEach(item => {
+                    const ds = (item.getAttribute('data-status') || item.dataset.status || '').toString().toLowerCase();
+                    const badge = item.querySelector('.badge');
+                    const badgeText = badge ? badge.textContent.toLowerCase() : '';
+                    const statusText = ds || badgeText || '';
+
+                    if (statusText.includes('approved') || statusText.includes('published')) {
+                        totals.approved++;
+                    } else if (statusText.includes('rejected')) {
+                        totals.rejected++;
+                    } else {
+                        // Treat everything else as pending
+                        totals.pending++;
+                    }
+                });
+
+                const statCards = document.querySelectorAll('.stat-card');
+                if (statCards && statCards.length >= 4) {
+                    const totalStat = statCards[0].querySelector('.stat-info h3');
+                    const approvedStat = statCards[1].querySelector('.stat-info h3');
+                    const pendingStat = statCards[2].querySelector('.stat-info h3');
+                    const rejectedStat = statCards[3].querySelector('.stat-info h3');
+
+                    if (totalStat) totalStat.textContent = String(totals.total);
+                    if (approvedStat) approvedStat.textContent = String(totals.approved);
+                    if (pendingStat) pendingStat.textContent = String(totals.pending);
+                    if (rejectedStat) rejectedStat.textContent = String(totals.rejected);
+                }
+            } catch (e) {
+                console.error('refreshDashboardStats error:', e);
             }
         }
     </script>
