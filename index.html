@@ -1622,16 +1622,36 @@
                             reviews.push(reviewData);
                             localStorage.setItem('content_reviews', JSON.stringify(reviews));
 
-                            // Remove the content item from the pending list
+                            // Update the status of the original content item(s) in 'Your Content'
                             const contentId = currentReviewingContent.id;
-                            console.log('Removing content with ID:', contentId);
-                            const allItems = document.querySelectorAll('[data-id]');
-                            allItems.forEach(item => {
-                                if (item.getAttribute('data-id') === contentId) {
-                                    console.log('Found and removing item');
-                                    item.remove();
+                            console.log('Updating content status for ID:', contentId, 'to', decision);
+
+                            // Find items inside the Your Content list and update their dataset/status and badge
+                            const yourContentElems = document.querySelectorAll('#content-items-container [data-id="' + contentId + '"]');
+                            yourContentElems.forEach(el => {
+                                const newStatus = decision === 'approved' ? 'Approved' : (decision === 'rejected' ? 'Rejected' : 'Changes Requested');
+                                el.setAttribute('data-status', newStatus);
+                                el.dataset.status = newStatus;
+
+                                const badge = el.querySelector('.badge');
+                                if (badge) {
+                                    badge.classList.remove('badge-success', 'badge-warning', 'badge-danger');
+                                    if (decision === 'approved') {
+                                        badge.classList.add('badge-success');
+                                        badge.textContent = 'Approved';
+                                    } else if (decision === 'rejected') {
+                                        badge.classList.add('badge-danger');
+                                        badge.textContent = 'Rejected';
+                                    } else {
+                                        badge.classList.add('badge-warning');
+                                        badge.textContent = 'Changes Requested';
+                                    }
                                 }
                             });
+
+                            // Sync approvals list (will remove the pending entry) and refresh dashboard stats
+                            syncApprovalsFromYourContent();
+                            refreshDashboardStats();
 
                             // Show success message
                             let successMessage = 'Content approved successfully!';
@@ -1643,8 +1663,8 @@
 
                             showSuccessPopup(successMessage);
 
-                            // Update dashboard stats and recent content
-                            updateDashboardStats(decision);
+                            // Dashboard and Recent Content already updated via DOM sync; update Recent badge
+                            updateRecentContentBadge(decision);
 
                             // Close review page and go back to approvals list
                             setTimeout(() => {
@@ -2106,8 +2126,9 @@
                         console.warn('Failed to remove from local storage:', e);
                     }
 
-                    // Update Recent/Dashboard
+                    // Update Recent, Approvals, and Dashboard
                     syncRecentFromYourContent();
+                    syncApprovalsFromYourContent();
                     refreshDashboardStats();
 
                     // If viewing this content, go back to list
@@ -2277,8 +2298,9 @@
                     `;
                     container.insertBefore(newRow, container.firstChild);
                 });
-                // Sync top 3 items from "Your Content" into Recent Content
+                // Sync top 3 items into Recent Content, approvals list, and dashboard stats
                 syncRecentFromYourContent();
+                syncApprovalsFromYourContent();
                 refreshDashboardStats();
             } catch (error) {
                 console.error('Failed to load contents:', error);
@@ -3024,8 +3046,9 @@
                                 </div>
                             `;
                             contentList.insertBefore(newRow, contentList.firstChild);
-                            // Sync Recent Content and dashboard stats to reflect newly uploaded item
+                            // Sync Recent, Approvals, and dashboard stats to reflect newly uploaded item
                             syncRecentFromYourContent();
+                            syncApprovalsFromYourContent();
                             refreshDashboardStats();
                         }
 
@@ -3085,7 +3108,10 @@
                     node.className = 'content-item content-item-clickable';
                     // Mirror data attributes so viewContentDetail can use them
                     const srcId = item.getAttribute('data-id') || item.dataset.id || '';
-                    node.setAttribute('data-id', srcId);
+                    // Use a distinct data-id for recent items so they are not removed when the original
+                    // content item is deleted/approved. Preserve original id in data-src-id for lookups.
+                    node.setAttribute('data-src-id', srcId);
+                    if (srcId) node.setAttribute('data-id', 'recent-' + srcId);
                     node.setAttribute('data-title', item.getAttribute('data-title') || title);
                     node.setAttribute('data-type', item.getAttribute('data-type') || item.dataset.type || 'Document');
                     node.setAttribute('data-size', item.getAttribute('data-size') || item.dataset.size || '');
@@ -3113,11 +3139,76 @@
             }
         }
 
+        // Sync pending items from 'Your Content' into the Approvals queue
+        function syncApprovalsFromYourContent() {
+            try {
+                const yourContainer = document.getElementById('content-items-container');
+                const approvalsContainer = document.getElementById('approvals-container');
+                if (!yourContainer || !approvalsContainer) return;
+
+                // Clear current approvals list
+                approvalsContainer.innerHTML = '';
+
+                const items = yourContainer.querySelectorAll('.content-item');
+                let added = 0;
+
+                items.forEach(item => {
+                    const status = (item.getAttribute('data-status') || item.dataset.status || '').toString().toLowerCase();
+                    if (!status.includes('pending')) return;
+
+                    const title = item.getAttribute('data-title') || item.dataset.title || 'Untitled';
+                    const date = item.getAttribute('data-date') || item.dataset.date || '-';
+                    const category = item.getAttribute('data-category') || item.dataset.category || '-';
+                    const author = item.getAttribute('data-author') || item.dataset.author || localStorage.getItem('current_user') || 'Unknown';
+                    const id = item.getAttribute('data-id') || item.dataset.id || '';
+                    const description = item.getAttribute('data-description') || item.dataset.description || '';
+
+                    const node = document.createElement('div');
+                    node.className = 'content-item';
+                    node.setAttribute('data-id', id);
+                    node.setAttribute('data-title', title);
+                    node.setAttribute('data-author', author);
+                    node.setAttribute('data-date', date);
+                    node.setAttribute('data-category', category);
+                    node.setAttribute('data-description', description);
+                    node.setAttribute('data-status', 'Pending');
+
+                    node.innerHTML = `
+                        <div>
+                            <div class="content-title">${title}</div>
+                            <div class="content-meta">Submitted by: ${author} | ${date} | Category: ${category}</div>
+                        </div>
+                        <button class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;">
+                            <i class="fas fa-eye"></i> Review
+                        </button>
+                    `;
+
+                    // Attach review handler
+                    const btn = node.querySelector('button');
+                    if (btn) {
+                        btn.onclick = function (e) {
+                            e.stopPropagation();
+                            openReviewPage(node);
+                        };
+                    }
+
+                    approvalsContainer.appendChild(node);
+                    added++;
+                });
+
+                // Update pending count and badges
+                updateApprovalsList();
+            } catch (e) {
+                console.error('syncApprovalsFromYourContent error:', e);
+            }
+        }
+
         // Open preview overlay using data attributes from a content element (used on Dashboard recent items)
         async function openPreviewFromElement(element) {
             try {
                 if (!element) return;
-                const id = element.getAttribute('data-id') || element.dataset.id;
+                // Prefer original source id if present (recent items use data-src-id)
+                const id = element.getAttribute('data-src-id') || element.getAttribute('data-id') || element.dataset.id;
                 const title = element.getAttribute('data-title') || element.dataset.title || 'No Title';
                 const description = element.getAttribute('data-description') || element.dataset.description || 'No description available.';
                 const category = element.getAttribute('data-category') || element.dataset.category || '-';
