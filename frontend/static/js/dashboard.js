@@ -303,17 +303,39 @@ async function handleContentUpload(e) {
             
             // Close modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('uploadModal'));
-            modal.hide();
+            if (modal) {
+                modal.hide();
+            }
+            
+            // Add new content to the list immediately
+            const contentList = document.querySelector('#content-list .card-body');
+            if (contentList) {
+                const newRow = document.createElement('div');
+                newRow.className = 'content-item';
+                newRow.innerHTML = `
+                    <div>
+                        <div class="content-title">${title}</div>
+                        <div class="content-meta">Document | Just now | Modified: ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+                    </div>
+                    <span class="badge badge-warning">Pending</span>
+                `;
+                contentList.insertBefore(newRow, contentList.firstChild); // Add to top
+            }
             
             // Reload content list
             loadUserContent();
+            
+            // Return response for external callers
+            return { status: response.status, ok: true };
         } else {
             const error = await response.json();
             showAlert(error.detail || 'Error uploading content', 'danger');
+            return { status: response.status, ok: false };
         }
     } catch (error) {
         console.error('Error uploading content:', error);
         showAlert('Error uploading content', 'danger');
+        return { status: 500, ok: false, error };
     }
 }
 
@@ -807,3 +829,27 @@ function deleteCategory(categoryId) {
 function deleteContent(contentId) {
     console.log('Deleting content:', contentId);
 }
+
+// --- EXPORT TO WINDOW (Immediate Assignment) ---
+(function() {
+    console.log('Dashboard.js loaded and executing exports...');
+    console.log('handleContentUpload exists?', typeof handleContentUpload);
+    console.log('loadUserContent exists?', typeof loadUserContent);
+    
+    // Force these functions to be globally accessible
+    if (typeof handleContentUpload !== 'undefined') {
+        window.handleContentUpload = handleContentUpload;
+        console.log('✓ handleContentUpload attached to window');
+    } else {
+        console.error('✗ handleContentUpload is undefined!');
+    }
+    
+    if (typeof loadUserContent !== 'undefined') {
+        window.loadUserContent = loadUserContent;
+        console.log('✓ loadUserContent attached to window');
+    } else {
+        console.error('✗ loadUserContent is undefined!');
+    }
+    
+    console.log('Exports complete. window.handleContentUpload is now:', typeof window.handleContentUpload);
+})();

@@ -280,6 +280,15 @@
             border-bottom: none;
         }
 
+        .content-item-clickable {
+            cursor: pointer;
+        }
+
+        .content-item-clickable:hover {
+            background-color: #e8f5e9;
+            transform: translateX(3px);
+        }
+
         .content-title {
             font-weight: 600;
             color: #2c3e50;
@@ -291,11 +300,456 @@
             color: #7f8c8d;
         }
 
+        /* Content Detail View */
+        .content-detail-view {
+            display: none;
+        }
+
+        .content-detail-view.active {
+            display: block;
+        }
+
+        .detail-header {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .detail-header h2 {
+            margin: 0 0 10px 0;
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .detail-meta-row {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .detail-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-meta-item i {
+            opacity: 0.8;
+        }
+
+        .detail-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .detail-section h4 {
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .detail-section p {
+            color: #5a6c7d;
+            line-height: 1.6;
+        }
+
+        .detail-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* Preview Page Styles */
+        .preview-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .preview-overlay.show {
+            display: flex;
+        }
+
+        .preview-container {
+            background: white;
+            border-radius: 12px;
+            max-width: 1400px;
+            width: 95%;
+            max-height: 95vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.4s ease;
+            position: relative;
+        }
+
+        .preview-header {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            padding: 20px;
+            text-align: center;
+            border-radius: 12px 12px 0 0;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .preview-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .preview-close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .preview-logo {
+            max-width: 200px;
+            height: auto;
+            margin: 0 auto 10px;
+        }
+
+        .preview-badge {
+            display: inline-block;
+            background: white;
+            color: #2ecc71;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .preview-content {
+            padding: 40px;
+        }
+
+        .preview-title {
+            font-size: 36px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .preview-media {
+            margin-bottom: 30px;
+            text-align: center;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .preview-media img,
+        .preview-media video {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: block;
+            margin: 0 auto;
+        }
+
+        .preview-description {
+            font-size: 18px;
+            line-height: 1.8;
+            color: #5a6c7d;
+            text-align: justify;
+        }
+
+        .preview-meta {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #ecf0f1;
+        }
+
+        .preview-meta-item {
+            text-align: center;
+        }
+
+        .preview-meta-item i {
+            font-size: 24px;
+            color: #2ecc71;
+            margin-bottom: 5px;
+        }
+
+        .preview-meta-item strong {
+            display: block;
+            font-size: 12px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+        }
+
+        .preview-meta-item span {
+            display: block;
+            font-size: 16px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
         .badge {
             padding: 6px 12px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
+        }
+
+        /* Delete Button */
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+
+        .delete-btn:hover {
+            background-color: rgba(231, 76, 60, 0.1);
+            transform: scale(1.1);
+        }
+
+        .content-item-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Custom Success Popup */
+        .success-popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .success-popup-overlay.show {
+            display: flex;
+        }
+
+        .success-popup {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.4s ease;
+            position: relative;
+        }
+
+        .success-popup-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: scaleUp 0.5s ease;
+        }
+
+        .success-popup-icon i {
+            color: white;
+            font-size: 40px;
+        }
+
+        .success-popup h3 {
+            color: #2c3e50;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .success-popup p {
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+
+        .success-popup-btn {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            border: none;
+            padding: 12px 40px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .success-popup-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(46, 204, 113, 0.4);
+        }
+
+        /* Custom Confirmation Popup */
+        .confirm-popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .confirm-popup-overlay.show {
+            display: flex;
+        }
+
+        .confirm-popup {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.4s ease;
+        }
+
+        .confirm-popup-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: scaleUp 0.5s ease;
+        }
+
+        .confirm-popup-icon i {
+            color: white;
+            font-size: 40px;
+        }
+
+        .confirm-popup h3 {
+            color: #2c3e50;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .confirm-popup p {
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+
+        .confirm-popup-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .confirm-popup-btn {
+            padding: 12px 35px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .confirm-popup-btn.yes {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+        }
+
+        .confirm-popup-btn.yes:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        .confirm-popup-btn.no {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+
+        .confirm-popup-btn.no:hover {
+            background: #bdc3c7;
+            transform: translateY(-2px);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleUp {
+            0% {
+                transform: scale(0);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
         }
 
         .badge-success { background: #d4edda; color: #155724; }
@@ -553,36 +1007,286 @@
                 <div id="content" class="tab-content-area" style="display: none;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                         <h1 class="page-title">My Content</h1>
-                        <button class="btn btn-primary">
+                        <button class="btn btn-primary" onclick="showUploadForm()">
                             <i class="fas fa-upload"></i> Upload Content
                         </button>
                     </div>
                     
-                    <div class="card">
+                    <div class="card" id="content-list">
                         <div class="card-header">
                             <h5>Your Content</h5>
                         </div>
-                        <div class="card-body">
-                            <div class="content-item">
+                        <div class="card-body" id="content-items-container">
+                            <div class="content-item content-item-clickable" data-id="default-1" 
+                                 data-title="Wind Energy Project" 
+                                 data-type="Video" 
+                                 data-size="125 MB" 
+                                 data-date="Dec 17, 2025"
+                                 data-status="Published"
+                                 data-category="Environmental"
+                                 data-description="Comprehensive video documentation of our latest wind energy project, showcasing the installation and benefits of renewable energy infrastructure. This project demonstrates our commitment to sustainable energy solutions and reducing carbon emissions."
+                                 onclick="viewContentDetail(this)">
                                 <div>
                                     <div class="content-title">Wind Energy Project</div>
                                     <div class="content-meta">Video | 125 MB | Modified: Dec 17, 2025</div>
                                 </div>
-                                <span class="badge badge-success">Published</span>
+                                <div class="content-item-actions">
+                                    <span class="badge badge-success">Published</span>
+                                    <button class="delete-btn" onclick="event.stopPropagation(); deleteContent('default-1')" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="content-item">
+                            <div class="content-item content-item-clickable" data-id="default-2"
+                                 data-title="Biodiversity Report 2024" 
+                                 data-type="Document" 
+                                 data-size="3.2 MB" 
+                                 data-date="Dec 16, 2025"
+                                 data-status="Pending"
+                                 data-category="Environmental"
+                                 data-description="Annual biodiversity assessment report documenting local ecosystem health, species population trends, and conservation efforts. This report includes detailed analysis of flora and fauna in protected areas and recommendations for future conservation strategies."
+                                 onclick="viewContentDetail(this)">
                                 <div>
                                     <div class="content-title">Biodiversity Report 2024</div>
                                     <div class="content-meta">Document | 3.2 MB | Modified: Dec 16, 2025</div>
                                 </div>
-                                <span class="badge badge-warning">Pending</span>
+                                <div class="content-item-actions">
+                                    <span class="badge badge-warning">Pending</span>
+                                    <button class="delete-btn" onclick="event.stopPropagation(); deleteContent('default-2')" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="content-item">
+                            <div class="content-item content-item-clickable" data-id="default-3"
+                                 data-title="Carbon Offset Initiative" 
+                                 data-type="Article" 
+                                 data-size="256 KB" 
+                                 data-date="Dec 15, 2025"
+                                 data-status="Approved"
+                                 data-category="Environmental"
+                                 data-description="Detailed article about our carbon offset program, including methodologies for calculating carbon footprint, offset strategies, and partnerships with reforestation projects. This initiative aims to achieve carbon neutrality by 2030."
+                                 onclick="viewContentDetail(this)">
                                 <div>
                                     <div class="content-title">Carbon Offset Initiative</div>
                                     <div class="content-meta">Article | 256 KB | Modified: Dec 15, 2025</div>
                                 </div>
-                                <span class="badge badge-success">Approved</span>
+                                <div class="content-item-actions">
+                                    <span class="badge badge-success">Approved</span>
+                                    <button class="delete-btn" onclick="event.stopPropagation(); deleteContent('default-3')" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Upload Form Section -->
+                    <div id="upload-form-section" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-upload"></i> Upload New Content</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="upload-form">
+                                    <div class="mb-3">
+                                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Title</label>
+                                        <input type="text" class="form-control" id="content-title" required placeholder="Enter content title">
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Description</label>
+                                        <textarea class="form-control" id="content-description" rows="4" required placeholder="Enter content description"></textarea>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Category</label>
+                                        <select class="form-control" id="content-category" required>
+                                            <option value="">Select a category</option>
+                                            <option value="Environmental">Environmental</option>
+                                            <option value="Social">Social</option>
+                                            <option value="Governance">Governance</option>
+                                            <option value="Economic">Economic</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Media File (Image/Video)</label>
+                                        <input type="file" class="form-control" id="content-media" accept="image/*,video/*" required>
+                                        <small style="color: #7f8c8d; display: block; margin-top: 5px;">Upload an image or video to display for this project</small>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Project Document</label>
+                                        <input type="file" class="form-control" id="content-file" required>
+                                        <small style="color: #7f8c8d; display: block; margin-top: 5px;">Upload project details (PDF, DOC, DOCX, etc. - Max 500MB)</small>
+                                    </div>
+                                    
+                                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-upload"></i> Upload Content
+                                        </button>
+                                        <button type="button" class="btn btn-primary" onclick="hideUploadForm()" style="background: #7f8c8d;">
+                                            <i class="fas fa-arrow-left"></i> Back
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Content Detail View -->
+                    <div id="content-detail-view" class="content-detail-view">
+                        <button class="btn btn-primary" onclick="backToContentList()" style="margin-bottom: 20px; background: #7f8c8d;">
+                            <i class="fas fa-arrow-left"></i> Back to My Content
+                        </button>
+                        
+                        <div class="detail-header">
+                            <h2 id="detail-title">Content Title</h2>
+                            <div class="detail-meta-row">
+                                <div class="detail-meta-item">
+                                    <i class="fas fa-file"></i>
+                                    <span id="detail-type">Document</span>
+                                </div>
+                                <div class="detail-meta-item">
+                                    <i class="fas fa-hdd"></i>
+                                    <span id="detail-size">0 KB</span>
+                                </div>
+                                <div class="detail-meta-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span id="detail-date">-</span>
+                                </div>
+                                <div class="detail-meta-item">
+                                    <i class="fas fa-tag"></i>
+                                    <span id="detail-category">-</span>
+                                </div>
+                                <div class="detail-meta-item">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span id="detail-status">-</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Media Preview Section -->
+                        <div id="detail-media-preview" class="detail-section" style="display: none;">
+                            <h4><i class="fas fa-image"></i> Media Preview</h4>
+                            <div style="text-align: center; padding: 20px;">
+                                <img id="detail-image-preview" style="max-width: 100%; max-height: 500px; border-radius: 8px; display: none; margin: 0 auto;" />
+                                <video id="detail-video-preview" controls style="max-width: 100%; max-height: 500px; border-radius: 8px; display: none; margin: 0 auto;"></video>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-section">
+                            <h4><i class="fas fa-align-left"></i> Description</h4>
+                            <p id="detail-description">No description available.</p>
+                        </div>
+                        
+                        <div class="detail-section">
+                            <h4><i class="fas fa-info-circle"></i> File Information</h4>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <strong>Content ID:</strong>
+                                    <p id="detail-id" style="margin: 5px 0;">-</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <strong>File Format:</strong>
+                                    <p id="detail-format" style="margin: 5px 0;">-</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <strong>Upload Date:</strong>
+                                    <p id="detail-upload-date" style="margin: 5px 0;">-</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <strong>Status:</strong>
+                                    <p id="detail-status-info" style="margin: 5px 0;">-</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-actions">
+                            <button class="btn btn-primary" onclick="downloadCurrentContent()">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                            <button class="btn btn-primary" style="background: #9b59b6;" onclick="previewContent()">
+                                <i class="fas fa-eye"></i> Preview
+                            </button>
+                            <button class="btn btn-primary" style="background: #3498db;" onclick="editCurrentContent()">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-primary" style="background: #e74c3c;" onclick="deleteCurrentContent()">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Content Edit Form -->
+                    <div id="content-edit-form" class="content-detail-view">
+                        <button class="btn btn-primary" onclick="cancelEdit()" style="margin-bottom: 20px; background: #7f8c8d;">
+                            <i class="fas fa-arrow-left"></i> Cancel
+                        </button>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-edit"></i> Edit Content</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="edit-content-form">
+                                    <div class="mb-3">
+                                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Title</label>
+                                        <input type="text" class="form-control" id="edit-title" required placeholder="Enter content title">
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Description</label>
+                                        <textarea class="form-control" id="edit-description" rows="6" required placeholder="Enter content description"></textarea>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Category</label>
+                                        <select class="form-control" id="edit-category" required>
+                                            <option value="">Select a category</option>
+                                            <option value="Environmental">Environmental</option>
+                                            <option value="Social">Social</option>
+                                            <option value="Governance">Governance</option>
+                                            <option value="Economic">Economic</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Replace Media File (Optional)</label>
+                                        <input type="file" class="form-control" id="edit-media" accept="image/*,video/*">
+                                        <small style="color: #7f8c8d; display: block; margin-top: 5px;">Leave empty to keep current media. Upload new image/video to replace it.</small>
+                                        <!-- Current Media Preview -->
+                                        <div id="edit-current-media" style="margin-top: 15px; text-align: center; display: none;">
+                                            <strong style="display: block; margin-bottom: 10px;">Current Media:</strong>
+                                            <img id="edit-current-image" style="max-width: 100%; max-height: 300px; border-radius: 8px; display: none; margin: 0 auto;" />
+                                            <video id="edit-current-video" controls style="max-width: 100%; max-height: 300px; border-radius: 8px; display: none; margin: 0 auto;"></video>
+                                        </div>
+                                        <!-- New Media Preview -->
+                                        <div id="edit-new-media-preview" style="margin-top: 15px; text-align: center; display: none;">
+                                            <strong style="display: block; margin-bottom: 10px; color: #2ecc71;">New Media Preview:</strong>
+                                            <img id="edit-new-image" style="max-width: 100%; max-height: 300px; border-radius: 8px; display: none; margin: 0 auto;" />
+                                            <video id="edit-new-video" controls style="max-width: 100%; max-height: 300px; border-radius: 8px; display: none; margin: 0 auto;"></video>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Replace Project Document (Optional)</label>
+                                        <input type="file" class="form-control" id="edit-file">
+                                        <small style="color: #7f8c8d; display: block; margin-top: 5px;">Leave empty to keep current document. Upload new file to replace it.</small>
+                                        <div id="current-file-info" style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 6px; display: none;">
+                                            <strong>Current document:</strong> <span id="current-file-display"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> Save Changes
+                                        </button>
+                                        <button type="button" class="btn btn-primary" onclick="cancelEdit()" style="background: #7f8c8d;">
+                                            <i class="fas fa-times"></i> Cancel
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -811,9 +1515,291 @@
         </main>
     </div>
 
+    <!-- Preview Overlay -->
+    <div id="previewOverlay" class="preview-overlay">
+        <div class="preview-container">
+            <div class="preview-header">
+                <button class="preview-close-btn" onclick="closePreview()">
+                    <i class="fas fa-times"></i>
+                </button>
+                <img src="https://www.moe.gov.sg/-/media/images/school-logos/post-secondary/republic-polytechnic.png?h=140&iar=0&w=500&hash=1EE0F782E863E3DB9FF95982A0BA8973" 
+                     alt="Republic Polytechnic Logo" 
+                     class="preview-logo">
+                <div class="preview-badge">CONTENT PREVIEW</div>
+            </div>
+            <div class="preview-content">
+                <h1 class="preview-title" id="preview-title">Content Title</h1>
+                
+                <div class="preview-media" id="preview-media-container">
+                    <img id="preview-image" style="display: none;" />
+                    <video id="preview-video" controls style="display: none;"></video>
+                    <div id="preview-no-media" style="color: #7f8c8d; padding: 40px; display: none;">
+                        <i class="fas fa-image" style="font-size: 48px; margin-bottom: 10px;"></i>
+                        <p>No media available for preview</p>
+                    </div>
+                </div>
+                
+                <div class="preview-description" id="preview-description">
+                    No description available.
+                </div>
+                
+                <div class="preview-meta">
+                    <div class="preview-meta-item">
+                        <i class="fas fa-tag"></i>
+                        <strong>Category</strong>
+                        <span id="preview-category">-</span>
+                    </div>
+                    <div class="preview-meta-item">
+                        <i class="fas fa-calendar"></i>
+                        <strong>Date</strong>
+                        <span id="preview-date">-</span>
+                    </div>
+                    <div class="preview-meta-item">
+                        <i class="fas fa-file"></i>
+                        <strong>Type</strong>
+                        <span id="preview-type">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Popup Modal -->
+    <div id="confirmPopup" class="confirm-popup-overlay">
+        <div class="confirm-popup">
+            <div class="confirm-popup-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3>Delete Content?</h3>
+            <p>Are you sure you want to delete this content? This action cannot be undone.</p>
+            <div class="confirm-popup-buttons">
+                <button class="confirm-popup-btn yes" onclick="confirmDelete(true)">Yes, Delete</button>
+                <button class="confirm-popup-btn no" onclick="confirmDelete(false)">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Popup Modal -->
+    <div id="successPopup" class="success-popup-overlay">
+        <div class="success-popup">
+            <div class="success-popup-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            <h3>Success!</h3>
+            <p id="successPopupMessage">Content uploaded successfully!</p>
+            <button class="success-popup-btn" onclick="closeSuccessPopup()">Great!</button>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="frontend/static/js/auth.js"></script>
+    <script src="frontend/static/js/dashboard.js"></script>
     <script>
-        const STORAGE_KEY = 'auth_token';
+        // API Configuration
+        const API_URL = 'https://rpecocjourney-backend.onrender.com';
+        
+        function showSuccessPopup(message) {
+            const popup = document.getElementById('successPopup');
+            const messageEl = document.getElementById('successPopupMessage');
+            messageEl.textContent = message;
+            popup.classList.add('show');
+        }
+
+        function closeSuccessPopup() {
+            const popup = document.getElementById('successPopup');
+            popup.classList.remove('show');
+        }
+
+        // Confirmation popup functions
+        let pendingDeleteId = null;
+
+        function showConfirmPopup(contentId) {
+            pendingDeleteId = contentId;
+            const popup = document.getElementById('confirmPopup');
+            popup.classList.add('show');
+        }
+
+        async function confirmDelete(confirmed) {
+            const popup = document.getElementById('confirmPopup');
+            popup.classList.remove('show');
+
+            if (confirmed && pendingDeleteId) {
+                try {
+                    // Delete from backend
+                    const response = await fetch(`${API_URL}/api/content/${pendingDeleteId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to delete content');
+                    }
+
+                    // Remove from DOM
+                    const contentItem = document.querySelector(`[data-id="${pendingDeleteId}"]`);
+                    if (contentItem) {
+                        contentItem.remove();
+                    }
+
+                    // If viewing this content, go back to list
+                    if (currentViewingContentId === pendingDeleteId) {
+                        backToContentList();
+                    }
+
+                    showSuccessPopup('Content deleted successfully!');
+                } catch (error) {
+                    console.error('Failed to delete:', error);
+                    alert('Failed to delete content: ' + error.message);
+                }
+            }
+
+            pendingDeleteId = null;
+        }
+
+        // Content persistence functions using IndexedDB for large files
+        let db;
+        
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open('EcoJourneyDB', 1);
+                
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    db = request.result;
+                    resolve(db);
+                };
+                
+                request.onupgradeneeded = (event) => {
+                    db = event.target.result;
+                    if (!db.objectStoreNames.contains('contents')) {
+                        db.createObjectStore('contents', { keyPath: 'id' });
+                    }
+                };
+            });
+        }
+        
+        function saveContentToStorage(content) {
+            return new Promise((resolve, reject) => {
+                if (!db) {
+                    reject(new Error('Database not initialized'));
+                    return;
+                }
+                
+                const transaction = db.transaction(['contents'], 'readwrite');
+                const store = transaction.objectStore('contents');
+                const request = store.put(content);
+                
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        function getStoredContents() {
+            return new Promise((resolve, reject) => {
+                if (!db) {
+                    resolve([]);
+                    return;
+                }
+                
+                const transaction = db.transaction(['contents'], 'readonly');
+                const store = transaction.objectStore('contents');
+                const request = store.getAll();
+                
+                request.onsuccess = () => resolve(request.result || []);
+                request.onerror = () => reject(request.error);
+            });
+        }
+        
+        function deleteContentFromStorage(contentId) {
+            return new Promise((resolve, reject) => {
+                if (!db) {
+                    resolve();
+                    return;
+                }
+                
+                const transaction = db.transaction(['contents'], 'readwrite');
+                const store = transaction.objectStore('contents');
+                const request = store.delete(contentId);
+                
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        function deleteContent(contentId) {
+            showConfirmPopup(contentId);
+        }
+
+        function formatToSGTime(isoString) {
+            if (!isoString) return '-';
+            const date = new Date(isoString);
+            // Singapore is UTC+8
+            const options = {
+                timeZone: 'Asia/Singapore',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            };
+            return date.toLocaleString('en-SG', options);
+        }
+
+        async function loadStoredContents() {
+            try {
+                const response = await fetch(`${API_URL}/api/content/all`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    console.error('Failed to fetch contents from server');
+                    return; // Silently fail and show default content
+                }
+                
+                const contents = await response.json();
+                const container = document.getElementById('content-items-container');
+                
+                if (!container) return;
+
+                contents.forEach(content => {
+                    const newRow = document.createElement('div');
+                    newRow.className = 'content-item content-item-clickable';
+                    newRow.setAttribute('data-id', content._id || content.id);
+                    newRow.setAttribute('data-title', content.title);
+                    newRow.setAttribute('data-type', content.type || 'Document');
+                    newRow.setAttribute('data-size', content.fileSize);
+                    newRow.setAttribute('data-date', content.date);
+                    newRow.setAttribute('data-status', content.status || 'Pending');
+                    newRow.setAttribute('data-category', content.category || 'General');
+                    newRow.setAttribute('data-description', content.description || 'No description available.');
+                    newRow.onclick = function() { viewContentDetail(this); };
+                    
+                    const formattedDate = formatToSGTime(content.date);
+                    newRow.innerHTML = `
+                        <div>
+                            <div class="content-title">${content.title}</div>
+                            <div class="content-meta">${content.type || 'Document'} | ${content.fileSize} bytes | Modified: ${formattedDate}</div>
+                        </div>
+                        <div class="content-item-actions">
+                            <span class="badge badge-warning">${content.status || 'Pending'}</span>
+                            <button class="delete-btn" onclick="event.stopPropagation(); deleteContent('${content._id || content.id}')" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    container.insertBefore(newRow, container.firstChild);
+                });
+            } catch (error) {
+                console.error('Failed to load contents:', error);
+                // Silently fail and show default content instead of alerting
+            }
+        }
 
         function updateProfileRole() {
             const role = localStorage.getItem('user_role');
@@ -868,17 +1854,25 @@
                 return;
             }
 
-        document.querySelectorAll('.sidebar .nav-link').forEach(link => {
-            // Skip the logout button
-            if (link.closest('.sidebar-footer')) return;
+            // Get the allowed tabs for this role
+            const allowedTabs = ROLE_PERMISSIONS[role];
 
-            const tabName = link.id.replace('nav-', '');
-            if (!ROLE_PERMISSIONS[role].includes(tabName)) {
+            // First, hide ALL navigation links (except logout)
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                // Skip the logout button
+                if (link.closest('.sidebar-footer')) return;
+
+                // Default to hidden
                 link.style.display = 'none';
-            } else {
-                link.style.display = 'block'; // make sure allowed links are visible
-            }
-        });
+            });
+
+            // Then, ONLY show the allowed tabs for this role
+            allowedTabs.forEach(tabName => {
+                const navLink = document.getElementById('nav-' + tabName);
+                if (navLink) {
+                    navLink.style.display = 'block';
+                }
+            });
 
             switchTab(ROLE_PERMISSIONS[role][0]);
         }
@@ -909,9 +1903,664 @@
             window.location.href = 'login.html';
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
+        function showUploadForm() {
+            document.getElementById('content-list').style.display = 'none';
+            document.getElementById('upload-form-section').style.display = 'block';
+            document.getElementById('content-detail-view').style.display = 'none';
+            document.getElementById('content-edit-form').style.display = 'none';
+        }
+
+        function hideUploadForm() {
+            document.getElementById('content-list').style.display = 'block';
+            document.getElementById('upload-form-section').style.display = 'none';
+            document.getElementById('content-detail-view').style.display = 'none';
+            document.getElementById('content-edit-form').style.display = 'none';
+            document.getElementById('upload-form').reset();
+        }
+
+        let currentViewingContentId = null;
+
+        async function viewContentDetail(element) {
+            const contentData = {
+                id: element.dataset.id,
+                title: element.dataset.title,
+                type: element.dataset.type,
+                size: element.dataset.size,
+                date: element.dataset.date,
+                status: element.dataset.status,
+                category: element.dataset.category,
+                description: element.dataset.description
+            };
+
+            currentViewingContentId = contentData.id;
+
+            // Hide list and upload form, show detail view
+            document.getElementById('content-list').style.display = 'none';
+            document.getElementById('upload-form-section').style.display = 'none';
+            document.getElementById('content-detail-view').style.display = 'block';
+            document.getElementById('content-edit-form').style.display = 'none';
+
+            // Populate detail view
+            document.getElementById('detail-title').textContent = contentData.title;
+            document.getElementById('detail-type').textContent = contentData.type;
+            document.getElementById('detail-size').textContent = contentData.size;
+            document.getElementById('detail-date').textContent = contentData.date;
+            document.getElementById('detail-category').textContent = contentData.category;
+            document.getElementById('detail-status').textContent = contentData.status;
+            document.getElementById('detail-description').textContent = contentData.description || 'No description available.';
+            document.getElementById('detail-id').textContent = contentData.id;
+            document.getElementById('detail-format').textContent = contentData.type;
+            document.getElementById('detail-upload-date').textContent = formatToSGTime(contentData.date);
+            document.getElementById('detail-status-info').textContent = contentData.status;
+            
+            // Display media preview if available
+            const mediaPreview = document.getElementById('detail-media-preview');
+            const imagePreview = document.getElementById('detail-image-preview');
+            const videoPreview = document.getElementById('detail-video-preview');
+            
+            // Hide both previews first
+            imagePreview.style.display = 'none';
+            videoPreview.style.display = 'none';
+            mediaPreview.style.display = 'none';
+            
+            // Fetch content with media data from backend
+            try {
+                const response = await fetch(`${API_URL}/api/content/${contentData.id}`);
+                console.log('Fetch response status:', response.status);
+                
+                if (response.ok) {
+                    const storedContent = await response.json();
+                    console.log('Stored content keys:', Object.keys(storedContent));
+                    console.log('Has mediaData:', !!storedContent.mediaData);
+                    console.log('MediaFileType:', storedContent.mediaFileType);
+                    
+                    if (storedContent && storedContent.mediaData) {
+                        const mediaType = storedContent.mediaFileType || '';
+                        console.log('MediaData starts with:', storedContent.mediaData.substring(0, 50));
+                        
+                        if (mediaType.startsWith('image/')) {
+                            imagePreview.src = storedContent.mediaData;
+                            imagePreview.style.display = 'block';
+                            mediaPreview.style.display = 'block';
+                            console.log('Showing image preview');
+                        } else if (mediaType.startsWith('video/')) {
+                            videoPreview.src = storedContent.mediaData;
+                            videoPreview.style.display = 'block';
+                            mediaPreview.style.display = 'block';
+                            console.log('Showing video preview');
+                        }
+                    } else {
+                        console.log('No mediaData found in response');
+                    }
+                } else {
+                    console.error('Response not OK:', await response.text());
+                }
+            } catch (error) {
+                console.error('Failed to load media:', error);
+            }
+        }
+
+        function backToContentList() {
+            document.getElementById('content-list').style.display = 'block';
+            document.getElementById('upload-form-section').style.display = 'none';
+            document.getElementById('content-detail-view').style.display = 'none';
+            document.getElementById('content-edit-form').style.display = 'none';
+            currentViewingContentId = null;
+        }
+
+        function deleteCurrentContent() {
+            if (currentViewingContentId) {
+                showConfirmPopup(currentViewingContentId);
+            }
+        }
+
+        async function downloadCurrentContent() {
+            if (!currentViewingContentId) return;
+
+            try {
+                console.log('Downloading content ID:', currentViewingContentId);
+                
+                // Use backend download proxy route that handles filename correctly
+                const downloadUrl = `${API_URL}/api/download/${currentViewingContentId}`;
+                console.log('Download URL:', downloadUrl);
+                
+                // Open download in new window/tab
+                window.open(downloadUrl, '_blank');
+                
+                showSuccessPopup('Download started!');
+            } catch (error) {
+                console.error('Download failed:', error);
+                alert('Download failed: ' + error.message);
+            }
+        }
+
+        async function previewContent() {
+            if (!currentViewingContentId) return;
+
+            try {
+                // Get content data from the detail view
+                const title = document.getElementById('detail-title').textContent;
+                const description = document.getElementById('detail-description').textContent;
+                const category = document.getElementById('detail-category').textContent;
+                const date = document.getElementById('detail-date').textContent;
+                const type = document.getElementById('detail-type').textContent;
+
+                // Populate preview
+                document.getElementById('preview-title').textContent = title;
+                document.getElementById('preview-description').textContent = description;
+                document.getElementById('preview-category').textContent = category;
+                document.getElementById('preview-date').textContent = formatToSGTime(date);
+                document.getElementById('preview-type').textContent = type;
+
+                // Get media from backend
+                console.log('Preview - Fetching content ID:', currentViewingContentId);
+                const response = await fetch(`${API_URL}/api/content/${currentViewingContentId}`);
+                console.log('Preview - Response status:', response.status);
+                const storedContent = response.ok ? await response.json() : null;
+                console.log('Preview - Has mediaData:', storedContent ? !!storedContent.mediaData : false);
+
+                const previewImage = document.getElementById('preview-image');
+                const previewVideo = document.getElementById('preview-video');
+                const previewNoMedia = document.getElementById('preview-no-media');
+
+                // Hide all media elements first
+                previewImage.style.display = 'none';
+                previewVideo.style.display = 'none';
+                previewNoMedia.style.display = 'none';
+
+                if (storedContent && storedContent.mediaData) {
+                    const mediaType = storedContent.mediaFileType || '';
+                    console.log('Preview - MediaType:', mediaType);
+
+                    if (mediaType.startsWith('image/')) {
+                        previewImage.src = storedContent.mediaData;
+                        previewImage.style.display = 'block';
+                        console.log('Preview - Showing image');
+                    } else if (mediaType.startsWith('video/')) {
+                        previewVideo.src = storedContent.mediaData;
+                        previewVideo.style.display = 'block';
+                        console.log('Preview - Showing video');
+                    } else {
+                        previewNoMedia.style.display = 'block';
+                        console.log('Preview - Unknown media type');
+                    }
+                } else {
+                    previewNoMedia.style.display = 'block';
+                    console.log('Preview - No media data available');
+                }
+
+                // Show preview overlay
+                document.getElementById('previewOverlay').classList.add('show');
+                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            } catch (error) {
+                console.error('Preview failed:', error);
+                alert('Failed to load preview: ' + error.message);
+            }
+        }
+
+        function closePreview() {
+            document.getElementById('previewOverlay').classList.remove('show');
+            document.body.style.overflow = ''; // Restore scrolling
+            
+            // Stop any playing video
+            const previewVideo = document.getElementById('preview-video');
+            if (previewVideo) {
+                previewVideo.pause();
+                previewVideo.currentTime = 0;
+            }
+        }
+
+        async function editCurrentContent() {
+            if (!currentViewingContentId) return;
+
+            // Get the current content element
+            const contentElement = document.querySelector(`[data-id="${currentViewingContentId}"]`);
+            if (!contentElement) return;
+
+            // Hide detail view, show edit form
+            document.getElementById('content-detail-view').style.display = 'none';
+            document.getElementById('content-edit-form').style.display = 'block';
+
+            // Pre-fill the form
+            document.getElementById('edit-title').value = contentElement.dataset.title;
+            document.getElementById('edit-description').value = contentElement.dataset.description || '';
+            document.getElementById('edit-category').value = contentElement.dataset.category || '';
+            document.getElementById('edit-file').value = ''; // Clear file input
+            
+            // Show current file info
+            const currentFileInfo = document.getElementById('current-file-info');
+            const currentFileDisplay = document.getElementById('current-file-display');
+            const fileType = contentElement.dataset.type || 'Document';
+            const fileSize = contentElement.dataset.size || 'Unknown';
+            currentFileDisplay.textContent = `${fileType} (${fileSize})`;
+            currentFileInfo.style.display = 'block';
+            
+            // Show current media if available
+            const editCurrentMedia = document.getElementById('edit-current-media');
+            const editCurrentImage = document.getElementById('edit-current-image');
+            const editCurrentVideo = document.getElementById('edit-current-video');
+            const editNewMediaPreview = document.getElementById('edit-new-media-preview');
+            
+            // Hide all media previews first
+            editCurrentImage.style.display = 'none';
+            editCurrentVideo.style.display = 'none';
+            editCurrentMedia.style.display = 'none';
+            editNewMediaPreview.style.display = 'none';
+            
+            // Check if content has stored media data from backend
+            const response = await fetch(`${API_URL}/api/content/${currentViewingContentId}`);
+            const storedContent = response.ok ? await response.json() : null;
+            
+            if (storedContent && storedContent.mediaData) {
+                const mediaFileType = storedContent.mediaFileType || '';
+                
+                if (mediaFileType.startsWith('image/')) {
+                    editCurrentImage.src = storedContent.mediaData;
+                    editCurrentImage.style.display = 'block';
+                    editCurrentMedia.style.display = 'block';
+                } else if (mediaFileType.startsWith('video/')) {
+                    editCurrentVideo.src = storedContent.mediaData;
+                    editCurrentVideo.style.display = 'block';
+                    editCurrentMedia.style.display = 'block';
+                }
+            }
+            
+            // Add media file change listener for preview
+            const mediaInput = document.getElementById('edit-media');
+            mediaInput.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const editNewImage = document.getElementById('edit-new-image');
+                    const editNewVideo = document.getElementById('edit-new-video');
+                    
+                    editNewImage.style.display = 'none';
+                    editNewVideo.style.display = 'none';
+                    
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function(evt) {
+                            editNewImage.src = evt.target.result;
+                            editNewImage.style.display = 'block';
+                            editNewMediaPreview.style.display = 'block';
+                        };
+                        reader.readAsDataURL(file);
+                    } else if (file.type.startsWith('video/')) {
+                        const reader = new FileReader();
+                        reader.onload = function(evt) {
+                            editNewVideo.src = evt.target.result;
+                            editNewVideo.style.display = 'block';
+                            editNewMediaPreview.style.display = 'block';
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                } else {
+                    editNewMediaPreview.style.display = 'none';
+                }
+            };
+        }
+
+        function cancelEdit() {
+            document.getElementById('content-edit-form').style.display = 'none';
+            document.getElementById('content-detail-view').style.display = 'block';
+        }
+
+        async function updateContentData(contentId, updatedData) {
+            // Update the content element's data attributes
+            const contentElement = document.querySelector(`[data-id="${contentId}"]`);
+            if (contentElement) {
+                contentElement.dataset.title = updatedData.title;
+                contentElement.dataset.description = updatedData.description;
+                contentElement.dataset.category = updatedData.category;
+                
+                // Update file info if provided (document file)
+                if (updatedData.fileSize) {
+                    contentElement.dataset.size = updatedData.fileSize;
+                }
+                if (updatedData.type) {
+                    contentElement.dataset.type = updatedData.type;
+                }
+                if (updatedData.date) {
+                    contentElement.dataset.date = updatedData.date;
+                }
+
+                // Update the display in the list
+                const titleElement = contentElement.querySelector('.content-title');
+                if (titleElement) {
+                    titleElement.textContent = updatedData.title;
+                }
+                
+                // Update meta info if file changed
+                if (updatedData.fileSize || updatedData.type || updatedData.date) {
+                    const metaElement = contentElement.querySelector('.content-meta');
+                    if (metaElement) {
+                        const type = updatedData.type || contentElement.dataset.type;
+                        const size = updatedData.fileSize || contentElement.dataset.size;
+                        const date = updatedData.date || contentElement.dataset.date;
+                        metaElement.textContent = `${type} | ${size} | Modified: ${date}`;
+                    }
+                }
+            }
+
+            // Update IndexedDB
+            try {
+                const contents = await getStoredContents();
+                const contentIndex = contents.findIndex(c => c.id === contentId);
+                if (contentIndex !== -1) {
+                    contents[contentIndex] = { ...contents[contentIndex], ...updatedData };
+                    await saveContentToStorage(contents[contentIndex]);
+                }
+            } catch (error) {
+                console.error('Failed to update storage:', error);
+            }
+
+            // Update the detail view
+            document.getElementById('detail-title').textContent = updatedData.title;
+            document.getElementById('detail-category').textContent = updatedData.category;
+            document.getElementById('detail-description').textContent = updatedData.description;
+            
+            // Update file info in detail view if changed
+            if (updatedData.type) {
+                document.getElementById('detail-type').textContent = updatedData.type;
+                document.getElementById('detail-format').textContent = updatedData.type;
+            }
+            if (updatedData.fileSize) {
+                document.getElementById('detail-size').textContent = updatedData.fileSize;
+            }
+            if (updatedData.date) {
+                document.getElementById('detail-date').textContent = updatedData.date;
+                document.getElementById('detail-upload-date').textContent = updatedData.date;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Initialize IndexedDB
+            try {
+                await initDB();
+            } catch (error) {
+                console.error('Failed to initialize database:', error);
+                alert('Failed to initialize storage. Some features may not work properly.');
+            }
+            
             applyRolePermissions();
             updateProfileRole();
+            await loadStoredContents(); // Load persisted content
+            
+            // Handle edit form submission
+            const editForm = document.getElementById('edit-content-form');
+            if (editForm) {
+                editForm.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    
+                    try {
+                        const title = document.getElementById('edit-title').value;
+                        const description = document.getElementById('edit-description').value;
+                        const category = document.getElementById('edit-category').value;
+                        const newMediaFile = document.getElementById('edit-media').files[0];
+                        const newDocFile = document.getElementById('edit-file').files[0];
+                        
+                        if (!title || !category) {
+                            alert('Please fill in title and category');
+                            return;
+                        }
+                        
+                        // Check file sizes (500MB max)
+                        const maxSize = 500 * 1024 * 1024; // 500MB in bytes
+                        if (newMediaFile && newMediaFile.size > maxSize) {
+                            alert('Media file is too large. Maximum size is 500MB.');
+                            return;
+                        }
+                        if (newDocFile && newDocFile.size > maxSize) {
+                            alert('Document file is too large. Maximum size is 500MB.');
+                            return;
+                        }
+                        
+                        const updatedData = {
+                            title: title,
+                            description: description,
+                            category: category
+                        };
+                        
+                        // If a new media file was uploaded, update media info
+                        if (newMediaFile) {
+                            const mediaData = await new Promise((resolve, reject) => {
+                                const reader = new FileReader();
+                                reader.onload = (e) => resolve(e.target.result);
+                                reader.onerror = () => reject(new Error('Failed to read media file'));
+                                reader.readAsDataURL(newMediaFile);
+                            });
+                            
+                            updatedData.mediaFileName = newMediaFile.name;
+                            updatedData.mediaFileType = newMediaFile.type;
+                            updatedData.mediaData = mediaData;
+                        }
+                        
+                        // If a new document file was uploaded, update document info
+                        if (newDocFile) {
+                            // Read the new document file data
+                            const fileData = await new Promise((resolve, reject) => {
+                                const reader = new FileReader();
+                                reader.onload = (e) => resolve(e.target.result);
+                                reader.onerror = () => reject(new Error('Failed to read document file'));
+                                reader.readAsDataURL(newDocFile);
+                            });
+                            
+                            const fileSize = newDocFile.size < 1024*1024 ? 
+                                (newDocFile.size / 1024).toFixed(1) + ' KB' : 
+                                (newDocFile.size / (1024*1024)).toFixed(1) + ' MB';
+                            
+                            // Determine file type from extension
+                            const fileName = newDocFile.name.toLowerCase();
+                            let fileType = 'Document';
+                            if (fileName.endsWith('.pdf')) {
+                                fileType = 'PDF';
+                            } else if (fileName.endsWith('.doc') || fileName.endsWith('.docx')) {
+                                fileType = 'Document';
+                            }
+                            
+                            updatedData.fileSize = fileSize;
+                            updatedData.type = fileType;
+                            updatedData.fileName = newDocFile.name;
+                            updatedData.fileType = newDocFile.type;
+                            updatedData.fileData = fileData;
+                            updatedData.date = new Date().toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric', 
+                                year: 'numeric' 
+                            });
+                        }
+                        
+                        // Update the content
+                        await updateContentData(currentViewingContentId, updatedData);
+                        
+                        // Show success popup
+                        let message = 'Content updated successfully!';
+                        if (newMediaFile && newDocFile) {
+                            message = 'Content, media, and document updated successfully!';
+                        } else if (newMediaFile) {
+                            message = 'Content and media updated successfully!';
+                        } else if (newDocFile) {
+                            message = 'Content and document updated successfully!';
+                        }
+                        showSuccessPopup(message);
+                        
+                        // Refresh the detail view with updated media
+                        if (newMediaFile) {
+                            const contents = await getStoredContents();
+                            const storedContent = contents.find(c => c.id === currentViewingContentId);
+                            
+                            if (storedContent && storedContent.mediaData) {
+                                const detailImage = document.getElementById('detail-image-preview');
+                                const detailVideo = document.getElementById('detail-video-preview');
+                                const detailMediaSection = document.getElementById('detail-media-preview');
+                                
+                                // Hide all first (with null checks)
+                                if (detailImage) detailImage.style.display = 'none';
+                                if (detailVideo) detailVideo.style.display = 'none';
+                                
+                                // Show the updated media
+                                const mediaType = storedContent.mediaFileType || '';
+                                if (mediaType.startsWith('image/') && detailImage) {
+                                    detailImage.src = storedContent.mediaData;
+                                    detailImage.style.display = 'block';
+                                    if (detailMediaSection) detailMediaSection.style.display = 'block';
+                                } else if (mediaType.startsWith('video/') && detailVideo) {
+                                    detailVideo.src = storedContent.mediaData;
+                                    detailVideo.style.display = 'block';
+                                    if (detailMediaSection) detailMediaSection.style.display = 'block';
+                                }
+                            }
+                        }
+                        
+                        // Go back to detail view
+                        document.getElementById('content-edit-form').style.display = 'none';
+                        document.getElementById('content-detail-view').style.display = 'block';
+                        
+                    } catch (error) {
+                        console.error('Update failed:', error);
+                        alert('Update failed: ' + error.message);
+                    }
+                });
+            }
+            
+            // Handle upload form submission
+            const uploadForm = document.getElementById('upload-form');
+            if (uploadForm) {
+                uploadForm.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    
+                    try {
+                        // Get form values
+                        const title = document.getElementById('content-title').value;
+                        const description = document.getElementById('content-description').value;
+                        const category = document.getElementById('content-category').value;
+                        const mediaFile = document.getElementById('content-media').files[0];
+                        const docFile = document.getElementById('content-file').files[0];
+                        
+                        if (!title || !category) {
+                            alert('Please fill in title and category');
+                            return;
+                        }
+                        
+                        if (!mediaFile) {
+                            alert('Please upload a media file (image or video)');
+                            return;
+                        }
+                        
+                        if (!docFile) {
+                            alert('Please upload a project document file');
+                            return;
+                        }
+                        
+                        // Check file sizes (500MB max)
+                        const maxSize = 500 * 1024 * 1024; // 500MB in bytes
+                        if (mediaFile.size > maxSize) {
+                            alert('Media file is too large. Maximum size is 500MB.');
+                            return;
+                        }
+                        if (docFile.size > maxSize) {
+                            alert('Document file is too large. Maximum size is 500MB.');
+                            return;
+                        }
+                        
+                        // Show loading state
+                        const submitBtn = uploadForm.querySelector('button[type="submit"]');
+                        const originalText = submitBtn.innerHTML;
+                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+                        submitBtn.disabled = true;
+                        
+                        // Get file sizes
+                        const docSize = docFile.size < 1024*1024 ? 
+                            (docFile.size / 1024).toFixed(1) + ' KB' : 
+                            (docFile.size / (1024*1024)).toFixed(1) + ' MB';
+                        
+                        const today = new Date().toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric', 
+                            year: 'numeric' 
+                        });
+                        
+                        // Determine document type
+                        const docName = docFile.name.toLowerCase();
+                        let docType = 'Document';
+                        if (docName.endsWith('.pdf')) {
+                            docType = 'PDF';
+                        } else if (docName.endsWith('.doc') || docName.endsWith('.docx')) {
+                            docType = 'Document';
+                        }
+                        
+                        // Create FormData to send files to Cloudinary
+                        const formData = new FormData();
+                        formData.append('title', title);
+                        formData.append('description', description);
+                        formData.append('category', category);
+                        formData.append('type', docType);
+                        formData.append('mediaFile', mediaFile); // Actual file object
+                        formData.append('documentFile', docFile); // Actual file object
+                        
+                        // Send to backend API with FormData (no Content-Type header needed)
+                        const response = await fetch(`${API_URL}/api/content/upload`, {
+                            method: 'POST',
+                            body: formData // Send FormData directly
+                        });
+                        
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.message || 'Upload failed');
+                        }
+                        
+                        const result = await response.json();
+                        const contentId = result.content._id || result.content.id;
+                        
+                        // Add new content to the list immediately
+                        const contentList = document.getElementById('content-items-container');
+                        if (contentList) {
+                            const newRow = document.createElement('div');
+                            newRow.className = 'content-item content-item-clickable';
+                            newRow.setAttribute('data-id', contentId);
+                            newRow.setAttribute('data-title', title);
+                            newRow.setAttribute('data-type', docType);
+                            newRow.setAttribute('data-size', docSize);
+                            newRow.setAttribute('data-date', today);
+                            newRow.setAttribute('data-status', 'Pending');
+                            newRow.setAttribute('data-category', category);
+                            newRow.setAttribute('data-description', description);
+                            newRow.onclick = function() { viewContentDetail(this); };
+                            
+                            newRow.innerHTML = `
+                                <div>
+                                    <div class="content-title">${title}</div>
+                                    <div class="content-meta">${docType} | ${docSize} | Modified: ${today}</div>
+                                </div>
+                                <div class="content-item-actions">
+                                    <span class="badge badge-warning">Pending</span>
+                                    <button class="delete-btn" onclick="event.stopPropagation(); deleteContent('${contentId}')" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            `;
+                            contentList.insertBefore(newRow, contentList.firstChild);
+                        }
+                        
+                        // Reset button
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                        
+                        // Show success popup and switch to content tab
+                        showSuccessPopup('Content uploaded successfully!');
+                        hideUploadForm();
+                        switchTab('content');
+                        
+                    } catch (error) {
+                        console.error('Upload failed:', error);
+                        alert('Upload failed: ' + error.message);
+                        
+                        // Reset button on error
+                        const submitBtn = uploadForm.querySelector('button[type="submit"]');
+                        submitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Content';
+                        submitBtn.disabled = false;
+                    }
+                });
+            }
         });
     </script>
 </body>

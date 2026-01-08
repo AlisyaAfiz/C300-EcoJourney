@@ -45,7 +45,7 @@ const multimediaContentSchema = new mongoose.Schema({
   creator: {
     type: String,
     ref: 'User',
-    required: true,
+    default: 'system',
   },
   viewCount: {
     type: Number,
@@ -63,7 +63,39 @@ const multimediaContentSchema = new mongoose.Schema({
     type: Date,
     default: null,
   },
-}, { collection: 'multimedia_content' });
+  // Additional fields for file storage
+  fileData: {
+    type: String,
+    default: null,
+  },
+  mediaData: {
+    type: String,
+    default: null,
+  },
+  fileSize: {
+    type: String,
+    default: null,
+  },
+  date: {
+    type: String,
+    default: null,
+  },
+  type: {
+    type: String,
+    default: null,
+  },
+  mediaFileName: {
+    type: String,
+    default: null,
+  },
+  mediaFileType: {
+    type: String,
+    default: null,
+  },
+}, { 
+  collection: 'multimedia_content',
+  strict: false // Allow additional fields not in schema
+});
 
 // Create indexes
 multimediaContentSchema.index({ status: 1 });
