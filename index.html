@@ -1627,13 +1627,16 @@
                             reviews.push(reviewData);
                             localStorage.setItem('content_reviews', JSON.stringify(reviews));
 
-                            // Update the content item's status in the list
-                            const contentItem = document.querySelector(`[data-id="${currentReviewingContent.id}"]`);
-                            if (contentItem) {
-                                contentItem.dataset.status = decision === 'approved' ? 'Approved' :
-                                    decision === 'changes_requested' ? 'Changes Requested' :
-                                        'Rejected';
-                            }
+                            // Remove the content item from the pending list
+                            const contentId = currentReviewingContent.id;
+                            console.log('Removing content with ID:', contentId);
+                            const allItems = document.querySelectorAll('[data-id]');
+                            allItems.forEach(item => {
+                                if (item.getAttribute('data-id') === contentId) {
+                                    console.log('Found and removing item');
+                                    item.remove();
+                                }
+                            });
 
                             // Show success message
                             let successMessage = 'Content approved successfully!';
