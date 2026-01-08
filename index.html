@@ -1003,7 +1003,7 @@
                                 <div class="card-header">
                                     <h5><i class="fas fa-history"></i> Recent Content</h5>
                                 </div>
-                                <div class="card-body">
+                                <div class="card-body" id="recent-content-container">
                                     <div class="content-item">
                                         <div>
                                             <div class="content-title">Solar Energy Initiative</div>
@@ -1044,9 +1044,6 @@
                                     </div>
                                     <div style="margin-bottom: 15px;">
                                         <span class="category-badge gov">Governance (6)</span>
-                                    </div>
-                                    <div style="margin-bottom: 15px;">
-                                        <span class="category-badge econ">Economic (3)</span>
                                     </div>
                                 </div>
                             </div>
@@ -1153,7 +1150,6 @@
                                             <option value="Environmental">Environmental</option>
                                             <option value="Social">Social</option>
                                             <option value="Governance">Governance</option>
-                                            <option value="Economic">Economic</option>
                                         </select>
                                     </div>
 
@@ -1311,7 +1307,6 @@
                                             <option value="Environmental">Environmental</option>
                                             <option value="Social">Social</option>
                                             <option value="Governance">Governance</option>
-                                            <option value="Economic">Economic</option>
                                         </select>
                                     </div>
 
@@ -1874,12 +1869,6 @@
                                         <div class="content-meta">6 content items | Color: #f39c12</div>
                                     </div>
                                 </div>
-                                <div class="content-item">
-                                    <div>
-                                        <div class="content-title">Economic</div>
-                                        <div class="content-meta">3 content items | Color: #e74c3c</div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -2120,6 +2109,8 @@
                     if (contentItem) {
                         contentItem.remove();
                     }
+                    // Update Recent Content after deletion
+                    syncRecentFromYourContent();
 
                     // If viewing this content, go back to list
                     if (currentViewingContentId === pendingDeleteId) {
@@ -2273,6 +2264,8 @@
                     `;
                     container.insertBefore(newRow, container.firstChild);
                 });
+                // Sync top 3 items from "Your Content" into Recent Content
+                syncRecentFromYourContent();
             } catch (error) {
                 console.error('Failed to load contents:', error);
                 // Silently fail and show default content instead of alerting
@@ -3017,6 +3010,8 @@
                                 </div>
                             `;
                             contentList.insertBefore(newRow, contentList.firstChild);
+                            // Sync Recent Content to reflect newly uploaded item
+                            syncRecentFromYourContent();
                         }
 
                         // Reset button
@@ -3040,6 +3035,54 @@
                 });
             }
         });
+
+        // Keep the "Recent Content" card in sync with the top 3 items from "Your Content"
+        function syncRecentFromYourContent() {
+            try {
+                const yourContainer = document.getElementById('content-items-container');
+                const recentContainer = document.getElementById('recent-content-container');
+                if (!yourContainer || !recentContainer) return;
+
+                // Clear existing recent items
+                recentContainer.innerHTML = '';
+
+                const items = yourContainer.querySelectorAll('.content-item');
+                let added = 0;
+
+                for (let i = 0; i < items.length && added < 3; i++) {
+                    const item = items[i];
+                    if (!item) continue;
+
+                    const titleEl = item.querySelector('.content-title');
+                    const metaEl = item.querySelector('.content-meta');
+                    const badgeEl = item.querySelector('.badge');
+
+                    const title = titleEl ? titleEl.textContent.trim() : (item.dataset.title || 'Untitled');
+                    const meta = metaEl ? metaEl.textContent.trim() : `${item.dataset.type || ''} | ${item.dataset.size || ''} | Modified: ${item.dataset.date || ''}`;
+                    const statusText = (item.dataset.status || (badgeEl ? badgeEl.textContent.trim() : '') || 'Pending');
+
+                    let badgeClass = 'badge-warning';
+                    const st = statusText.toLowerCase();
+                    if (st.includes('approved') || st.includes('published')) badgeClass = 'badge-success';
+                    else if (st.includes('rejected')) badgeClass = 'badge-danger';
+
+                    const node = document.createElement('div');
+                    node.className = 'content-item';
+                    node.innerHTML = `
+                        <div>
+                            <div class="content-title">${title}</div>
+                            <div class="content-meta">${meta}</div>
+                        </div>
+                        <span class="badge ${badgeClass}">${statusText}</span>
+                    `;
+
+                    recentContainer.appendChild(node);
+                    added++;
+                }
+            } catch (e) {
+                console.error('syncRecentFromYourContent error:', e);
+            }
+        }
     </script>
 </body>
 
