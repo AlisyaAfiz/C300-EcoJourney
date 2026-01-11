@@ -2238,9 +2238,20 @@
         function formatToSGTime(isoString) {
             if (!isoString) return '-';
             const date = new Date(isoString);
-            // Singapore is UTC+8
+            // Format as "MMM DD, YYYY" (e.g., "Dec 17, 2025")
             const options = {
-                timeZone: 'Asia/Singapore',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        function formatDateTime(isoString) {
+            if (!isoString) return '-';
+            const date = new Date(isoString);
+            // Format as "MMM DD, YYYY, HH:MM AM/PM" (e.g., "Dec 17, 2025, 02:30 PM")
+            const options = {
                 year: 'numeric',
                 month: 'short',
                 day: 'numeric',
@@ -2248,7 +2259,46 @@
                 minute: '2-digit',
                 hour12: true
             };
-            return date.toLocaleString('en-SG', options);
+            return date.toLocaleString('en-US', options);
+        }
+
+        function formatContentId(id) {
+            if (!id) return '-';
+            
+            // If it's a default ID (like "default-1"), return as is
+            if (id.startsWith('default-')) {
+                return id.toUpperCase();
+            }
+            
+            // For UUID/MongoDB ObjectId format, show shortened version
+            // Format: CONTENT-XXXXX (using first 8 characters)
+            if (id.length > 12) {
+                return 'CONTENT-' + id.substring(0, 8).toUpperCase();
+            }
+            
+            return id.toUpperCase();
+        }
+
+        function formatFileSize(bytes) {
+            if (!bytes || bytes === 0) return '0 KB';
+            
+            // If it's already formatted (contains 'KB', 'MB', 'GB'), return as is
+            if (typeof bytes === 'string' && (bytes.includes('KB') || bytes.includes('MB') || bytes.includes('GB'))) {
+                return bytes;
+            }
+            
+            // Convert to number if string
+            const numBytes = typeof bytes === 'string' ? parseInt(bytes) : bytes;
+            
+            if (numBytes < 1024) {
+                return numBytes + ' bytes';
+            } else if (numBytes < 1024 * 1024) {
+                return (numBytes / 1024).toFixed(1) + ' KB';
+            } else if (numBytes < 1024 * 1024 * 1024) {
+                return (numBytes / (1024 * 1024)).toFixed(1) + ' MB';
+            } else {
+                return (numBytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+            }
         }
 
         async function loadStoredContents() {
@@ -2284,10 +2334,11 @@
                     newRow.onclick = function () { viewContentDetail(this); };
 
                     const formattedDate = formatToSGTime(content.date);
+                    const formattedSize = formatFileSize(content.fileSize);
                     newRow.innerHTML = `
                         <div>
                             <div class="content-title">${content.title}</div>
-                            <div class="content-meta">${content.type || 'Document'} | ${content.fileSize} bytes | Modified: ${formattedDate}</div>
+                            <div class="content-meta">${content.type || 'Document'} | ${formattedSize} | Modified: ${formattedDate}</div>
                         </div>
                         <div class="content-item-actions">
                             <span class="badge badge-warning">${content.status || 'Pending'}</span>
@@ -2450,14 +2501,14 @@
             // Populate detail view
             document.getElementById('detail-title').textContent = contentData.title;
             document.getElementById('detail-type').textContent = contentData.type;
-            document.getElementById('detail-size').textContent = contentData.size;
-            document.getElementById('detail-date').textContent = contentData.date;
+            document.getElementById('detail-size').textContent = formatFileSize(contentData.size);
+            document.getElementById('detail-date').textContent = formatToSGTime(contentData.date);
             document.getElementById('detail-category').textContent = contentData.category;
             document.getElementById('detail-status').textContent = contentData.status;
             document.getElementById('detail-description').textContent = contentData.description || 'No description available.';
-            document.getElementById('detail-id').textContent = contentData.id;
+            document.getElementById('detail-id').textContent = formatContentId(contentData.id);
             document.getElementById('detail-format').textContent = contentData.type;
-            document.getElementById('detail-upload-date').textContent = formatToSGTime(contentData.date);
+            document.getElementById('detail-upload-date').textContent = formatDateTime(contentData.date);
             document.getElementById('detail-status-info').textContent = contentData.status;
 
             // Display media preview if available
@@ -2470,40 +2521,71 @@
             videoPreview.style.display = 'none';
             mediaPreview.style.display = 'none';
 
-            // Fetch content with media data from backend
+            // First, try to get media from IndexedDB (for locally edited/stored content)
             try {
-                const response = await fetch(`${API_URL}/api/content/${contentData.id}`);
-                console.log('Fetch response status:', response.status);
+                const contents = await getStoredContents();
+                const localContent = contents.find(c => c.id === contentData.id);
+                
+                if (localContent && localContent.mediaData) {
+                    const mediaType = localContent.mediaFileType || '';
+                    console.log('Found local media data, type:', mediaType);
 
-                if (response.ok) {
-                    const storedContent = await response.json();
-                    console.log('Stored content keys:', Object.keys(storedContent));
-                    console.log('Has mediaData:', !!storedContent.mediaData);
-                    console.log('MediaFileType:', storedContent.mediaFileType);
-
-                    if (storedContent && storedContent.mediaData) {
-                        const mediaType = storedContent.mediaFileType || '';
-                        console.log('MediaData starts with:', storedContent.mediaData.substring(0, 50));
-
-                        if (mediaType.startsWith('image/')) {
-                            imagePreview.src = storedContent.mediaData;
-                            imagePreview.style.display = 'block';
-                            mediaPreview.style.display = 'block';
-                            console.log('Showing image preview');
-                        } else if (mediaType.startsWith('video/')) {
-                            videoPreview.src = storedContent.mediaData;
-                            videoPreview.style.display = 'block';
-                            mediaPreview.style.display = 'block';
-                            console.log('Showing video preview');
-                        }
-                    } else {
-                        console.log('No mediaData found in response');
+                    if (mediaType.startsWith('image/')) {
+                        imagePreview.src = localContent.mediaData;
+                        imagePreview.style.display = 'block';
+                        mediaPreview.style.display = 'block';
+                        console.log('Showing image preview from IndexedDB');
+                    } else if (mediaType.startsWith('video/')) {
+                        videoPreview.src = localContent.mediaData;
+                        videoPreview.style.display = 'block';
+                        mediaPreview.style.display = 'block';
+                        console.log('Showing video preview from IndexedDB');
                     }
-                } else {
-                    console.error('Response not OK:', await response.text());
+                    return; // Don't try backend if we found it locally
                 }
             } catch (error) {
-                console.error('Failed to load media:', error);
+                console.warn('Could not check IndexedDB:', error);
+            }
+
+            // If not found locally, try to fetch from backend
+            // Skip backend fetch for default content items
+            if (!contentData.id.startsWith('default-')) {
+                try {
+                    const response = await fetch(`${API_URL}/api/content/${contentData.id}`);
+                    console.log('Fetch response status:', response.status);
+
+                    if (response.ok) {
+                        const storedContent = await response.json();
+                        console.log('Stored content keys:', Object.keys(storedContent));
+                        console.log('Has mediaData:', !!storedContent.mediaData);
+                        console.log('MediaFileType:', storedContent.mediaFileType);
+
+                        if (storedContent && storedContent.mediaData) {
+                            const mediaType = storedContent.mediaFileType || '';
+                            console.log('MediaData starts with:', storedContent.mediaData.substring(0, 50));
+
+                            if (mediaType.startsWith('image/')) {
+                                imagePreview.src = storedContent.mediaData;
+                                imagePreview.style.display = 'block';
+                                mediaPreview.style.display = 'block';
+                                console.log('Showing image preview from backend');
+                            } else if (mediaType.startsWith('video/')) {
+                                videoPreview.src = storedContent.mediaData;
+                                videoPreview.style.display = 'block';
+                                mediaPreview.style.display = 'block';
+                                console.log('Showing video preview from backend');
+                            }
+                        } else {
+                            console.log('No mediaData found in backend response');
+                        }
+                    } else {
+                        console.error('Response not OK:', await response.text());
+                    }
+                } catch (error) {
+                    console.error('Failed to load media from backend:', error);
+                }
+            } else {
+                console.log('Skipping backend fetch for default content:', contentData.id);
             }
         }
 
@@ -2545,27 +2627,21 @@
             if (!currentViewingContentId) return;
 
             try {
-                // Get content data from the detail view
+                // Get content data from the detail view text
                 const title = document.getElementById('detail-title').textContent;
                 const description = document.getElementById('detail-description').textContent;
                 const category = document.getElementById('detail-category').textContent;
                 const date = document.getElementById('detail-date').textContent;
                 const type = document.getElementById('detail-type').textContent;
 
-                // Populate preview
+                // Populate preview text
                 document.getElementById('preview-title').textContent = title;
                 document.getElementById('preview-description').textContent = description;
                 document.getElementById('preview-category').textContent = category;
                 document.getElementById('preview-date').textContent = formatToSGTime(date);
                 document.getElementById('preview-type').textContent = type;
 
-                // Get media from backend
-                console.log('Preview - Fetching content ID:', currentViewingContentId);
-                const response = await fetch(`${API_URL}/api/content/${currentViewingContentId}`);
-                console.log('Preview - Response status:', response.status);
-                const storedContent = response.ok ? await response.json() : null;
-                console.log('Preview - Has mediaData:', storedContent ? !!storedContent.mediaData : false);
-
+                // Prepare media placeholders
                 const previewImage = document.getElementById('preview-image');
                 const previewVideo = document.getElementById('preview-video');
                 const previewNoMedia = document.getElementById('preview-no-media');
@@ -2575,30 +2651,70 @@
                 previewVideo.style.display = 'none';
                 previewNoMedia.style.display = 'none';
 
-                if (storedContent && storedContent.mediaData) {
-                    const mediaType = storedContent.mediaFileType || '';
-                    console.log('Preview - MediaType:', mediaType);
+                let mediaFound = false;
 
-                    if (mediaType.startsWith('image/')) {
-                        previewImage.src = storedContent.mediaData;
-                        previewImage.style.display = 'block';
-                        console.log('Preview - Showing image');
-                    } else if (mediaType.startsWith('video/')) {
-                        previewVideo.src = storedContent.mediaData;
-                        previewVideo.style.display = 'block';
-                        console.log('Preview - Showing video');
-                    } else {
-                        previewNoMedia.style.display = 'block';
-                        console.log('Preview - Unknown media type');
+                // 1. Try Local Storage (IndexedDB) first
+                try {
+                    const contents = await getStoredContents();
+                    const localContent = contents.find(c => c.id === currentViewingContentId);
+                    
+                    if (localContent && localContent.mediaData) {
+                        const mediaType = localContent.mediaFileType || '';
+                        console.log('Preview - Found local media, type:', mediaType);
+                        
+                        if (mediaType.startsWith('image/')) {
+                            previewImage.src = localContent.mediaData;
+                            previewImage.style.display = 'block';
+                            mediaFound = true;
+                            console.log('Preview - Showing image from IndexedDB');
+                        } else if (mediaType.startsWith('video/')) {
+                            previewVideo.src = localContent.mediaData;
+                            previewVideo.style.display = 'block';
+                            mediaFound = true;
+                            console.log('Preview - Showing video from IndexedDB');
+                        }
                     }
-                } else {
+                } catch (e) {
+                    console.warn('Local preview check failed', e);
+                }
+
+                // 2. If not found locally, try Backend
+                if (!mediaFound && !currentViewingContentId.startsWith('default-')) {
+                    try {
+                        console.log('Preview - Fetching content from API:', currentViewingContentId);
+                        const response = await fetch(`${API_URL}/api/content/${currentViewingContentId}`);
+                        const storedContent = response.ok ? await response.json() : null;
+
+                        if (storedContent && storedContent.mediaData) {
+                            const mediaType = storedContent.mediaFileType || '';
+                            console.log('Preview - Found backend media, type:', mediaType);
+
+                            if (mediaType.startsWith('image/')) {
+                                previewImage.src = storedContent.mediaData;
+                                previewImage.style.display = 'block';
+                                mediaFound = true;
+                                console.log('Preview - Showing image from backend');
+                            } else if (mediaType.startsWith('video/')) {
+                                previewVideo.src = storedContent.mediaData;
+                                previewVideo.style.display = 'block';
+                                mediaFound = true;
+                                console.log('Preview - Showing video from backend');
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Preview API fetch failed:', error);
+                    }
+                }
+
+                // 3. If still no media, show "No Media"
+                if (!mediaFound) {
                     previewNoMedia.style.display = 'block';
-                    console.log('Preview - No media data available');
+                    console.log('Preview - No media available');
                 }
 
                 // Show preview overlay
                 document.getElementById('previewOverlay').classList.add('show');
-                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+                document.body.style.overflow = 'hidden'; 
             } catch (error) {
                 console.error('Preview failed:', error);
                 alert('Failed to load preview: ' + error.message);
@@ -2633,12 +2749,13 @@
             document.getElementById('edit-description').value = contentElement.dataset.description || '';
             document.getElementById('edit-category').value = contentElement.dataset.category || '';
             document.getElementById('edit-file').value = ''; // Clear file input
+            document.getElementById('edit-media').value = ''; // Clear media input
 
             // Show current file info
             const currentFileInfo = document.getElementById('current-file-info');
             const currentFileDisplay = document.getElementById('current-file-display');
             const fileType = contentElement.dataset.type || 'Document';
-            const fileSize = contentElement.dataset.size || 'Unknown';
+            const fileSize = formatFileSize(contentElement.dataset.size) || 'Unknown';
             currentFileDisplay.textContent = `${fileType} (${fileSize})`;
             currentFileInfo.style.display = 'block';
 
@@ -2654,32 +2771,46 @@
             editCurrentMedia.style.display = 'none';
             editNewMediaPreview.style.display = 'none';
 
-            // Check if content has stored media data from backend
-            const response = await fetch(`${API_URL}/api/content/${currentViewingContentId}`);
-            const storedContent = response.ok ? await response.json() : null;
+            // Only try to fetch from backend if it's NOT a default content item
+            // Default content items (default-1, default-2, etc.) don't exist in the database
+            const isDefaultContent = currentViewingContentId.startsWith('default-');
+            
+            if (!isDefaultContent) {
+                try {
+                    const response = await fetch(`${API_URL}/api/content/${currentViewingContentId}`);
+                    const storedContent = response.ok ? await response.json() : null;
 
-            if (storedContent && storedContent.mediaData) {
-                const mediaFileType = storedContent.mediaFileType || '';
+                    if (storedContent && storedContent.mediaData) {
+                        const mediaFileType = storedContent.mediaFileType || '';
 
-                if (mediaFileType.startsWith('image/')) {
-                    editCurrentImage.src = storedContent.mediaData;
-                    editCurrentImage.style.display = 'block';
-                    editCurrentMedia.style.display = 'block';
-                } else if (mediaFileType.startsWith('video/')) {
-                    editCurrentVideo.src = storedContent.mediaData;
-                    editCurrentVideo.style.display = 'block';
-                    editCurrentMedia.style.display = 'block';
+                        if (mediaFileType.startsWith('image/')) {
+                            editCurrentImage.src = storedContent.mediaData;
+                            editCurrentImage.style.display = 'block';
+                            editCurrentMedia.style.display = 'block';
+                        } else if (mediaFileType.startsWith('video/')) {
+                            editCurrentVideo.src = storedContent.mediaData;
+                            editCurrentVideo.style.display = 'block';
+                            editCurrentMedia.style.display = 'block';
+                        }
+                    }
+                } catch (error) {
+                    console.warn('Could not fetch content from backend, continuing with edit:', error);
+                    // Continue anyway - user can still edit title, description, and upload new files
                 }
+            } else {
+                // For default content, show a message that they need to upload new media
+                console.log('Editing default content - user can upload new media and document files');
             }
 
             // Add media file change listener for preview
             const mediaInput = document.getElementById('edit-media');
             mediaInput.onchange = function (e) {
                 const file = e.target.files[0];
+                const editNewImage = document.getElementById('edit-new-image');
+                const editNewVideo = document.getElementById('edit-new-video');
+                const editNewMediaPreviewDiv = document.getElementById('edit-new-media-preview');
+                
                 if (file) {
-                    const editNewImage = document.getElementById('edit-new-image');
-                    const editNewVideo = document.getElementById('edit-new-video');
-
                     editNewImage.style.display = 'none';
                     editNewVideo.style.display = 'none';
 
@@ -2688,7 +2819,7 @@
                         reader.onload = function (evt) {
                             editNewImage.src = evt.target.result;
                             editNewImage.style.display = 'block';
-                            editNewMediaPreview.style.display = 'block';
+                            editNewMediaPreviewDiv.style.display = 'block';
                         };
                         reader.readAsDataURL(file);
                     } else if (file.type.startsWith('video/')) {
@@ -2696,12 +2827,12 @@
                         reader.onload = function (evt) {
                             editNewVideo.src = evt.target.result;
                             editNewVideo.style.display = 'block';
-                            editNewMediaPreview.style.display = 'block';
+                            editNewMediaPreviewDiv.style.display = 'block';
                         };
                         reader.readAsDataURL(file);
                     }
                 } else {
-                    editNewMediaPreview.style.display = 'none';
+                    editNewMediaPreviewDiv.style.display = 'none';
                 }
             };
         }
@@ -2712,70 +2843,68 @@
         }
 
         async function updateContentData(contentId, updatedData) {
-            // Update the content element's data attributes
+            // 1. Update the DOM elements (Visual update)
             const contentElement = document.querySelector(`[data-id="${contentId}"]`);
             if (contentElement) {
                 contentElement.dataset.title = updatedData.title;
                 contentElement.dataset.description = updatedData.description;
                 contentElement.dataset.category = updatedData.category;
 
-                // Update file info if provided (document file)
-                if (updatedData.fileSize) {
-                    contentElement.dataset.size = updatedData.fileSize;
-                }
-                if (updatedData.type) {
-                    contentElement.dataset.type = updatedData.type;
-                }
-                if (updatedData.date) {
-                    contentElement.dataset.date = updatedData.date;
-                }
+                if (updatedData.fileSize) contentElement.dataset.size = updatedData.fileSize;
+                if (updatedData.type) contentElement.dataset.type = updatedData.type;
+                if (updatedData.date) contentElement.dataset.date = updatedData.date;
 
-                // Update the display in the list
                 const titleElement = contentElement.querySelector('.content-title');
-                if (titleElement) {
-                    titleElement.textContent = updatedData.title;
-                }
+                if (titleElement) titleElement.textContent = updatedData.title;
 
-                // Update meta info if file changed
                 if (updatedData.fileSize || updatedData.type || updatedData.date) {
                     const metaElement = contentElement.querySelector('.content-meta');
                     if (metaElement) {
                         const type = updatedData.type || contentElement.dataset.type;
                         const size = updatedData.fileSize || contentElement.dataset.size;
                         const date = updatedData.date || contentElement.dataset.date;
-                        metaElement.textContent = `${type} | ${size} | Modified: ${date}`;
+                        metaElement.textContent = `${type} | ${formatFileSize(size)} | Modified: ${formatToSGTime(date)}`;
                     }
                 }
             }
 
-            // Update IndexedDB
+            // 2. Update Storage (IndexedDB) - THE FIX IS HERE
             try {
                 const contents = await getStoredContents();
                 const contentIndex = contents.findIndex(c => c.id === contentId);
+                
                 if (contentIndex !== -1) {
+                    // Case A: Item exists (e.g., previously uploaded content), update it
                     contents[contentIndex] = { ...contents[contentIndex], ...updatedData };
                     await saveContentToStorage(contents[contentIndex]);
+                } else {
+                    // Case B: Item does not exist (e.g., Default Content being edited for the first time)
+                    // We must CREATE it in the database so the media/files are saved.
+                    const newEntry = { 
+                        id: contentId, 
+                        ...updatedData 
+                    };
+                    await saveContentToStorage(newEntry);
                 }
             } catch (error) {
                 console.error('Failed to update storage:', error);
             }
 
-            // Update the detail view
+            // 3. Update the detail view UI immediately
             document.getElementById('detail-title').textContent = updatedData.title;
             document.getElementById('detail-category').textContent = updatedData.category;
             document.getElementById('detail-description').textContent = updatedData.description;
 
-            // Update file info in detail view if changed
             if (updatedData.type) {
                 document.getElementById('detail-type').textContent = updatedData.type;
                 document.getElementById('detail-format').textContent = updatedData.type;
             }
             if (updatedData.fileSize) {
-                document.getElementById('detail-size').textContent = updatedData.fileSize;
+                document.getElementById('detail-size').textContent = formatFileSize(updatedData.fileSize);
             }
             if (updatedData.date) {
-                document.getElementById('detail-date').textContent = updatedData.date;
-                document.getElementById('detail-upload-date').textContent = updatedData.date;
+                document.getElementById('detail-date').textContent = formatToSGTime(updatedData.date);
+                document.getElementById('detail-upload-date').textContent = formatDateTime(updatedData.date);
             }
         }
 
@@ -3230,34 +3359,61 @@
                 previewVideo.style.display = 'none';
                 previewNoMedia.style.display = 'none';
 
-                // Try fetch media from backend if id available
+                let mediaFound = false;
+
+                // 1. Try Local Storage (IndexedDB) first
                 if (id) {
                     try {
-                        const response = await fetch(`${API_URL}/api/content/${id}`);
-                        if (response.ok) {
-                            const stored = await response.json();
-                            if (stored && stored.mediaData) {
-                                const mediaType = stored.mediaFileType || '';
-                                if (mediaType.startsWith('image/')) {
-                                    previewImage.src = stored.mediaData;
-                                    previewImage.style.display = 'block';
-                                } else if (mediaType.startsWith('video/')) {
-                                    previewVideo.src = stored.mediaData;
-                                    previewVideo.style.display = 'block';
-                                } else {
-                                    previewNoMedia.style.display = 'block';
-                                }
-                            } else {
-                                previewNoMedia.style.display = 'block';
+                        const contents = await getStoredContents();
+                        const localContent = contents.find(c => c.id === id);
+                        
+                        if (localContent && localContent.mediaData) {
+                            const mediaType = localContent.mediaFileType || '';
+                            console.log('Preview element - Found local media, type:', mediaType);
+                            
+                            if (mediaType.startsWith('image/')) {
+                                previewImage.src = localContent.mediaData;
+                                previewImage.style.display = 'block';
+                                mediaFound = true;
+                            } else if (mediaType.startsWith('video/')) {
+                                previewVideo.src = localContent.mediaData;
+                                previewVideo.style.display = 'block';
+                                mediaFound = true;
                             }
-                        } else {
-                            previewNoMedia.style.display = 'block';
                         }
-                    } catch (err) {
-                        console.error('openPreviewFromElement fetch error:', err);
-                        previewNoMedia.style.display = 'block';
+                    } catch (e) {
+                        console.warn('Local preview check failed:', e);
                     }
-                } else {
+
+                    // 2. If not found locally, try Backend
+                    if (!mediaFound && !id.startsWith('default-')) {
+                        try {
+                            const response = await fetch(`${API_URL}/api/content/${id}`);
+                            if (response.ok) {
+                                const stored = await response.json();
+                                if (stored && stored.mediaData) {
+                                    const mediaType = stored.mediaFileType || '';
+                                    console.log('Preview element - Found backend media, type:', mediaType);
+                                    
+                                    if (mediaType.startsWith('image/')) {
+                                        previewImage.src = stored.mediaData;
+                                        previewImage.style.display = 'block';
+                                        mediaFound = true;
+                                    } else if (mediaType.startsWith('video/')) {
+                                        previewVideo.src = stored.mediaData;
+                                        previewVideo.style.display = 'block';
+                                        mediaFound = true;
+                                    }
+                                }
+                            }
+                        } catch (err) {
+                            console.error('openPreviewFromElement fetch error:', err);
+                        }
+                    }
+                }
+
+                // 3. If still no media, show "No Media"
+                if (!mediaFound) {
                     previewNoMedia.style.display = 'block';
                 }
 
