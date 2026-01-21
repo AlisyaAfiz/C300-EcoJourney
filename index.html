@@ -909,6 +909,10 @@
                 <a id="nav-admin" class="nav-link" onclick="switchTab('admin')">
                     <i class="fas fa-cog"></i> Administration
                 </a>
+                <a id="nav-notifications" class="nav-link" onclick="switchTab('notifications')" style="display: none;">
+                    <i class="fas fa-bell"></i> Notifications
+                    <span id="notification-count" class="badge bg-danger ms-2" style="display: none;">0</span>
+                </a>
                 <a id="nav-profile" class="nav-link" onclick="switchTab('profile')">
                     <i class="fas fa-user"></i> Profile
                 </a>
@@ -1361,6 +1365,63 @@
                                     </div>
                                 </form>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="notifications" class="tab-content-area" style="display: none;">
+                    <h1 class="page-title">Notifications</h1>
+
+                    <div class="card">
+                        <div class="card-body">
+
+                            <!-- Approval Notification -->
+                            <div class="content-item">
+                                <div>
+                                    <div class="content-title">
+                                        <i class="fas fa-check-circle text-success"></i>
+                                        Content Approved
+                                    </div>
+                                    <div class="content-meta">
+                                        Your <strong>Carbon Offset Initiative</strong> has been approved.
+                                    </div>
+                                    <small class="text-muted">2 hours ago</small>
+                                </div>
+                                <span class="badge badge-success">New</span>
+                            </div>
+
+                            <!-- Manager Feedback Notification -->
+                            <div class="content-item">
+                                <div>
+                                    <div class="content-title">
+                                        <i class="fas fa-comment-dots text-warning"></i>
+                                        Feedback Received
+                                    </div>
+                                    <div class="content-meta">
+                                        <strong>Biodiversity Report 2024: </strong>Please revise the introduction section to include updated 2025 emissions data.
+                                    </div>
+                                    <small class="text-muted">
+                                        5 hours ago
+                                    </small>
+                                </div>
+                                <span class="badge badge-warning">Action Required</span>
+                            </div>
+
+                            <!-- Rejection Notification -->
+                            <div class="content-item">
+                                <div>
+                                    <div class="content-title">
+                                        <i class="fas fa-times-circle text-danger"></i>
+                                        Content Rejected
+                                    </div>
+                                    <div class="content-meta">
+                                        <strong>Community Outreach Program</strong> was rejected. Please review feedback.
+                                    </div>
+                                    <small class="text-muted">1 day ago</small>
+                                </div>
+                                <span class="badge badge-danger">Rejected</span>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -2380,7 +2441,7 @@
         const ROLE_PERMISSIONS = {
             admin: ['dashboard', 'admin', 'profile'],
             manager: ['dashboard', 'approvals', 'profile'],
-            producer: ['dashboard', 'content', 'profile']
+            producer: ['dashboard', 'content', 'notifications', 'profile']
         };
 
         function switchTab(tabName) {
