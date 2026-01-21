@@ -2696,30 +2696,29 @@
         }
 
         async function updateContentData(contentId, updatedData) {
-            // 1. Update the DOM element attributes in the list
+            // 1. Update the DOM element attributes in the list (The hidden data index uses)
             const contentElement = document.querySelector(`[data-id="${contentId}"]`);
             if (contentElement) {
-                // CRITICAL FIX: Sync the description attribute so the Index Detail shows the new long text
+                // This syncs the attributes so the Side Panel shows the new text
                 contentElement.dataset.title = updatedData.title;
-                contentElement.dataset.description = updatedData.description; // Syncs the long description
+                contentElement.dataset.description = updatedData.description; 
                 contentElement.dataset.category = updatedData.category;
                 
                 if (updatedData.fileSize) contentElement.dataset.size = updatedData.fileSize;
                 if (updatedData.type) contentElement.dataset.type = updatedData.type;
-                contentElement.dataset.date = updatedData.date; // Updates the date attribute
                 
+                // Update the date in the list attribute
+                contentElement.dataset.date = updatedData.date; 
+
                 // Update the visible text in the list row
                 const titleElement = contentElement.querySelector('.content-title');
                 if (titleElement) titleElement.textContent = updatedData.title;
                 
-                // Update the meta description (Type | Size | Date)
                 const metaElement = contentElement.querySelector('.content-meta');
                 if (metaElement) {
                     const type = updatedData.type || contentElement.dataset.type;
                     const size = updatedData.fileSize || contentElement.dataset.size;
-                    // Use current date if no date provided in update
-                    const dateStr = updatedData.date || contentElement.dataset.date;
-                    metaElement.textContent = `${type} | ${formatFileSize(size)} | Modified: ${formatToSGTime(dateStr)}`;
+                    metaElement.textContent = `${type} | ${formatFileSize(size)} | Modified: ${formatToSGTime(updatedData.date)}`;
                 }
             }
 
@@ -2734,11 +2733,10 @@
                     await saveContentToStorage(mergedData);
                 }
             } catch (error) {
-                console.error('Failed to update storage:', error);
+                console.error('Failed to update local storage:', error);
             }
 
-            // 3. IMMEDIATELY Refresh the detail panel view so the user sees changes
-            // We pass the updated element back into the view function
+            // 3. Immediately refresh the Side Panel to show the changes
             if (contentElement) {
                 viewContentDetail(contentElement);
             }
@@ -2846,8 +2844,8 @@
                         // Update the content
                         await updateContentData(currentViewingContentId, updatedData);
 
-                        // Sync other parts of the dashboard
-                        syncRecentFromYourContent();
+                        // REFRESH the dashboard recent list so it doesn't show old data
+                        syncRecentFromYourContent(); 
                         refreshDashboardStats();
 
                         // Show success popup
