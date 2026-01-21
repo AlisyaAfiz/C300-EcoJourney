@@ -1624,136 +1624,74 @@
                             const response = await fetch(`${API_URL}/api/content/${contentId}`);
 
                             if (response.ok) {
-                                const content = await response.json();
+                                const editForm = document.getElementById('edit-content-form');
+                                if (editForm) {
+                                    editForm.addEventListener('submit', async (event) => {
+                                        event.preventDefault();
 
-                                // Update with full content data
-                                if (content.mediaData) {
-                                    const mediaSection = document.getElementById('review-media-section');
-                                    const image = document.getElementById('review-image');
-                                    const video = document.getElementById('review-video');
-                                    const noMedia = document.getElementById('review-no-media');
+                                        try {
+                                            const title = document.getElementById('edit-title').value;
+                                            const description = document.getElementById('edit-description').value;
+                                            const category = document.getElementById('edit-category').value;
+                                            const newMediaFile = document.getElementById('edit-media').files[0];
+                                            const newDocFile = document.getElementById('edit-file').files[0];
 
-                                    image.style.display = 'none';
-                                    video.style.display = 'none';
-                                    noMedia.style.display = 'none';
+                                            // 1. Get the CURRENTLY stored data first so we don't lose the image
+                                            const contents = await getStoredContents();
+                                            const existingItem = contents.find(c => c.id === currentViewingContentId);
 
-                                    if (content.mediaFileType?.startsWith('image/')) {
-                                        image.src = content.mediaData;
-                                        image.style.display = 'block';
-                                        mediaSection.style.display = 'block';
-                                    } else if (content.mediaFileType?.startsWith('video/')) {
-                                        video.src = content.mediaData;
-                                        video.style.display = 'block';
-                                        mediaSection.style.display = 'block';
-                                    } else {
-                                        noMedia.style.display = 'block';
-                                        mediaSection.style.display = 'block';
-                                    }
+                                            const updatedData = {
+                                                ...existingItem, // Start with everything we already have
+                                                title: title,
+                                                description: description,
+                                                category: category,
+                                                date: new Date().toISOString() // Update the modified timestamp
+                                            };
+
+                                            // 2. ONLY if a new media file is selected, overwrite the mediaData
+                                            if (newMediaFile) {
+                                                const mediaData = await new Promise((resolve, reject) => {
+                                                    const reader = new FileReader();
+                                                    reader.onload = (e) => resolve(e.target.result);
+                                                    reader.onerror = () => reject(new Error('Failed to read media file'));
+                                                    reader.readAsDataURL(newMediaFile);
+                                                });
+
+                                                updatedData.mediaFileName = newMediaFile.name;
+                                                updatedData.mediaFileType = newMediaFile.type;
+                                                updatedData.mediaData = mediaData;
+                                            }
+
+                                            // 3. ONLY if a new doc is selected, overwrite doc info
+                                            if (newDocFile) {
+                                                const fileData = await new Promise((resolve, reject) => {
+                                                    const reader = new FileReader();
+                                                    reader.onload = (e) => resolve(e.target.result);
+                                                    reader.onerror = () => reject(new Error('Failed to read document file'));
+                                                    reader.readAsDataURL(newDocFile);
+                                                });
+
+                                                updatedData.fileName = newDocFile.name;
+                                                updatedData.fileType = newDocFile.type;
+                                                updatedData.fileData = fileData;
+                                                updatedData.fileSize = newDocFile.size;
+                                            }
+
+                                            // 4. Save the fully merged object
+                                            await updateContentData(currentViewingContentId, updatedData);
+
+                                            showSuccessPopup('Content updated successfully!');
+                        
+                                            // UI Refresh
+                                            document.getElementById('content-edit-form').style.display = 'none';
+                                            document.getElementById('content-detail-view').style.display = 'block';
+
+                                        } catch (error) {
+                                            console.error('Update failed:', error);
+                                            alert('Update failed: ' + error.message);
+                                        }
+                                    });
                                 }
-                            }
-                        } catch (error) {
-                            console.error('Failed to fetch content for review:', error);
-                        }
-                    }
-
-                    async function submitReview(decision) {
-                        if (!currentReviewingContent) return;
-
-                        const comments = document.getElementById('review-comments').value.trim();
-
-                        if (!comments) {
-                            alert('Please add comments before submitting your review.');
-                            return;
-                        }
-
-                        // Store review data
-                        const reviewData = {
-                            contentId: currentReviewingContent.id,
-                            decision: decision,
-                            comments: comments,
-                            reviewedBy: localStorage.getItem('current_user') || 'Manager',
-                            reviewedAt: new Date().toLocaleString('en-SG'),
-                            title: currentReviewingContent.title,
-                            author: currentReviewingContent.author
-                        };
-
-                        try {
-                            // Save to localStorage
-                            let reviews = JSON.parse(localStorage.getItem('content_reviews') || '[]');
-                            reviews.push(reviewData);
-                            localStorage.setItem('content_reviews', JSON.stringify(reviews));
-
-                            // Update the status of the original content item(s) in 'Your Content'
-                            const contentId = currentReviewingContent.id;
-                            console.log('Updating content status for ID:', contentId, 'to', decision);
-
-                            // Find items inside the Your Content list and update their dataset/status and badge
-                            const yourContentElems = document.querySelectorAll('#content-items-container [data-id="' + contentId + '"]');
-                            yourContentElems.forEach(el => {
-                                const newStatus = decision === 'approved' ? 'Approved' : (decision === 'rejected' ? 'Rejected' : 'Changes Requested');
-                                el.setAttribute('data-status', newStatus);
-                                el.dataset.status = newStatus;
-
-                                const badge = el.querySelector('.badge');
-                                if (badge) {
-                                    badge.classList.remove('badge-success', 'badge-warning', 'badge-danger');
-                                    if (decision === 'approved') {
-                                        badge.classList.add('badge-success');
-                                        badge.textContent = 'Approved';
-                                    } else if (decision === 'rejected') {
-                                        badge.classList.add('badge-danger');
-                                        badge.textContent = 'Rejected';
-                                    } else {
-                                        badge.classList.add('badge-warning');
-                                        badge.textContent = 'Changes Requested';
-                                    }
-                                }
-                            });
-
-                            // Sync approvals list (will remove the pending entry) and refresh dashboard stats
-                            syncApprovalsFromYourContent();
-                            refreshDashboardStats();
-
-                            // Show success message
-                            let successMessage = 'Content approved successfully!';
-                            if (decision === 'changes_requested') {
-                                successMessage = 'Review request sent. Author will be notified to make changes.';
-                            } else if (decision === 'rejected') {
-                                successMessage = 'Content has been rejected.';
-                            }
-
-                            showSuccessPopup(successMessage);
-
-                            // Dashboard and Recent Content already updated via DOM sync; update Recent badge
-                            updateRecentContentBadge(decision);
-
-                            // Close review page and go back to approvals list
-                            setTimeout(() => {
-                                closeReviewPage();
-                                updateApprovalsList();
-                            }, 1500);
-
-                        } catch (error) {
-                            console.error('Failed to save review:', error);
-                            alert('Failed to save review. Please try again.');
-                        }
-                    }
-
-                    function updateApprovalsList() {
-                        const container = document.getElementById('approvals-container');
-                        const items = container.querySelectorAll('.content-item');
-                        let pendingCount = 0;
-
-                        items.forEach(item => {
-                            const status = item.dataset.status;
-                            if (status === 'Pending') {
-                                pendingCount++;
-                            }
-                        });
-
-                        // Update the pending count in approvals tab
-                        document.getElementById('pending-count').textContent = pendingCount;
-
                         // Update the badge in sidebar navigation
                         const approvalsNav = document.getElementById('nav-approvals');
                         const badge = approvalsNav.querySelector('.badge');
