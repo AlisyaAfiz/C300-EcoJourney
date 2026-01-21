@@ -1620,7 +1620,6 @@
 
                     async function fetchContentForReview(contentId) {
                         try {
-                            const API_URL = 'https://rpecocjourney-backend.onrender.com';
                             const response = await fetch(`${API_URL}/api/content/${contentId}`);
 
                             if (response.ok) {
@@ -2756,28 +2755,30 @@
         }
 
         async function updateContentData(contentId, updatedData) {
-            // 1. Update the DOM elements (Visual update)
+            // 1. Update the DOM elements in the list (Visual update)
             const contentElement = document.querySelector(`[data-id="${contentId}"]`);
             if (contentElement) {
+                // Sync the hidden data attributes used by the detail panel
                 contentElement.dataset.title = updatedData.title;
                 contentElement.dataset.description = updatedData.description;
                 contentElement.dataset.category = updatedData.category;
-
+                
                 if (updatedData.fileSize) contentElement.dataset.size = updatedData.fileSize;
                 if (updatedData.type) contentElement.dataset.type = updatedData.type;
                 if (updatedData.date) contentElement.dataset.date = updatedData.date;
-
+                
+                // Update the visible text in the list row
                 const titleElement = contentElement.querySelector('.content-title');
                 if (titleElement) titleElement.textContent = updatedData.title;
-
-                if (updatedData.fileSize || updatedData.type || updatedData.date) {
-                    const metaElement = contentElement.querySelector('.content-meta');
-                    if (metaElement) {
-                        const type = updatedData.type || contentElement.dataset.type;
-                        const size = updatedData.fileSize || contentElement.dataset.size;
-                        const date = updatedData.date || contentElement.dataset.date;
-                        metaElement.textContent = `${type} | ${formatFileSize(size)} | Modified: ${formatToSGTime(date)}`;
-                    }
+                
+                // Update the meta description (Type | Size | Date)
+                const metaElement = contentElement.querySelector('.content-meta');
+                if (metaElement) {
+                    const type = updatedData.type || contentElement.dataset.type;
+                    const size = updatedData.fileSize || contentElement.dataset.size;
+                    // Use current date if no date provided in update
+                    const dateStr = updatedData.date || contentElement.dataset.date;
+                    metaElement.textContent = `${type} | ${formatFileSize(size)} | Modified: ${formatToSGTime(dateStr)}`;
                 }
             }
 
@@ -2787,35 +2788,18 @@
                 const contentIndex = contents.findIndex(c => c.id === contentId);
                 
                 if (contentIndex !== -1) {
-                    // BUG FIX: Merge existing data (like mediaData) with the new updates
-                    // This ensures if only description changed, the old mediaData is kept.
                     const existingItem = contents[contentIndex];
                     const mergedData = { ...existingItem, ...updatedData };
-                    
                     await saveContentToStorage(mergedData);
-                } else {
-                    const newEntry = { id: contentId, ...updatedData };
-                    await saveContentToStorage(newEntry);
                 }
             } catch (error) {
                 console.error('Failed to update storage:', error);
             }
 
-            // 3. Update the detail view UI immediately
-            document.getElementById('detail-title').textContent = updatedData.title;
-            document.getElementById('detail-category').textContent = updatedData.category;
-            document.getElementById('detail-description').textContent = updatedData.description;
-
-            if (updatedData.type) {
-                document.getElementById('detail-type').textContent = updatedData.type;
-                document.getElementById('detail-format').textContent = updatedData.type;
-            }
-            if (updatedData.fileSize) {
-                document.getElementById('detail-size').textContent = formatFileSize(updatedData.fileSize);
-            }
-            if (updatedData.date) {
-                document.getElementById('detail-date').textContent = formatToSGTime(updatedData.date);
-                document.getElementById('detail-upload-date').textContent = formatDateTime(updatedData.date);
+            // 3. IMMEDIATELY Refresh the detail panel view so the user sees changes
+            // We pass the updated element back into the view function
+            if (contentElement) {
+                viewContentDetail(contentElement);
             }
         }
 
@@ -2864,7 +2848,9 @@
                         const updatedData = {
                             title: title,
                             description: description,
-                            category: category
+                            category: category,
+                            // Ensure we save a fresh ISO string for the backend/storage
+                            date: new Date().toISOString()
                         };
 
                         // If a new media file was uploaded, update media info
@@ -2919,46 +2905,14 @@
                         // Update the content
                         await updateContentData(currentViewingContentId, updatedData);
 
+                        // Sync other parts of the dashboard
+                        syncRecentFromYourContent();
+                        refreshDashboardStats();
+
                         // Show success popup
-                        let message = 'Content updated successfully!';
-                        if (newMediaFile && newDocFile) {
-                            message = 'Content, media, and document updated successfully!';
-                        } else if (newMediaFile) {
-                            message = 'Content and media updated successfully!';
-                        } else if (newDocFile) {
-                            message = 'Content and document updated successfully!';
-                        }
-                        showSuccessPopup(message);
+                        showSuccessPopup('Content updated successfully!');
 
-                        // Refresh the detail view with updated media
-                        if (newMediaFile) {
-                            const contents = await getStoredContents();
-                            const storedContent = contents.find(c => c.id === currentViewingContentId);
-
-                            if (storedContent && storedContent.mediaData) {
-                                const detailImage = document.getElementById('detail-image-preview');
-                                const detailVideo = document.getElementById('detail-video-preview');
-                                const detailMediaSection = document.getElementById('detail-media-preview');
-
-                                // Hide all first (with null checks)
-                                if (detailImage) detailImage.style.display = 'none';
-                                if (detailVideo) detailVideo.style.display = 'none';
-
-                                // Show the updated media
-                                const mediaType = storedContent.mediaFileType || '';
-                                if (mediaType.startsWith('image/') && detailImage) {
-                                    detailImage.src = storedContent.mediaData;
-                                    detailImage.style.display = 'block';
-                                    if (detailMediaSection) detailMediaSection.style.display = 'block';
-                                } else if (mediaType.startsWith('video/') && detailVideo) {
-                                    detailVideo.src = storedContent.mediaData;
-                                    detailVideo.style.display = 'block';
-                                    if (detailMediaSection) detailMediaSection.style.display = 'block';
-                                }
-                            }
-                        }
-
-                        // Go back to detail view
+                        // Go back to detail view (updateContentData already refreshed it)
                         document.getElementById('content-edit-form').style.display = 'none';
                         document.getElementById('content-detail-view').style.display = 'block';
 
