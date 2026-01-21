@@ -1621,84 +1621,25 @@
                     async function fetchContentForReview(contentId) {
                         try {
                             const response = await fetch(`${API_URL}/api/content/${contentId}`);
-
                             if (response.ok) {
-                                const editForm = document.getElementById('edit-content-form');
-                                if (editForm) {
-                                    editForm.addEventListener('submit', async (event) => {
-                                        event.preventDefault();
+                                const data = await response.json();
+                                // Optional: Logic to display media in the review section
+                            }
+                        } catch (err) {
+                            console.error('Review fetch failed:', err);
+                        }
+                    }
 
-                                        try {
-                                            const title = document.getElementById('edit-title').value;
-                                            const description = document.getElementById('edit-description').value;
-                                            const category = document.getElementById('edit-category').value;
-                                            const newMediaFile = document.getElementById('edit-media').files[0];
-                                            const newDocFile = document.getElementById('edit-file').files[0];
-
-                                            // 1. Get the CURRENTLY stored data first so we don't lose the image
-                                            const contents = await getStoredContents();
-                                            const existingItem = contents.find(c => c.id === currentViewingContentId);
-
-                                            const updatedData = {
-                                                ...existingItem, // Start with everything we already have
-                                                title: title,
-                                                description: description,
-                                                category: category,
-                                                date: new Date().toISOString() // Update the modified timestamp
-                                            };
-
-                                            // 2. ONLY if a new media file is selected, overwrite the mediaData
-                                            if (newMediaFile) {
-                                                const mediaData = await new Promise((resolve, reject) => {
-                                                    const reader = new FileReader();
-                                                    reader.onload = (e) => resolve(e.target.result);
-                                                    reader.onerror = () => reject(new Error('Failed to read media file'));
-                                                    reader.readAsDataURL(newMediaFile);
-                                                });
-
-                                                updatedData.mediaFileName = newMediaFile.name;
-                                                updatedData.mediaFileType = newMediaFile.type;
-                                                updatedData.mediaData = mediaData;
-                                            }
-
-                                            // 3. ONLY if a new doc is selected, overwrite doc info
-                                            if (newDocFile) {
-                                                const fileData = await new Promise((resolve, reject) => {
-                                                    const reader = new FileReader();
-                                                    reader.onload = (e) => resolve(e.target.result);
-                                                    reader.onerror = () => reject(new Error('Failed to read document file'));
-                                                    reader.readAsDataURL(newDocFile);
-                                                });
-
-                                                updatedData.fileName = newDocFile.name;
-                                                updatedData.fileType = newDocFile.type;
-                                                updatedData.fileData = fileData;
-                                                updatedData.fileSize = newDocFile.size;
-                                            }
-
-                                            // 4. Save the fully merged object
-                                            await updateContentData(currentViewingContentId, updatedData);
-
-                                            showSuccessPopup('Content updated successfully!');
+                    function updateApprovalsList() {
+                        const container = document.getElementById('approvals-container');
+                        const pendingCount = container.querySelectorAll('.content-item').length;
                         
-                                            // UI Refresh
-                                            document.getElementById('content-edit-form').style.display = 'none';
-                                            document.getElementById('content-detail-view').style.display = 'block';
-
-                                        } catch (error) {
-                                            console.error('Update failed:', error);
-                                            alert('Update failed: ' + error.message);
-                                        }
-                                    });
-                                }
                         // Update the badge in sidebar navigation
                         const approvalsNav = document.getElementById('nav-approvals');
                         const badge = approvalsNav.querySelector('.badge');
                         if (badge) {
                             badge.textContent = pendingCount;
-                            if (pendingCount === 0) {
-                                badge.style.display = 'none';
-                            }
+                            badge.style.display = pendingCount === 0 ? 'none' : 'inline-block';
                         }
 
                         if (pendingCount === 0) {
@@ -2542,12 +2483,12 @@
                 // Update the UI
                 const uploadDateElement = document.getElementById('detail-upload-date');
                 uploadDateElement.innerHTML = `
-                    <div class="mb-2">
-                        <strong class="text-dark">Upload Date:</strong> 
+                    <div style="margin-bottom: 8px;">
+                        <span class="text-dark fw-bold">Upload Date:</span> 
                         <span class="text-secondary">${formatDateTime(contentData.date)}</span>
                     </div>
                     <div>
-                        <strong class="text-dark">Last Modified:</strong> 
+                        <span class="text-dark fw-bold">Last Modified:</span> 
                         <span class="text-secondary">${currentTime}</span>
                     </div>
                 `;
@@ -2755,17 +2696,17 @@
         }
 
         async function updateContentData(contentId, updatedData) {
-            // 1. Update the DOM elements in the list (Visual update)
+            // 1. Update the DOM element attributes in the list
             const contentElement = document.querySelector(`[data-id="${contentId}"]`);
             if (contentElement) {
-                // Sync the hidden data attributes used by the detail panel
+                // CRITICAL FIX: Sync the description attribute so the Index Detail shows the new long text
                 contentElement.dataset.title = updatedData.title;
-                contentElement.dataset.description = updatedData.description;
+                contentElement.dataset.description = updatedData.description; // Syncs the long description
                 contentElement.dataset.category = updatedData.category;
                 
                 if (updatedData.fileSize) contentElement.dataset.size = updatedData.fileSize;
                 if (updatedData.type) contentElement.dataset.type = updatedData.type;
-                if (updatedData.date) contentElement.dataset.date = updatedData.date;
+                contentElement.dataset.date = updatedData.date; // Updates the date attribute
                 
                 // Update the visible text in the list row
                 const titleElement = contentElement.querySelector('.content-title');
