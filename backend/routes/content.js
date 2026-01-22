@@ -290,10 +290,10 @@ router.put('/:id', upload.fields([
       }
     }
 
-    // UPDATED: Set both 'date' and 'updatedAt' to current time
+    // UPDATED: Only update 'updatedAt'. Keep 'date' as the original upload date.
     const now = new Date().toISOString();
-    content.date = now;
-    content.updatedAt = now;
+    // content.date = now; // REMOVED: Do not overwrite the original upload date
+    content.updatedAt = now; // Update the modification timestamp
 
     await content.save();
     

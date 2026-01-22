@@ -2289,18 +2289,26 @@
                     newRow.setAttribute('data-title', content.title);
                     newRow.setAttribute('data-type', content.type || 'Document');
                     newRow.setAttribute('data-size', content.fileSize);
-                    newRow.setAttribute('data-date', content.date);
+                    
+                    // FIX: Store Upload Date and Modified Date separately
+                    const uploadDate = content.date; // The original creation date
+                    const modifiedDate = content.updatedAt || content.date; // Fallback to upload date if never edited
+
+                    newRow.setAttribute('data-upload-date', uploadDate);     // STORE UPLOAD DATE
+                    newRow.setAttribute('data-modified-date', modifiedDate); // STORE MODIFIED DATE
+                    
                     newRow.setAttribute('data-status', content.status || 'Pending');
                     newRow.setAttribute('data-category', content.category || 'General');
                     newRow.setAttribute('data-description', content.description || 'No description available.');
                     newRow.onclick = function () { viewContentDetail(this); };
 
-                    const formattedDate = formatToSGTime(content.date);
+                    // Display the MODIFIED date in the list view
+                    const formattedModifiedDate = formatToSGTime(modifiedDate);
                     const formattedSize = formatFileSize(content.fileSize);
                     newRow.innerHTML = `
                         <div>
                             <div class="content-title">${content.title}</div>
-                            <div class="content-meta">${content.type || 'Document'} | ${formattedSize} | Modified: ${formattedDate}</div>
+                            <div class="content-meta">${content.type || 'Document'} | ${formattedSize} | Modified: ${formattedModifiedDate}</div>
                         </div>
                         <div class="content-item-actions">
                             <span class="badge badge-warning">${content.status || 'Pending'}</span>
@@ -2451,7 +2459,9 @@
                 title: element.dataset.title,
                 type: element.dataset.type,
                 size: element.dataset.size,
-                date: element.dataset.date,
+                // FIX: Retrieve both dates from the data attributes
+                uploadDate: element.dataset.uploadDate,
+                modifiedDate: element.dataset.modifiedDate,
                 status: element.dataset.status,
                 category: element.dataset.category,
                 description: element.dataset.description
@@ -2469,26 +2479,24 @@
             document.getElementById('detail-title').textContent = contentData.title;
             document.getElementById('detail-type').textContent = contentData.type;
             document.getElementById('detail-size').textContent = formatFileSize(contentData.size);
-            document.getElementById('detail-date').textContent = formatToSGTime(contentData.date);
+            // Use modified date for the small header info
+            document.getElementById('detail-date').textContent = formatToSGTime(contentData.modifiedDate);
             document.getElementById('detail-category').textContent = contentData.category;
             document.getElementById('detail-status').textContent = contentData.status;
             document.getElementById('detail-description').textContent = contentData.description || 'No description available.';
             document.getElementById('detail-id').textContent = formatContentId(contentData.id);
             document.getElementById('detail-format').textContent = contentData.type;
             
-                // Use the actual date from the content data, not the current time
-                const displayTime = formatDateTime(contentData.date);
-
-                // Update the UI
+                // FIX: Render separate Upload and Modified times
                 const uploadDateElement = document.getElementById('detail-upload-date');
                 uploadDateElement.innerHTML = `
                     <div style="margin-bottom: 8px;">
                         <span class="text-dark fw-bold">Upload Date:</span> 
-                        <span class="text-secondary">${formatDateTime(contentData.date)}</span>
+                        <span class="text-secondary">${formatDateTime(contentData.uploadDate)}</span>
                     </div>
                     <div>
                         <span class="text-dark fw-bold">Last Modified:</span> 
-                        <span class="text-secondary">${displayTime}</span>
+                        <span class="text-secondary">${formatDateTime(contentData.modifiedDate)}</span>
                     </div>
                 `;
             
@@ -2785,9 +2793,12 @@
                             contentElement.dataset.description = updatedContent.description; 
                             contentElement.dataset.category = updatedContent.category;
                             
+                            // FIX: Update ONLY the modified date attribute
+                            // Do NOT update 'data-upload-date' here
+                            contentElement.dataset.modifiedDate = updatedContent.updatedAt || new Date().toISOString();
+                            
                             if (updatedContent.fileSize) contentElement.dataset.size = formatFileSize(updatedContent.fileSize);
                             if (updatedContent.type) contentElement.dataset.type = updatedContent.type;
-                            contentElement.dataset.date = updatedContent.date || new Date().toISOString();
                             
                             // Update the visible text in the list row
                             const titleElement = contentElement.querySelector('.content-title');
@@ -2797,7 +2808,8 @@
                             if (metaElement) {
                                 const type = updatedContent.type || contentElement.dataset.type;
                                 const size = contentElement.dataset.size;
-                                const dateStr = formatToSGTime(updatedContent.date);
+                                // Display the new Modified Date
+                                const dateStr = formatToSGTime(contentElement.dataset.modifiedDate);
                                 metaElement.textContent = `${type} | ${size} | Modified: ${dateStr}`;
                             }
                         }
