@@ -12,7 +12,6 @@
         .media-container { background: #000; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3); margin-top: 50px; }
         .media-container img, .media-container video { width: 100%; display: block; max-height: 70vh; object-fit: contain; }
         .description-card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-top: 30px; }
-        /* Added styling for the logo */
         .rp-logo { max-width: 200px; height: auto; margin-bottom: 20px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
     </style>
 </head>
@@ -114,7 +113,12 @@
             if (type.startsWith('image/')) {
                 mediaBox.innerHTML = `<img src="${data.mediaData}" alt="Project Image" style="width:100%; height:auto;">`;
             } else if (type.startsWith('video/')) {
-                mediaBox.innerHTML = `<video controls autoplay style="width:100%;"><source src="${data.mediaData}" type="${type}"></video>`;
+                // UPDATED: Added loop, muted, and playsinline for better autoplay/looping performance
+                mediaBox.innerHTML = `
+                    <video controls autoplay loop muted playsinline style="width:100%;">
+                        <source src="${data.mediaData}" type="${type}">
+                        Your browser does not support the video tag.
+                    </video>`;
             } else {
                 mediaBox.innerHTML = `<div class="p-5 text-white text-center"><i class="fas fa-file-alt fa-4x mb-3"></i><p>No preview available.</p></div>`;
             }
