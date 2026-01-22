@@ -31,7 +31,7 @@
             height: 100vh;
             width: 250px;
             padding: 20px;
-            background: linear-gradient(135deg, #0288d1 0%, #2a5298 100%);
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: white;
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
             position: fixed;
@@ -41,35 +41,20 @@
         }
 
         .sidebar-header {
-            text-align: center;
             margin-bottom: 20px;
             border-bottom: 2px solid rgba(255, 255, 255, 0.2);
             padding-bottom: 15px;
         }
 
         .sidebar-header h3 {
-            font-size: 22px;
-            margin: 0;
+            font-size: 24px;
+            margin-bottom: 5px;
             color: #2ecc71;
-            white-space: nowrap;
         }
 
         .sidebar-header p {
             font-size: 12px;
             color: rgba(255, 255, 255, 0.7);
-        }
-
-        .sidebar-logo {
-            width: 36px;
-            height: 36px;
-            object-fit: contain;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            justify-content: center; 
-            gap: 10px;               
         }
 
         .nav {
@@ -906,10 +891,7 @@
         <!-- Sidebar Navigation -->
         <nav class="sidebar">
             <div class="sidebar-header">
-                <div class="brand">
-                    <img src="frontend\static\logo.png" alt="EcoJourney Logo" class="sidebar-logo">
-                    <h3>EcoJourney</h3>
-                </div>
+                <h3><i class="fas fa-leaf"></i> EcoJourney</h3>
                 <p>Content Management System</p>
             </div>
 
@@ -1638,148 +1620,26 @@
 
                     async function fetchContentForReview(contentId) {
                         try {
-                            const API_URL = 'https://rpecocjourney-backend.onrender.com';
                             const response = await fetch(`${API_URL}/api/content/${contentId}`);
-
                             if (response.ok) {
-                                const content = await response.json();
-
-                                // Update with full content data
-                                if (content.mediaData) {
-                                    const mediaSection = document.getElementById('review-media-section');
-                                    const image = document.getElementById('review-image');
-                                    const video = document.getElementById('review-video');
-                                    const noMedia = document.getElementById('review-no-media');
-
-                                    image.style.display = 'none';
-                                    video.style.display = 'none';
-                                    noMedia.style.display = 'none';
-
-                                    if (content.mediaFileType?.startsWith('image/')) {
-                                        image.src = content.mediaData;
-                                        image.style.display = 'block';
-                                        mediaSection.style.display = 'block';
-                                    } else if (content.mediaFileType?.startsWith('video/')) {
-                                        video.src = content.mediaData;
-                                        video.style.display = 'block';
-                                        mediaSection.style.display = 'block';
-                                    } else {
-                                        noMedia.style.display = 'block';
-                                        mediaSection.style.display = 'block';
-                                    }
-                                }
+                                const data = await response.json();
+                                // Optional: Logic to display media in the review section
                             }
-                        } catch (error) {
-                            console.error('Failed to fetch content for review:', error);
-                        }
-                    }
-
-                    async function submitReview(decision) {
-                        if (!currentReviewingContent) return;
-
-                        const comments = document.getElementById('review-comments').value.trim();
-
-                        if (!comments) {
-                            alert('Please add comments before submitting your review.');
-                            return;
-                        }
-
-                        // Store review data
-                        const reviewData = {
-                            contentId: currentReviewingContent.id,
-                            decision: decision,
-                            comments: comments,
-                            reviewedBy: localStorage.getItem('current_user') || 'Manager',
-                            reviewedAt: new Date().toLocaleString('en-SG'),
-                            title: currentReviewingContent.title,
-                            author: currentReviewingContent.author
-                        };
-
-                        try {
-                            // Save to localStorage
-                            let reviews = JSON.parse(localStorage.getItem('content_reviews') || '[]');
-                            reviews.push(reviewData);
-                            localStorage.setItem('content_reviews', JSON.stringify(reviews));
-
-                            // Update the status of the original content item(s) in 'Your Content'
-                            const contentId = currentReviewingContent.id;
-                            console.log('Updating content status for ID:', contentId, 'to', decision);
-
-                            // Find items inside the Your Content list and update their dataset/status and badge
-                            const yourContentElems = document.querySelectorAll('#content-items-container [data-id="' + contentId + '"]');
-                            yourContentElems.forEach(el => {
-                                const newStatus = decision === 'approved' ? 'Approved' : (decision === 'rejected' ? 'Rejected' : 'Changes Requested');
-                                el.setAttribute('data-status', newStatus);
-                                el.dataset.status = newStatus;
-
-                                const badge = el.querySelector('.badge');
-                                if (badge) {
-                                    badge.classList.remove('badge-success', 'badge-warning', 'badge-danger');
-                                    if (decision === 'approved') {
-                                        badge.classList.add('badge-success');
-                                        badge.textContent = 'Approved';
-                                    } else if (decision === 'rejected') {
-                                        badge.classList.add('badge-danger');
-                                        badge.textContent = 'Rejected';
-                                    } else {
-                                        badge.classList.add('badge-warning');
-                                        badge.textContent = 'Changes Requested';
-                                    }
-                                }
-                            });
-
-                            // Sync approvals list (will remove the pending entry) and refresh dashboard stats
-                            syncApprovalsFromYourContent();
-                            refreshDashboardStats();
-
-                            // Show success message
-                            let successMessage = 'Content approved successfully!';
-                            if (decision === 'changes_requested') {
-                                successMessage = 'Review request sent. Author will be notified to make changes.';
-                            } else if (decision === 'rejected') {
-                                successMessage = 'Content has been rejected.';
-                            }
-
-                            showSuccessPopup(successMessage);
-
-                            // Dashboard and Recent Content already updated via DOM sync; update Recent badge
-                            updateRecentContentBadge(decision);
-
-                            // Close review page and go back to approvals list
-                            setTimeout(() => {
-                                closeReviewPage();
-                                updateApprovalsList();
-                            }, 1500);
-
-                        } catch (error) {
-                            console.error('Failed to save review:', error);
-                            alert('Failed to save review. Please try again.');
+                        } catch (err) {
+                            console.error('Review fetch failed:', err);
                         }
                     }
 
                     function updateApprovalsList() {
                         const container = document.getElementById('approvals-container');
-                        const items = container.querySelectorAll('.content-item');
-                        let pendingCount = 0;
-
-                        items.forEach(item => {
-                            const status = item.dataset.status;
-                            if (status === 'Pending') {
-                                pendingCount++;
-                            }
-                        });
-
-                        // Update the pending count in approvals tab
-                        document.getElementById('pending-count').textContent = pendingCount;
-
+                        const pendingCount = container.querySelectorAll('.content-item').length;
+                        
                         // Update the badge in sidebar navigation
                         const approvalsNav = document.getElementById('nav-approvals');
                         const badge = approvalsNav.querySelector('.badge');
                         if (badge) {
                             badge.textContent = pendingCount;
-                            if (pendingCount === 0) {
-                                badge.style.display = 'none';
-                            }
+                            badge.style.display = pendingCount === 0 ? 'none' : 'inline-block';
                         }
 
                         if (pendingCount === 0) {
@@ -2104,7 +1964,6 @@
                 </button>
                 <img src="https://www.rp.edu.sg/images/default-source/default-album/rp-logo.png?sfvrsn=41990045_3"
                     alt="Republic Polytechnic Logo" class="preview-logo">
-                <div class="preview-badge">CONTENT PREVIEW</div>
             </div>
             <div class="preview-content">
                 <h1 class="preview-title" id="preview-title">Content Title</h1>
@@ -2342,16 +2201,19 @@
         function formatDateTime(isoString) {
             if (!isoString) return '-';
             const date = new Date(isoString);
-            // Format as "MMM DD, YYYY, HH:MM AM/PM" (e.g., "Dec 17, 2025, 02:30 PM")
-            const options = {
-                year: 'numeric',
-                month: 'short',
+            
+            // Check if the date is valid
+            if (isNaN(date.getTime())) return isoString;
+
+            // Use en-SG to match Singapore time formatting
+            return date.toLocaleString('en-SG', {
                 day: 'numeric',
+                month: 'short',
+                year: 'numeric',
                 hour: '2-digit',
                 minute: '2-digit',
                 hour12: true
-            };
-            return date.toLocaleString('en-US', options);
+            });
         }
 
         function formatContentId(id) {
@@ -2605,7 +2467,32 @@
             document.getElementById('detail-description').textContent = contentData.description || 'No description available.';
             document.getElementById('detail-id').textContent = formatContentId(contentData.id);
             document.getElementById('detail-format').textContent = contentData.type;
-            document.getElementById('detail-upload-date').textContent = formatDateTime(contentData.date);
+            
+                // Create a "Now" timestamp for Last Modified if you just edited it, 
+                // otherwise use the stored date.
+                const currentTime = new Date().toLocaleString('en-SG', {
+                    timeZone: 'Asia/Singapore',
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                });
+
+                // Update the UI
+                const uploadDateElement = document.getElementById('detail-upload-date');
+                uploadDateElement.innerHTML = `
+                    <div style="margin-bottom: 8px;">
+                        <span class="text-dark fw-bold">Upload Date:</span> 
+                        <span class="text-secondary">${formatDateTime(contentData.date)}</span>
+                    </div>
+                    <div>
+                        <span class="text-dark fw-bold">Last Modified:</span> 
+                        <span class="text-secondary">${currentTime}</span>
+                    </div>
+                `;
+            
             document.getElementById('detail-status-info').textContent = contentData.status;
 
             // Display media preview if available
@@ -2613,76 +2500,35 @@
             const imagePreview = document.getElementById('detail-image-preview');
             const videoPreview = document.getElementById('detail-video-preview');
 
-            // Hide both previews first
+            // Reset display
             imagePreview.style.display = 'none';
             videoPreview.style.display = 'none';
-            mediaPreview.style.display = 'none';
 
-            // First, try to get media from IndexedDB (for locally edited/stored content)
+            // Logic to fetch and display
             try {
                 const contents = await getStoredContents();
                 const localContent = contents.find(c => c.id === contentData.id);
                 
-                if (localContent && localContent.mediaData) {
-                    const mediaType = localContent.mediaFileType || '';
-                    console.log('Found local media data, type:', mediaType);
+                // Use data from local storage or fetch from server
+                const displayData = localContent || await fetch(`${API_URL}/api/content/${contentData.id}`).then(r => r.json());
 
-                    if (mediaType.startsWith('image/')) {
-                        imagePreview.src = localContent.mediaData;
+                if (displayData && displayData.mediaData) {
+                    const mType = displayData.mediaFileType || "";
+                    if (mType.startsWith('image/')) {
+                        imagePreview.src = displayData.mediaData;
                         imagePreview.style.display = 'block';
-                        mediaPreview.style.display = 'block';
-                        console.log('Showing image preview from IndexedDB');
-                    } else if (mediaType.startsWith('video/')) {
-                        videoPreview.src = localContent.mediaData;
+                        videoPreview.style.display = 'none'; // Ensure video is hidden
+                    } else if (mType.startsWith('video/')) {
+                        videoPreview.src = displayData.mediaData;
                         videoPreview.style.display = 'block';
-                        mediaPreview.style.display = 'block';
-                        console.log('Showing video preview from IndexedDB');
+                        imagePreview.style.display = 'none'; // Ensure image is hidden
                     }
-                    return; // Don't try backend if we found it locally
+                    mediaPreview.style.display = 'block';
+                } else {
+                    mediaPreview.style.display = 'none'; // Hide if no media exists
                 }
-            } catch (error) {
-                console.warn('Could not check IndexedDB:', error);
-            }
-
-            // If not found locally, try to fetch from backend
-            // Skip backend fetch for default content items
-            if (!contentData.id.startsWith('default-')) {
-                try {
-                    const response = await fetch(`${API_URL}/api/content/${contentData.id}`);
-                    console.log('Fetch response status:', response.status);
-
-                    if (response.ok) {
-                        const storedContent = await response.json();
-                        console.log('Stored content keys:', Object.keys(storedContent));
-                        console.log('Has mediaData:', !!storedContent.mediaData);
-                        console.log('MediaFileType:', storedContent.mediaFileType);
-
-                        if (storedContent && storedContent.mediaData) {
-                            const mediaType = storedContent.mediaFileType || '';
-                            console.log('MediaData starts with:', storedContent.mediaData.substring(0, 50));
-
-                            if (mediaType.startsWith('image/')) {
-                                imagePreview.src = storedContent.mediaData;
-                                imagePreview.style.display = 'block';
-                                mediaPreview.style.display = 'block';
-                                console.log('Showing image preview from backend');
-                            } else if (mediaType.startsWith('video/')) {
-                                videoPreview.src = storedContent.mediaData;
-                                videoPreview.style.display = 'block';
-                                mediaPreview.style.display = 'block';
-                                console.log('Showing video preview from backend');
-                            }
-                        } else {
-                            console.log('No mediaData found in backend response');
-                        }
-                    } else {
-                        console.error('Response not OK:', await response.text());
-                    }
-                } catch (error) {
-                    console.error('Failed to load media from backend:', error);
-                }
-            } else {
-                console.log('Skipping backend fetch for default content:', contentData.id);
+            } catch (e) {
+                console.error("Preview failed", e);
             }
         }
 
@@ -2723,99 +2569,9 @@
         async function previewContent() {
             if (!currentViewingContentId) return;
 
-            try {
-                // Get content data from the detail view text
-                const title = document.getElementById('detail-title').textContent;
-                const description = document.getElementById('detail-description').textContent;
-                const category = document.getElementById('detail-category').textContent;
-                const date = document.getElementById('detail-date').textContent;
-                const type = document.getElementById('detail-type').textContent;
-
-                // Populate preview text
-                document.getElementById('preview-title').textContent = title;
-                document.getElementById('preview-description').textContent = description;
-                document.getElementById('preview-category').textContent = category;
-                document.getElementById('preview-date').textContent = formatToSGTime(date);
-                document.getElementById('preview-type').textContent = type;
-
-                // Prepare media placeholders
-                const previewImage = document.getElementById('preview-image');
-                const previewVideo = document.getElementById('preview-video');
-                const previewNoMedia = document.getElementById('preview-no-media');
-
-                // Hide all media elements first
-                previewImage.style.display = 'none';
-                previewVideo.style.display = 'none';
-                previewNoMedia.style.display = 'none';
-
-                let mediaFound = false;
-
-                // 1. Try Local Storage (IndexedDB) first
-                try {
-                    const contents = await getStoredContents();
-                    const localContent = contents.find(c => c.id === currentViewingContentId);
-                    
-                    if (localContent && localContent.mediaData) {
-                        const mediaType = localContent.mediaFileType || '';
-                        console.log('Preview - Found local media, type:', mediaType);
-                        
-                        if (mediaType.startsWith('image/')) {
-                            previewImage.src = localContent.mediaData;
-                            previewImage.style.display = 'block';
-                            mediaFound = true;
-                            console.log('Preview - Showing image from IndexedDB');
-                        } else if (mediaType.startsWith('video/')) {
-                            previewVideo.src = localContent.mediaData;
-                            previewVideo.style.display = 'block';
-                            mediaFound = true;
-                            console.log('Preview - Showing video from IndexedDB');
-                        }
-                    }
-                } catch (e) {
-                    console.warn('Local preview check failed', e);
-                }
-
-                // 2. If not found locally, try Backend
-                if (!mediaFound && !currentViewingContentId.startsWith('default-')) {
-                    try {
-                        console.log('Preview - Fetching content from API:', currentViewingContentId);
-                        const response = await fetch(`${API_URL}/api/content/${currentViewingContentId}`);
-                        const storedContent = response.ok ? await response.json() : null;
-
-                        if (storedContent && storedContent.mediaData) {
-                            const mediaType = storedContent.mediaFileType || '';
-                            console.log('Preview - Found backend media, type:', mediaType);
-
-                            if (mediaType.startsWith('image/')) {
-                                previewImage.src = storedContent.mediaData;
-                                previewImage.style.display = 'block';
-                                mediaFound = true;
-                                console.log('Preview - Showing image from backend');
-                            } else if (mediaType.startsWith('video/')) {
-                                previewVideo.src = storedContent.mediaData;
-                                previewVideo.style.display = 'block';
-                                mediaFound = true;
-                                console.log('Preview - Showing video from backend');
-                            }
-                        }
-                    } catch (error) {
-                        console.error('Preview API fetch failed:', error);
-                    }
-                }
-
-                // 3. If still no media, show "No Media"
-                if (!mediaFound) {
-                    previewNoMedia.style.display = 'block';
-                    console.log('Preview - No media available');
-                }
-
-                // Show preview overlay
-                document.getElementById('previewOverlay').classList.add('show');
-                document.body.style.overflow = 'hidden'; 
-            } catch (error) {
-                console.error('Preview failed:', error);
-                alert('Failed to load preview: ' + error.message);
-            }
+            // Open the detail page in a new tab, passing the ID
+            const previewUrl = `content-detail.html?id=${currentViewingContentId}`;
+            window.open(previewUrl, '_blank');
         }
 
         function closePreview() {
@@ -2940,68 +2696,49 @@
         }
 
         async function updateContentData(contentId, updatedData) {
-            // 1. Update the DOM elements (Visual update)
+            // 1. Update the DOM element attributes in the list (The hidden data index uses)
             const contentElement = document.querySelector(`[data-id="${contentId}"]`);
             if (contentElement) {
+                // This syncs the attributes so the Side Panel shows the new text
                 contentElement.dataset.title = updatedData.title;
-                contentElement.dataset.description = updatedData.description;
+                contentElement.dataset.description = updatedData.description; 
                 contentElement.dataset.category = updatedData.category;
-
+                
                 if (updatedData.fileSize) contentElement.dataset.size = updatedData.fileSize;
                 if (updatedData.type) contentElement.dataset.type = updatedData.type;
-                if (updatedData.date) contentElement.dataset.date = updatedData.date;
+                
+                // Update the date in the list attribute
+                contentElement.dataset.date = updatedData.date; 
 
+                // Update the visible text in the list row
                 const titleElement = contentElement.querySelector('.content-title');
                 if (titleElement) titleElement.textContent = updatedData.title;
-
-                if (updatedData.fileSize || updatedData.type || updatedData.date) {
-                    const metaElement = contentElement.querySelector('.content-meta');
-                    if (metaElement) {
-                        const type = updatedData.type || contentElement.dataset.type;
-                        const size = updatedData.fileSize || contentElement.dataset.size;
-                        const date = updatedData.date || contentElement.dataset.date;
-                        metaElement.textContent = `${type} | ${formatFileSize(size)} | Modified: ${formatToSGTime(date)}`;
-                    }
+                
+                const metaElement = contentElement.querySelector('.content-meta');
+                if (metaElement) {
+                    const type = updatedData.type || contentElement.dataset.type;
+                    const size = updatedData.fileSize || contentElement.dataset.size;
+                    metaElement.textContent = `${type} | ${formatFileSize(size)} | Modified: ${formatToSGTime(updatedData.date)}`;
                 }
             }
 
-            // 2. Update Storage (IndexedDB) - THE FIX IS HERE
+            // 2. Update Storage (IndexedDB)
             try {
                 const contents = await getStoredContents();
                 const contentIndex = contents.findIndex(c => c.id === contentId);
                 
                 if (contentIndex !== -1) {
-                    // Case A: Item exists (e.g., previously uploaded content), update it
-                    contents[contentIndex] = { ...contents[contentIndex], ...updatedData };
-                    await saveContentToStorage(contents[contentIndex]);
-                } else {
-                    // Case B: Item does not exist (e.g., Default Content being edited for the first time)
-                    // We must CREATE it in the database so the media/files are saved.
-                    const newEntry = { 
-                        id: contentId, 
-                        ...updatedData 
-                    };
-                    await saveContentToStorage(newEntry);
+                    const existingItem = contents[contentIndex];
+                    const mergedData = { ...existingItem, ...updatedData };
+                    await saveContentToStorage(mergedData);
                 }
             } catch (error) {
-                console.error('Failed to update storage:', error);
+                console.error('Failed to update local storage:', error);
             }
 
-            // 3. Update the detail view UI immediately
-            document.getElementById('detail-title').textContent = updatedData.title;
-            document.getElementById('detail-category').textContent = updatedData.category;
-            document.getElementById('detail-description').textContent = updatedData.description;
-
-            if (updatedData.type) {
-                document.getElementById('detail-type').textContent = updatedData.type;
-                document.getElementById('detail-format').textContent = updatedData.type;
-            }
-            if (updatedData.fileSize) {
-                document.getElementById('detail-size').textContent = formatFileSize(updatedData.fileSize);
-            }
-            if (updatedData.date) {
-                document.getElementById('detail-date').textContent = formatToSGTime(updatedData.date);
-                document.getElementById('detail-upload-date').textContent = formatDateTime(updatedData.date);
+            // 3. Immediately refresh the Side Panel to show the changes
+            if (contentElement) {
+                viewContentDetail(contentElement);
             }
         }
 
@@ -3050,7 +2787,9 @@
                         const updatedData = {
                             title: title,
                             description: description,
-                            category: category
+                            category: category,
+                            // Ensure we save a fresh ISO string for the backend/storage
+                            date: new Date().toISOString()
                         };
 
                         // If a new media file was uploaded, update media info
@@ -3105,46 +2844,14 @@
                         // Update the content
                         await updateContentData(currentViewingContentId, updatedData);
 
+                        // REFRESH the dashboard recent list so it doesn't show old data
+                        syncRecentFromYourContent(); 
+                        refreshDashboardStats();
+
                         // Show success popup
-                        let message = 'Content updated successfully!';
-                        if (newMediaFile && newDocFile) {
-                            message = 'Content, media, and document updated successfully!';
-                        } else if (newMediaFile) {
-                            message = 'Content and media updated successfully!';
-                        } else if (newDocFile) {
-                            message = 'Content and document updated successfully!';
-                        }
-                        showSuccessPopup(message);
+                        showSuccessPopup('Content updated successfully!');
 
-                        // Refresh the detail view with updated media
-                        if (newMediaFile) {
-                            const contents = await getStoredContents();
-                            const storedContent = contents.find(c => c.id === currentViewingContentId);
-
-                            if (storedContent && storedContent.mediaData) {
-                                const detailImage = document.getElementById('detail-image-preview');
-                                const detailVideo = document.getElementById('detail-video-preview');
-                                const detailMediaSection = document.getElementById('detail-media-preview');
-
-                                // Hide all first (with null checks)
-                                if (detailImage) detailImage.style.display = 'none';
-                                if (detailVideo) detailVideo.style.display = 'none';
-
-                                // Show the updated media
-                                const mediaType = storedContent.mediaFileType || '';
-                                if (mediaType.startsWith('image/') && detailImage) {
-                                    detailImage.src = storedContent.mediaData;
-                                    detailImage.style.display = 'block';
-                                    if (detailMediaSection) detailMediaSection.style.display = 'block';
-                                } else if (mediaType.startsWith('video/') && detailVideo) {
-                                    detailVideo.src = storedContent.mediaData;
-                                    detailVideo.style.display = 'block';
-                                    if (detailMediaSection) detailMediaSection.style.display = 'block';
-                                }
-                            }
-                        }
-
-                        // Go back to detail view
+                        // Go back to detail view (updateContentData already refreshed it)
                         document.getElementById('content-edit-form').style.display = 'none';
                         document.getElementById('content-detail-view').style.display = 'block';
 
