@@ -2716,10 +2716,9 @@
         }
 
         async function updateContentData(contentId, updatedData) {
-            // 1. Update the DOM element attributes in the list (The hidden data index uses)
+            // 1. Update the DOM element attributes immediately so the UI reflects changes
             const contentElement = document.querySelector(`[data-id="${contentId}"]`);
             if (contentElement) {
-                // This syncs the attributes so the Side Panel shows the new text
                 contentElement.dataset.title = updatedData.title;
                 contentElement.dataset.description = updatedData.description; 
                 contentElement.dataset.category = updatedData.category;
@@ -2727,9 +2726,6 @@
                 if (updatedData.fileSize) contentElement.dataset.size = updatedData.fileSize;
                 if (updatedData.type) contentElement.dataset.type = updatedData.type;
                 
-                // Update the date in the list attribute
-                contentElement.dataset.date = updatedData.date; 
-
                 // Update the visible text in the list row
                 const titleElement = contentElement.querySelector('.content-title');
                 if (titleElement) titleElement.textContent = updatedData.title;
@@ -2738,25 +2734,39 @@
                 if (metaElement) {
                     const type = updatedData.type || contentElement.dataset.type;
                     const size = updatedData.fileSize || contentElement.dataset.size;
-                    metaElement.textContent = `${type} | ${formatFileSize(size)} | Modified: ${formatToSGTime(updatedData.date)}`;
+                    // Use the new date if provided, otherwise keep old
+                    const dateStr = updatedData.date || contentElement.dataset.date;
+                    contentElement.dataset.date = dateStr;
+                    metaElement.textContent = `${type} | ${formatFileSize(size)} | Modified: ${formatToSGTime(dateStr)}`;
                 }
             }
 
-            // 2. Update Storage (IndexedDB)
+            // 2. Update Storage (IndexedDB) - THE FIX IS HERE
             try {
                 const contents = await getStoredContents();
                 const contentIndex = contents.findIndex(c => c.id === contentId);
                 
                 if (contentIndex !== -1) {
+                    // Case A: Item exists, merge new data with old data (preserves media if not changed)
                     const existingItem = contents[contentIndex];
                     const mergedData = { ...existingItem, ...updatedData };
                     await saveContentToStorage(mergedData);
+                } else {
+                    // Case B: Item is new or a "Default" item being edited for the first time
+                    // We must create a new object. 
+                    // WARNING: If this was a default item and no new media was uploaded, 
+                    // the new DB entry will typically lack mediaData.
+                    const newItem = {
+                        id: contentId,
+                        ...updatedData
+                    };
+                    await saveContentToStorage(newItem);
                 }
             } catch (error) {
                 console.error('Failed to update local storage:', error);
             }
 
-            // 3. Immediately refresh the Side Panel to show the changes
+            // 3. Refresh views
             if (contentElement) {
                 viewContentDetail(contentElement);
             }
@@ -2802,6 +2812,15 @@
                         if (newDocFile && newDocFile.size > maxSize) {
                             alert('Document file is too large. Maximum size is 500MB.');
                             return;
+                        }
+
+                        // FIX: Check if we are editing a default item without uploading new media
+                        const isDefaultItem = currentViewingContentId.startsWith('default-');
+                        if (isDefaultItem && !newMediaFile) {
+                            // Optional: You could alert the user, or just accept that media will vanish.
+                            // Ideally, force them to upload media for default items:
+                            const proceed = confirm("Warning: You are editing a default template item. If you do not upload a new Image/Video, the original media will be removed. Do you want to proceed?");
+                            if (!proceed) return;
                         }
 
                         const updatedData = {
