@@ -2476,17 +2476,8 @@
             document.getElementById('detail-id').textContent = formatContentId(contentData.id);
             document.getElementById('detail-format').textContent = contentData.type;
             
-                // Create a "Now" timestamp for Last Modified if you just edited it, 
-                // otherwise use the stored date.
-                const currentTime = new Date().toLocaleString('en-SG', {
-                    timeZone: 'Asia/Singapore',
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: true
-                });
+                // Use the actual date from the content data, not the current time
+                const displayTime = formatDateTime(contentData.date);
 
                 // Update the UI
                 const uploadDateElement = document.getElementById('detail-upload-date');
@@ -2497,7 +2488,7 @@
                     </div>
                     <div>
                         <span class="text-dark fw-bold">Last Modified:</span> 
-                        <span class="text-secondary">${currentTime}</span>
+                        <span class="text-secondary">${displayTime}</span>
                     </div>
                 `;
             
