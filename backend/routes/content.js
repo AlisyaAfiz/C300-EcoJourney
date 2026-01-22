@@ -25,7 +25,7 @@ router.get('/all', async (req, res) => {
 });
 
 // Upload new content with Cloudinary (supports both media and document files)
-router.post('/upload', authMiddleware, upload.fields([
+router.post('/upload', upload.fields([
   { name: 'mediaFile', maxCount: 1 },
   { name: 'documentFile', maxCount: 1 }
 ]), async (req, res) => {
