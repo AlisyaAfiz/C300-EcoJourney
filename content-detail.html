@@ -8,15 +8,19 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { background-color: #f8f9fa; font-family: 'Segoe UI', sans-serif; }
-        .hero-section { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 60px 0; }
-        .media-container { background: #000; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3); margin-top: -50px; }
+        .hero-section { background: linear-gradient(135deg, #7A8450  0%, #7A8450 100%); color: white; padding: 60px 0; }
+        .media-container { background: #000; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3); margin-top: 50px; }
         .media-container img, .media-container video { width: 100%; display: block; max-height: 70vh; object-fit: contain; }
         .description-card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-top: 30px; }
+        /* Added styling for the logo */
+        .rp-logo { max-width: 200px; height: auto; margin-bottom: 20px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
     </style>
 </head>
 <body>
     <div class="hero-section text-center">
         <div class="container">
+            <img src="rp-logo.png" alt="Republic Polytechnic" class="rp-logo">
+            
             <h1 id="title" class="display-4 fw-bold">Loading Project...</h1>
             <p id="meta" class="lead opacity-75"></p>
         </div>
@@ -26,7 +30,7 @@
         <div class="row justify-content-center">
             <div class="col-lg-10">
                 <div class="media-container" id="media-box">
-                    </div>
+                </div>
                 
                 <div class="description-card">
                     <h3>Project Description</h3>
@@ -45,21 +49,19 @@
     <script>
         const API_URL = 'https://rpecocjourney-backend.onrender.com';
         
-            // Updated helper to handle missing or weird date formats
         function formatDate(dateString) {
-                if (!dateString || dateString === "Not available") {
-                    // Fallback to current SG time if no date is provided
-                    return new Date().toLocaleDateString('en-SG', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                    });
-                }
+            if (!dateString || dateString === "Not available") {
+                return new Date().toLocaleDateString('en-SG', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            }
             
             const date = new Date(dateString);
-                if (isNaN(date.getTime())) return dateString; // Return as-is if already a string
+            if (isNaN(date.getTime())) return dateString;
 
-                return date.toLocaleDateString('en-SG', {
+            return date.toLocaleDateString('en-SG', {
                 year: 'numeric',
                 month: 'short',
                 day: 'numeric'
@@ -103,15 +105,12 @@
             document.getElementById('description').textContent = data.description || "No description provided.";
             document.getElementById('category').textContent = data.category;
             
-            // Robust date selection: try 'date' then 'uploadDate'
             const displayDate = data.date || data.uploadDate || null;
-            // Full page preview shows clean date (no time)
             document.getElementById('date').textContent = formatDate(displayDate);
             
             const mediaBox = document.getElementById('media-box');
             const type = data.mediaFileType || "";
             
-            // Ensure we are using the correct media property (mediaData usually contains the URL/Base64)
             if (type.startsWith('image/')) {
                 mediaBox.innerHTML = `<img src="${data.mediaData}" alt="Project Image" style="width:100%; height:auto;">`;
             } else if (type.startsWith('video/')) {
