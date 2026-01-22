@@ -244,7 +244,11 @@ router.get('/:id', async (req, res) => {
 });
 
 // Update content (creator only)
-router.put('/:id', authMiddleware, async (req, res) => {
+// CHANGE: Remove authMiddleware to match your upload/delete pattern
+router.put('/:id', upload.fields([
+  { name: 'mediaFile', maxCount: 1 },
+  { name: 'documentFile', maxCount: 1 }
+]), async (req, res) => {
   try {
     let content = await MultimediaContent.findById(req.params.id);
 
@@ -252,20 +256,52 @@ router.put('/:id', authMiddleware, async (req, res) => {
       return res.status(404).json({ message: 'Content not found' });
     }
 
-    if (content.creator.toString() !== req.user.id) {
-      return res.status(403).json({ message: 'Not authorized to update this content' });
-    }
+    // Remove this auth check since you don't have auth in upload/delete
+    // if (content.creator.toString() !== req.user.id) {
+    //   return res.status(403).json({ message: 'Not authorized to update this content' });
+    // }
 
-    const { title, description, category, tags } = req.body;
+    const { title, description, category } = req.body;
 
+    // Update text fields
     if (title) content.title = title;
     if (description) content.description = description;
     if (category) content.category = category;
-    if (tags) content.tags = tags.split(',').map(t => t.trim());
+
+    // Update files if new ones were uploaded
+    const mediaFile = req.files?.mediaFile?.[0];
+    const documentFile = req.files?.documentFile?.[0];
+
+    if (mediaFile && mediaFile.path) {
+      content.mediaData = mediaFile.path;
+      content.mediaFileName = mediaFile.originalname;
+      content.mediaFileType = mediaFile.mimetype;
+    }
+
+    if (documentFile && documentFile.path) {
+      content.fileData = documentFile.path;
+      content.file = documentFile.path;
+      content.fileName = documentFile.originalname;
+      content.fileType = documentFile.mimetype;
+      content.fileSize = documentFile.size;
+      
+      // Update type based on file extension
+      if (req.body.type) {
+        content.type = req.body.type;
+      }
+    }
+
+    // Update modification date
+    content.date = new Date().toISOString();
 
     await content.save();
-    res.json({ message: 'Content updated', content });
+    
+    res.json({ 
+      message: 'Content updated successfully', 
+      content 
+    });
   } catch (error) {
+    console.error('Update error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
