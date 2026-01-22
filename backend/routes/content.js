@@ -243,8 +243,15 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Update content (creator only)
-router.put('/:id', authMiddleware, async (req, res) => {
+// Update content with file upload support (no authentication for now to match upload behavior)
+router.put('/:id', upload.fields([
+  { name: 'mediaFile', maxCount: 1 },
+  { name: 'documentFile', maxCount: 1 }
+]), async (req, res) => {
+  console.log('========================================');
+  console.log('📝 UPDATE ENDPOINT HIT!');
+  console.log('========================================');
+  
   try {
     let content = await MultimediaContent.findById(req.params.id);
 
@@ -252,20 +259,57 @@ router.put('/:id', authMiddleware, async (req, res) => {
       return res.status(404).json({ message: 'Content not found' });
     }
 
-    if (content.creator.toString() !== req.user.id) {
-      return res.status(403).json({ message: 'Not authorized to update this content' });
-    }
+    const { title, description, category, type } = req.body;
 
-    const { title, description, category, tags } = req.body;
+    console.log('📋 Update data received:');
+    console.log('  - Title:', title);
+    console.log('  - Description:', description?.substring(0, 50));
+    console.log('  - Category:', category);
+    console.log('  - Type:', type);
 
+    // Update basic fields if provided
     if (title) content.title = title;
     if (description) content.description = description;
     if (category) content.category = category;
-    if (tags) content.tags = tags.split(',').map(t => t.trim());
+    if (type) content.type = type;
+
+    // Check if new files were uploaded
+    const mediaFile = req.files?.mediaFile?.[0];
+    const documentFile = req.files?.documentFile?.[0];
+
+    console.log('Files in update:', {
+      hasMedia: !!mediaFile,
+      hasDocument: !!documentFile
+    });
+
+    // Update media file if provided (replaces old one)
+    if (mediaFile && mediaFile.path) {
+      content.mediaData = mediaFile.path;
+      content.mediaFileName = mediaFile.originalname;
+      content.mediaFileType = mediaFile.mimetype;
+      console.log('✅ Media updated to:', content.mediaData);
+    }
+
+    // Update document file if provided (replaces old one)
+    if (documentFile && documentFile.path) {
+      content.fileData = documentFile.path;
+      content.file = documentFile.path;
+      content.fileName = documentFile.originalname;
+      content.fileType = documentFile.mimetype;
+      content.fileSize = documentFile.size;
+      console.log('✅ Document updated to:', content.fileData);
+    }
+
+    // Update the modification date
+    content.date = new Date().toISOString();
 
     await content.save();
+    
+    console.log('✅ Content updated successfully! ID:', content._id);
+    
     res.json({ message: 'Content updated', content });
   } catch (error) {
+    console.error('❌ Update error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });

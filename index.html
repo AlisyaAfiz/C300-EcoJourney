@@ -2082,19 +2082,24 @@
             popup.classList.remove('show');
 
             if (confirmed && pendingDeleteId) {
-                // Optimistic local delete: remove from DOM and local storage first
                 try {
-                    // Remove ALL elements with this data-id (may exist in both lists)
+                    // Delete from backend first
+                    const response = await fetch(`${API_URL}/api/content/${pendingDeleteId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Delete failed');
+                    }
+
+                    // Remove from DOM after successful backend delete
                     const contentItems = document.querySelectorAll(`[data-id="${pendingDeleteId}"]`);
                     if (contentItems && contentItems.length) {
                         contentItems.forEach(ci => ci.remove());
-                    }
-
-                    // Remove from IndexedDB if present
-                    try {
-                        await deleteContentFromStorage(pendingDeleteId);
-                    } catch (e) {
-                        console.warn('Failed to remove from local storage:', e);
                     }
 
                     // Update Recent, Approvals, and Dashboard
@@ -2106,26 +2111,9 @@
                     if (currentViewingContentId === pendingDeleteId) backToContentList();
 
                     showSuccessPopup('Content deleted successfully!');
-
-                    // Attempt backend delete but don't block UI
-                    try {
-                        const response = await fetch(`${API_URL}/api/content/${pendingDeleteId}`, {
-                            method: 'DELETE',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            }
-                        });
-
-                        if (!response.ok) {
-                            console.error('Server delete failed:', await response.text());
-                            // Optionally notify user later; keep UI consistent for now
-                        }
-                    } catch (err) {
-                        console.error('Failed to reach server for delete:', err);
-                    }
                 } catch (error) {
-                    console.error('Failed to perform local delete:', error);
-                    alert('Failed to delete content locally: ' + (error.message || error));
+                    console.error('Failed to delete content:', error);
+                    alert('Failed to delete content: ' + (error.message || error));
                 }
             }
 
@@ -2524,31 +2512,35 @@
             imagePreview.style.display = 'none';
             videoPreview.style.display = 'none';
 
-            // Logic to fetch and display
+            // Always fetch fresh data from backend
             try {
-                const contents = await getStoredContents();
-                const localContent = contents.find(c => c.id === contentData.id);
-                
-                // Use data from local storage or fetch from server
-                const displayData = localContent || await fetch(`${API_URL}/api/content/${contentData.id}`).then(r => r.json());
+                const response = await fetch(`${API_URL}/api/content/${contentData.id}`);
+                if (!response.ok) {
+                    console.warn('Could not fetch content from backend');
+                    mediaPreview.style.display = 'none';
+                    return;
+                }
+
+                const displayData = await response.json();
 
                 if (displayData && displayData.mediaData) {
                     const mType = displayData.mediaFileType || "";
                     if (mType.startsWith('image/')) {
                         imagePreview.src = displayData.mediaData;
                         imagePreview.style.display = 'block';
-                        videoPreview.style.display = 'none'; // Ensure video is hidden
+                        videoPreview.style.display = 'none';
                     } else if (mType.startsWith('video/')) {
                         videoPreview.src = displayData.mediaData;
                         videoPreview.style.display = 'block';
-                        imagePreview.style.display = 'none'; // Ensure image is hidden
+                        imagePreview.style.display = 'none';
                     }
                     mediaPreview.style.display = 'block';
                 } else {
-                    mediaPreview.style.display = 'none'; // Hide if no media exists
+                    mediaPreview.style.display = 'none';
                 }
             } catch (e) {
                 console.error("Preview failed", e);
+                mediaPreview.style.display = 'none';
             }
         }
 
@@ -2715,79 +2707,12 @@
             document.getElementById('content-detail-view').style.display = 'block';
         }
 
-        async function updateContentData(contentId, updatedData) {
-            // 1. Update the DOM element attributes immediately so the UI reflects changes
-            const contentElement = document.querySelector(`[data-id="${contentId}"]`);
-            if (contentElement) {
-                contentElement.dataset.title = updatedData.title;
-                contentElement.dataset.description = updatedData.description; 
-                contentElement.dataset.category = updatedData.category;
-                
-                if (updatedData.fileSize) contentElement.dataset.size = updatedData.fileSize;
-                if (updatedData.type) contentElement.dataset.type = updatedData.type;
-                
-                // Update the visible text in the list row
-                const titleElement = contentElement.querySelector('.content-title');
-                if (titleElement) titleElement.textContent = updatedData.title;
-                
-                const metaElement = contentElement.querySelector('.content-meta');
-                if (metaElement) {
-                    const type = updatedData.type || contentElement.dataset.type;
-                    const size = updatedData.fileSize || contentElement.dataset.size;
-                    // Use the new date if provided, otherwise keep old
-                    const dateStr = updatedData.date || contentElement.dataset.date;
-                    contentElement.dataset.date = dateStr;
-                    metaElement.textContent = `${type} | ${formatFileSize(size)} | Modified: ${formatToSGTime(dateStr)}`;
-                }
-            }
-
-            // 2. Update Storage (IndexedDB) - THE FIX IS HERE
-            try {
-                const contents = await getStoredContents();
-                const contentIndex = contents.findIndex(c => c.id === contentId);
-                
-                if (contentIndex !== -1) {
-                    // Case A: Item exists, merge new data with old data (preserves media if not changed)
-                    const existingItem = contents[contentIndex];
-                    const mergedData = { ...existingItem, ...updatedData };
-                    await saveContentToStorage(mergedData);
-                } else {
-                    // Case B: Item is new or a "Default" item being edited for the first time
-                    // We must create a new object. 
-                    // WARNING: If this was a default item and no new media was uploaded, 
-                    // the new DB entry will typically lack mediaData.
-                    const newItem = {
-                        id: contentId,
-                        ...updatedData
-                    };
-                    await saveContentToStorage(newItem);
-                }
-            } catch (error) {
-                console.error('Failed to update local storage:', error);
-            }
-
-            // 3. Refresh views
-            if (contentElement) {
-                viewContentDetail(contentElement);
-            }
-        }
+        // Function removed - edit form now sends directly to backend via PUT request
 
         window.addEventListener('DOMContentLoaded', async () => {
-            // Initialize IndexedDB
-            try {
-                await initDB();
-            } catch (error) {
-                console.error('Failed to initialize database:', error);
-                alert('Failed to initialize storage. Some features may not work properly.');
-            }
-
             applyRolePermissions();
             updateProfileRole();
-            await loadStoredContents(); // Load persisted content
-
-            // START OF FIX
-            await applyLocalOverrides(); // Apply local edits to refresh Dashboard with saved changes
-            // END OF FIX
+            await loadStoredContents(); // Load content from backend
 
             // Handle edit form submission
             const editForm = document.getElementById('edit-content-form');
@@ -2818,89 +2743,100 @@
                             return;
                         }
 
-                        // FIX: Check if we are editing a default item without uploading new media
-                        const isDefaultItem = currentViewingContentId.startsWith('default-');
-                        if (isDefaultItem && !newMediaFile) {
-                            // Optional: You could alert the user, or just accept that media will vanish.
-                            // Ideally, force them to upload media for default items:
-                            const proceed = confirm("Warning: You are editing a default template item. If you do not upload a new Image/Video, the original media will be removed. Do you want to proceed?");
-                            if (!proceed) return;
-                        }
+                        // Show loading state
+                        const submitBtn = editForm.querySelector('button[type="submit"]');
+                        const originalText = submitBtn.innerHTML;
+                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+                        submitBtn.disabled = true;
 
-                        const updatedData = {
-                            title: title,
-                            description: description,
-                            category: category,
-                            // Ensure we save a fresh ISO string for the backend/storage
-                            date: new Date().toISOString()
-                        };
-
-                        // If a new media file was uploaded, update media info
+                        // Create FormData to send to backend
+                        const formData = new FormData();
+                        formData.append('title', title);
+                        formData.append('description', description);
+                        formData.append('category', category);
+                        
+                        // Append files only if new ones were selected (this replaces old files)
                         if (newMediaFile) {
-                            const mediaData = await new Promise((resolve, reject) => {
-                                const reader = new FileReader();
-                                reader.onload = (e) => resolve(e.target.result);
-                                reader.onerror = () => reject(new Error('Failed to read media file'));
-                                reader.readAsDataURL(newMediaFile);
-                            });
-
-                            updatedData.mediaFileName = newMediaFile.name;
-                            updatedData.mediaFileType = newMediaFile.type;
-                            updatedData.mediaData = mediaData;
+                            formData.append('mediaFile', newMediaFile);
                         }
-
-                        // If a new document file was uploaded, update document info
                         if (newDocFile) {
-                            // Read the new document file data
-                            const fileData = await new Promise((resolve, reject) => {
-                                const reader = new FileReader();
-                                reader.onload = (e) => resolve(e.target.result);
-                                reader.onerror = () => reject(new Error('Failed to read document file'));
-                                reader.readAsDataURL(newDocFile);
-                            });
-
-                            const fileSize = newDocFile.size < 1024 * 1024 ?
-                                (newDocFile.size / 1024).toFixed(1) + ' KB' :
-                                (newDocFile.size / (1024 * 1024)).toFixed(1) + ' MB';
-
-                            // Determine file type from extension
-                            const fileName = newDocFile.name.toLowerCase();
-                            let fileType = 'Document';
-                            if (fileName.endsWith('.pdf')) {
-                                fileType = 'PDF';
-                            } else if (fileName.endsWith('.doc') || fileName.endsWith('.docx')) {
-                                fileType = 'Document';
+                            formData.append('documentFile', newDocFile);
+                            
+                            // Determine document type
+                            const docName = newDocFile.name.toLowerCase();
+                            let docType = 'Document';
+                            if (docName.endsWith('.pdf')) {
+                                docType = 'PDF';
+                            } else if (docName.endsWith('.doc') || docName.endsWith('.docx')) {
+                                docType = 'Document';
                             }
-
-                            updatedData.fileSize = fileSize;
-                            updatedData.type = fileType;
-                            updatedData.fileName = newDocFile.name;
-                            updatedData.fileType = newDocFile.type;
-                            updatedData.fileData = fileData;
-                            updatedData.date = new Date().toLocaleDateString('en-US', {
-                                month: 'short',
-                                day: 'numeric',
-                                year: 'numeric'
-                            });
+                            formData.append('type', docType);
                         }
 
-                        // Update the content
-                        await updateContentData(currentViewingContentId, updatedData);
+                        // Send update to backend
+                        const response = await fetch(`${API_URL}/api/content/${currentViewingContentId}`, {
+                            method: 'PUT',
+                            body: formData
+                        });
 
-                        // REFRESH the dashboard recent list so it doesn't show old data
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.message || 'Update failed');
+                        }
+
+                        const result = await response.json();
+                        const updatedContent = result.content;
+
+                        // Update the DOM element attributes so UI reflects changes
+                        const contentElement = document.querySelector(`[data-id="${currentViewingContentId}"]`);
+                        if (contentElement) {
+                            contentElement.dataset.title = updatedContent.title;
+                            contentElement.dataset.description = updatedContent.description; 
+                            contentElement.dataset.category = updatedContent.category;
+                            
+                            if (updatedContent.fileSize) contentElement.dataset.size = formatFileSize(updatedContent.fileSize);
+                            if (updatedContent.type) contentElement.dataset.type = updatedContent.type;
+                            contentElement.dataset.date = updatedContent.date || new Date().toISOString();
+                            
+                            // Update the visible text in the list row
+                            const titleElement = contentElement.querySelector('.content-title');
+                            if (titleElement) titleElement.textContent = updatedContent.title;
+                            
+                            const metaElement = contentElement.querySelector('.content-meta');
+                            if (metaElement) {
+                                const type = updatedContent.type || contentElement.dataset.type;
+                                const size = contentElement.dataset.size;
+                                const dateStr = formatToSGTime(updatedContent.date);
+                                metaElement.textContent = `${type} | ${size} | Modified: ${dateStr}`;
+                            }
+                        }
+
+                        // Refresh views
                         syncRecentFromYourContent(); 
                         refreshDashboardStats();
+
+                        // Reset button
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
 
                         // Show success popup
                         showSuccessPopup('Content updated successfully!');
 
-                        // Go back to detail view (updateContentData already refreshed it)
+                        // Go back to detail view and refresh it
+                        if (contentElement) {
+                            viewContentDetail(contentElement);
+                        }
                         document.getElementById('content-edit-form').style.display = 'none';
                         document.getElementById('content-detail-view').style.display = 'block';
 
                     } catch (error) {
                         console.error('Update failed:', error);
                         alert('Update failed: ' + error.message);
+                        
+                        // Reset button on error
+                        const submitBtn = editForm.querySelector('button[type="submit"]');
+                        submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+                        submitBtn.disabled = false;
                     }
                 });
             }
