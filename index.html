@@ -1085,62 +1085,56 @@
                         </button>
                     </div>
 
+                    <div class="card mb-3">
+                        <div class="card-body p-3">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
+                                        <input type="text" class="form-control border-start-0" id="filter-search" placeholder="Search by title...">
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-2">
+                                    <select class="form-select" id="filter-category">
+                                        <option value="all">All Categories</option>
+                                        <option value="Environmental">Environmental</option>
+                                        <option value="Social">Social</option>
+                                        <option value="Governance">Governance</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <select class="form-select" id="filter-status">
+                                        <option value="all">All Statuses</option>
+                                        <option value="Approved">Approved</option>
+                                        <option value="Pending">Pending</option>
+                                        <option value="Rejected">Rejected</option>
+                                        <option value="Published">Published</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="input-group">
+                                        <span class="input-group-text">Sort By:</span>
+                                        <select class="form-select" id="sort-order">
+                                            <option value="newest">Newest Modified (Default)</option>
+                                            <option value="oldest">Oldest Modified</option>
+                                            <option value="az">A-Z (Title)</option>
+                                            <option value="za">Z-A (Title)</option>
+                                            <option value="largest">File Size (Largest)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="card" id="content-list">
                         <div class="card-header">
                             <h5>Your Content</h5>
                         </div>
                         <div class="card-body" id="content-items-container">
-                            <div class="content-item content-item-clickable" data-id="default-1"
-                                data-title="Wind Energy Project" data-type="Video" data-size="125 MB"
-                                data-date="Dec 17, 2025" data-status="Published" data-category="Environmental"
-                                data-description="Comprehensive video documentation of our latest wind energy project, showcasing the installation and benefits of renewable energy infrastructure. This project demonstrates our commitment to sustainable energy solutions and reducing carbon emissions."
-                                onclick="viewContentDetail(this)">
-                                <div>
-                                    <div class="content-title">Wind Energy Project</div>
-                                    <div class="content-meta">Video | 125 MB | Modified: Dec 17, 2025</div>
-                                </div>
-                                <div class="content-item-actions">
-                                    <span class="badge badge-success">Published</span>
-                                    <button class="delete-btn"
-                                        onclick="event.stopPropagation(); deleteContent('default-1')" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="content-item content-item-clickable" data-id="default-2"
-                                data-title="Biodiversity Report 2024" data-type="Document" data-size="3.2 MB"
-                                data-date="Dec 16, 2025" data-status="Pending" data-category="Environmental"
-                                data-description="Annual biodiversity assessment report documenting local ecosystem health, species population trends, and conservation efforts. This report includes detailed analysis of flora and fauna in protected areas and recommendations for future conservation strategies."
-                                onclick="viewContentDetail(this)">
-                                <div>
-                                    <div class="content-title">Biodiversity Report 2024</div>
-                                    <div class="content-meta">Document | 3.2 MB | Modified: Dec 16, 2025</div>
-                                </div>
-                                <div class="content-item-actions">
-                                    <span class="badge badge-warning">Pending</span>
-                                    <button class="delete-btn"
-                                        onclick="event.stopPropagation(); deleteContent('default-2')" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="content-item content-item-clickable" data-id="default-3"
-                                data-title="Carbon Offset Initiative" data-type="Article" data-size="256 KB"
-                                data-date="Dec 15, 2025" data-status="Approved" data-category="Environmental"
-                                data-description="Detailed article about our carbon offset program, including methodologies for calculating carbon footprint, offset strategies, and partnerships with reforestation projects. This initiative aims to achieve carbon neutrality by 2030."
-                                onclick="viewContentDetail(this)">
-                                <div>
-                                    <div class="content-title">Carbon Offset Initiative</div>
-                                    <div class="content-meta">Article | 256 KB | Modified: Dec 15, 2025</div>
-                                </div>
-                                <div class="content-item-actions">
-                                    <span class="badge badge-success">Approved</span>
-                                    <button class="delete-btn"
-                                        onclick="event.stopPropagation(); deleteContent('default-3')" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
                         </div>
                     </div>
 
@@ -2096,16 +2090,12 @@
                         throw new Error(errorData.message || 'Delete failed');
                     }
 
-                    // Remove from DOM after successful backend delete
-                    const contentItems = document.querySelectorAll(`[data-id="${pendingDeleteId}"]`);
-                    if (contentItems && contentItems.length) {
-                        contentItems.forEach(ci => ci.remove());
-                    }
+                    // Remove from global data array
+                    allContentData = allContentData.filter(item => item._id !== pendingDeleteId && item.id !== pendingDeleteId);
+                    filterAndRenderContent(); // Re-render list
 
                     // Update Recent, Approvals, and Dashboard
-                    syncRecentFromYourContent();
                     syncApprovalsFromYourContent();
-                    refreshDashboardStats();
 
                     // If viewing this content, go back to list
                     if (currentViewingContentId === pendingDeleteId) backToContentList();
@@ -2263,70 +2253,136 @@
             }
         }
 
+        // Global variable to store the raw data
+        let allContentData = [];
+
+        // 1. Modified Load Function
         async function loadStoredContents() {
             try {
                 const response = await fetch(`${API_URL}/api/content/all`, {
                     method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
+                    headers: { 'Content-Type': 'application/json' }
                 });
 
                 if (!response.ok) {
-                    console.error('Failed to fetch contents from server');
-                    return; // Silently fail and show default content
+                    console.error('Failed to fetch contents');
+                    return;
                 }
 
-                const contents = await response.json();
-                const container = document.getElementById('content-items-container');
+                // Store raw data globally
+                allContentData = await response.json();
+                
+                // Initial Render
+                filterAndRenderContent();
 
-                if (!container) return;
-
-                contents.forEach(content => {
-                    const newRow = document.createElement('div');
-                    newRow.className = 'content-item content-item-clickable';
-                    newRow.setAttribute('data-id', content._id || content.id);
-                    newRow.setAttribute('data-title', content.title);
-                    newRow.setAttribute('data-type', content.type || 'Document');
-                    newRow.setAttribute('data-size', content.fileSize);
-                    
-                    // FIX: Store Upload Date and Modified Date separately
-                    const uploadDate = content.date; // The original creation date
-                    const modifiedDate = content.updatedAt || content.date; // Fallback to upload date if never edited
-
-                    newRow.setAttribute('data-upload-date', uploadDate);     // STORE UPLOAD DATE
-                    newRow.setAttribute('data-modified-date', modifiedDate); // STORE MODIFIED DATE
-                    
-                    newRow.setAttribute('data-status', content.status || 'Pending');
-                    newRow.setAttribute('data-category', content.category || 'General');
-                    newRow.setAttribute('data-description', content.description || 'No description available.');
-                    newRow.onclick = function () { viewContentDetail(this); };
-
-                    // Display the MODIFIED date in the list view
-                    const formattedModifiedDate = formatToSGTime(modifiedDate);
-                    const formattedSize = formatFileSize(content.fileSize);
-                    newRow.innerHTML = `
-                        <div>
-                            <div class="content-title">${content.title}</div>
-                            <div class="content-meta">${content.type || 'Document'} | ${formattedSize} | Modified: ${formattedModifiedDate}</div>
-                        </div>
-                        <div class="content-item-actions">
-                            <span class="badge badge-warning">${content.status || 'Pending'}</span>
-                            <button class="delete-btn" onclick="event.stopPropagation(); deleteContent('${content._id || content.id}')" title="Delete">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    `;
-                    container.insertBefore(newRow, container.firstChild);
-                });
-                // Sync top 3 items into Recent Content, approvals list, and dashboard stats
-                syncRecentFromYourContent();
-                syncApprovalsFromYourContent();
-                refreshDashboardStats();
             } catch (error) {
                 console.error('Failed to load contents:', error);
-                // Silently fail and show default content instead of alerting
             }
+        }
+
+        // 2. The Filter & Sort Logic
+        function filterAndRenderContent() {
+            const searchTerm = document.getElementById('filter-search')?.value.toLowerCase() || '';
+            const categoryFilter = document.getElementById('filter-category')?.value || 'all';
+            const statusFilter = document.getElementById('filter-status')?.value || 'all';
+            const sortOrder = document.getElementById('sort-order')?.value || 'newest';
+
+            // A. Filter Data
+            let filteredData = allContentData.filter(item => {
+                // Search (Title)
+                const matchesSearch = item.title.toLowerCase().includes(searchTerm);
+                
+                // Category
+                const matchesCategory = categoryFilter === 'all' || (item.category === categoryFilter);
+                
+                // Status (Case insensitive check)
+                const itemStatus = (item.status || 'Pending').toLowerCase();
+                const filterStatusLower = statusFilter.toLowerCase();
+                const matchesStatus = statusFilter === 'all' || itemStatus === filterStatusLower;
+
+                return matchesSearch && matchesCategory && matchesStatus;
+            });
+
+            // B. Sort Data
+            filteredData.sort((a, b) => {
+                const dateA = new Date(a.updatedAt || a.date);
+                const dateB = new Date(b.updatedAt || b.date);
+                const titleA = a.title.toLowerCase();
+                const titleB = b.title.toLowerCase();
+                
+                switch (sortOrder) {
+                    case 'newest': return dateB - dateA;
+                    case 'oldest': return dateA - dateB;
+                    case 'az': return titleA.localeCompare(titleB);
+                    case 'za': return titleB.localeCompare(titleA);
+                    case 'largest': return (b.fileSize || 0) - (a.fileSize || 0);
+                    default: return dateB - dateA;
+                }
+            });
+
+            // C. Render Data
+            const container = document.getElementById('content-items-container');
+            if (!container) return;
+            
+            container.innerHTML = ''; // Clear current list
+
+            if (filteredData.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center p-5 text-muted">
+                        <i class="fas fa-search fa-3x mb-3"></i>
+                        <p>No content found matching your filters.</p>
+                    </div>`;
+                return;
+            }
+
+            filteredData.forEach(content => {
+                const newRow = document.createElement('div');
+                newRow.className = 'content-item content-item-clickable';
+                
+                // Data Attributes
+                newRow.setAttribute('data-id', content._id || content.id);
+                newRow.setAttribute('data-title', content.title);
+                newRow.setAttribute('data-type', content.type || 'Document');
+                newRow.setAttribute('data-size', content.fileSize);
+                newRow.setAttribute('data-upload-date', content.date);
+                newRow.setAttribute('data-modified-date', content.updatedAt || content.date);
+                newRow.setAttribute('data-status', content.status || 'Pending');
+                newRow.setAttribute('data-category', content.category || 'General');
+                newRow.setAttribute('data-description', content.description || '');
+                
+                newRow.onclick = function () { viewContentDetail(this); };
+
+                // Formatting for display
+                const modifiedDate = content.updatedAt || content.date;
+                const formattedDate = formatToSGTime(modifiedDate);
+                const formattedSize = formatFileSize(content.fileSize);
+                
+                // Badge Logic
+                let badgeClass = 'badge-warning';
+                const st = (content.status || 'Pending').toLowerCase();
+                if (st.includes('approved') || st.includes('published')) badgeClass = 'badge-success';
+                else if (st.includes('rejected')) badgeClass = 'badge-danger';
+
+                newRow.innerHTML = `
+                    <div>
+                        <div class="content-title">${content.title}</div>
+                        <div class="content-meta">
+                            ${content.type || 'Document'} | ${formattedSize} | Modified: ${formattedDate}
+                        </div>
+                    </div>
+                    <div class="content-item-actions">
+                        <span class="badge ${badgeClass}">${content.status || 'Pending'}</span>
+                        <button class="delete-btn" onclick="event.stopPropagation(); deleteContent('${content._id || content.id}')" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(newRow);
+            });
+
+            // Sync other UI parts
+            syncRecentFromYourContent();
+            refreshDashboardStats();
         }
 
         function updateProfileRole() {
@@ -2713,6 +2769,17 @@
             updateProfileRole();
             await loadStoredContents(); // Load content from backend
 
+            // Attach listeners to filter controls
+            const filterSearch = document.getElementById('filter-search');
+            const filterCategory = document.getElementById('filter-category');
+            const filterStatus = document.getElementById('filter-status');
+            const sortOrder = document.getElementById('sort-order');
+            
+            if (filterSearch) filterSearch.addEventListener('input', filterAndRenderContent);
+            if (filterCategory) filterCategory.addEventListener('change', filterAndRenderContent);
+            if (filterStatus) filterStatus.addEventListener('change', filterAndRenderContent);
+            if (sortOrder) sortOrder.addEventListener('change', filterAndRenderContent);
+
             // Handle edit form submission
             const editForm = document.getElementById('edit-content-form');
             if (editForm) {
@@ -2786,37 +2853,16 @@
                         const result = await response.json();
                         const updatedContent = result.content;
 
-                        // Update the DOM element attributes so UI reflects changes
-                        const contentElement = document.querySelector(`[data-id="${currentViewingContentId}"]`);
-                        if (contentElement) {
-                            contentElement.dataset.title = updatedContent.title;
-                            contentElement.dataset.description = updatedContent.description; 
-                            contentElement.dataset.category = updatedContent.category;
-                            
-                            // FIX: Update ONLY the modified date attribute
-                            // Do NOT update 'data-upload-date' here
-                            contentElement.dataset.modifiedDate = updatedContent.updatedAt || new Date().toISOString();
-                            
-                            if (updatedContent.fileSize) contentElement.dataset.size = formatFileSize(updatedContent.fileSize);
-                            if (updatedContent.type) contentElement.dataset.type = updatedContent.type;
-                            
-                            // Update the visible text in the list row
-                            const titleElement = contentElement.querySelector('.content-title');
-                            if (titleElement) titleElement.textContent = updatedContent.title;
-                            
-                            const metaElement = contentElement.querySelector('.content-meta');
-                            if (metaElement) {
-                                const type = updatedContent.type || contentElement.dataset.type;
-                                const size = contentElement.dataset.size;
-                                // Display the new Modified Date
-                                const dateStr = formatToSGTime(contentElement.dataset.modifiedDate);
-                                metaElement.textContent = `${type} | ${size} | Modified: ${dateStr}`;
-                            }
+                        // Update the item in our global array
+                        const index = allContentData.findIndex(item => item._id === currentViewingContentId || item.id === currentViewingContentId);
+                        if (index !== -1) {
+                            allContentData[index] = updatedContent;
                         }
 
-                        // Refresh views
-                        syncRecentFromYourContent(); 
-                        refreshDashboardStats();
+                        filterAndRenderContent(); // Re-render list
+
+                        // Get updated element for view refresh
+                        const contentElement = document.querySelector(`[data-id="${currentViewingContentId}"]`);
 
                         // Reset button
                         submitBtn.innerHTML = originalText;
@@ -2931,41 +2977,14 @@
                         }
 
                         const result = await response.json();
-                        const contentId = result.content._id || result.content.id;
-
-                        // Add new content to the list immediately
-                        const contentList = document.getElementById('content-items-container');
-                        if (contentList) {
-                            const newRow = document.createElement('div');
-                            newRow.className = 'content-item content-item-clickable';
-                            newRow.setAttribute('data-id', contentId);
-                            newRow.setAttribute('data-title', title);
-                            newRow.setAttribute('data-type', docType);
-                            newRow.setAttribute('data-size', docSize);
-                            newRow.setAttribute('data-date', today);
-                            newRow.setAttribute('data-status', 'Pending');
-                            newRow.setAttribute('data-category', category);
-                            newRow.setAttribute('data-description', description);
-                            newRow.onclick = function () { viewContentDetail(this); };
-
-                            newRow.innerHTML = `
-                                <div>
-                                    <div class="content-title">${title}</div>
-                                    <div class="content-meta">${docType} | ${docSize} | Modified: ${today}</div>
-                                </div>
-                                <div class="content-item-actions">
-                                    <span class="badge badge-warning">Pending</span>
-                                    <button class="delete-btn" onclick="event.stopPropagation(); deleteContent('${contentId}')" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            `;
-                            contentList.insertBefore(newRow, contentList.firstChild);
-                            // Sync Recent, Approvals, and dashboard stats to reflect newly uploaded item
-                            syncRecentFromYourContent();
-                            syncApprovalsFromYourContent();
-                            refreshDashboardStats();
-                        }
+                        const newContent = result.content;
+                        
+                        // Add to global data array
+                        allContentData.unshift(newContent); // Add to beginning of array
+                        filterAndRenderContent(); // Re-render list
+                        
+                        // Sync other parts
+                        syncApprovalsFromYourContent();
 
                         // Reset button
                         submitBtn.innerHTML = originalText;
