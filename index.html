@@ -1962,7 +1962,7 @@
                 <button class="preview-close-btn" onclick="closePreview()">
                     <i class="fas fa-times"></i>
                 </button>
-                <img src="https://www.moe.gov.sg/-/media/images/school-logos/post-secondary/republic-polytechnic.png?h=140&iar=0&w=500&hash=1EE0F782E863E3DB9FF95982A0BA8973"
+                <img src="https://www.rp.edu.sg/images/default-source/default-album/rp-logo.png?sfvrsn=41990045_3"
                     alt="Republic Polytechnic Logo" class="preview-logo">
             </div>
             <div class="preview-content">
@@ -3041,8 +3041,7 @@
                     node.className = 'content-item content-item-clickable';
                     // Mirror data attributes so viewContentDetail can use them
                     const srcId = item.getAttribute('data-id') || item.dataset.id || '';
-                    // Use a distinct data-id for recent items so they are not removed when the original
-                    // content item is deleted/approved. Preserve original id in data-src-id for lookups.
+                    
                     node.setAttribute('data-src-id', srcId);
                     if (srcId) node.setAttribute('data-id', 'recent-' + srcId);
                     node.setAttribute('data-title', item.getAttribute('data-title') || title);
@@ -3053,8 +3052,12 @@
                     node.setAttribute('data-category', item.getAttribute('data-category') || item.dataset.category || '');
                     node.setAttribute('data-description', item.getAttribute('data-description') || item.dataset.description || '');
 
-                    // When clicked from Dashboard recent list, open preview overlay instead
-                    node.onclick = function () { openPreviewFromElement(this); };
+                    // UPDATED: Instead of opening the popup overlay, open the content-detail page
+                    node.onclick = function () { 
+                        if (srcId) {
+                            window.open(`content-detail.html?id=${srcId}`, '_blank'); 
+                        }
+                    };
 
                     node.innerHTML = `
                         <div>
