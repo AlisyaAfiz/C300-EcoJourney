@@ -41,7 +41,6 @@
         }
 
         .sidebar-header {
-            text-align: center;
             margin-bottom: 20px;
             border-bottom: 2px solid rgba(255, 255, 255, 0.2);
             padding-bottom: 15px;
@@ -50,28 +49,12 @@
         .sidebar-header h3 {
             font-size: 24px;
             margin-bottom: 5px;
-            font-size: 22px;
-            margin: 0;
             color: #2ecc71;
-            white-space: nowrap;
         }
 
         .sidebar-header p {
             font-size: 12px;
             color: rgba(255, 255, 255, 0.7);
-        }
-
-        .sidebar-logo {
-            width: 36px;
-            height: 36px;
-            object-fit: contain;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            justify-content: center; 
-            gap: 10px;               
         }
 
         .nav {
@@ -908,10 +891,7 @@
         <!-- Sidebar Navigation -->
         <nav class="sidebar">
             <div class="sidebar-header">
-                <div class="brand">
-                    <img src="frontend\static\logo.png" alt="EcoJourney Logo" class="sidebar-logo">
-                    <h3>EcoJourney</h3>
-                </div>
+                <h3><i class="fas fa-leaf"></i> EcoJourney</h3>
                 <p>Content Management System</p>
             </div>
 
@@ -2785,6 +2765,10 @@
             updateProfileRole();
             await loadStoredContents(); // Load persisted content
 
+            // START OF FIX
+            await applyLocalOverrides(); // Apply local edits to refresh Dashboard with saved changes
+            // END OF FIX
+
             // Handle edit form submission
             const editForm = document.getElementById('edit-content-form');
             if (editForm) {
@@ -3317,6 +3301,69 @@
                 }
             } catch (e) {
                 console.error('refreshDashboardStats error:', e);
+
+                    // --- NEW FIX: Sync Local Edits to Dashboard ---
+                    async function applyLocalOverrides() {
+                        try {
+                            // 1. Get all your saved edits from the local database
+                            const localContents = await getStoredContents();
+                            if (!localContents || localContents.length === 0) return;
+
+                            // 2. Loop through every item currently visible on the screen
+                            const uiItems = document.querySelectorAll('.content-item[data-id]');
+                
+                            uiItems.forEach(item => {
+                                const id = item.getAttribute('data-id');
+                                // 3. Check if we have a newer version of this item in the database
+                                const localVersion = localContents.find(c => c.id === id || c._id === id);
+
+                                if (localVersion) {
+                                    // 4. FOUND ONE! Overwrite the stale HTML with the saved local data
+                        
+                                    // Update hidden data attributes (crucial for View Detail to work)
+                                    item.setAttribute('data-title', localVersion.title);
+                                    item.setAttribute('data-description', localVersion.description); // <--- This fixes your description bug
+                                    item.setAttribute('data-category', localVersion.category);
+                                    if (localVersion.date) item.setAttribute('data-date', localVersion.date);
+                                    if (localVersion.status) item.setAttribute('data-status', localVersion.status);
+
+                                    // Update visible text in the list
+                                    const titleEl = item.querySelector('.content-title');
+                                    if (titleEl) titleEl.textContent = localVersion.title;
+
+                                    const metaEl = item.querySelector('.content-meta');
+                                    if (metaEl) {
+                                        // Re-format the meta line
+                                        const type = localVersion.type || item.getAttribute('data-type');
+                                        const size = localVersion.fileSize || item.getAttribute('data-size');
+                                        const date = localVersion.date || item.getAttribute('data-date');
+                                        // Helper to reuse your existing formatting
+                                        const formattedSize = typeof formatFileSize === 'function' ? formatFileSize(size) : size;
+                                        const formattedDate = typeof formatToSGTime === 'function' ? formatToSGTime(date) : date;
+                            
+                                        metaEl.textContent = `${type} | ${formattedSize} | Modified: ${formattedDate}`;
+                                    }
+                        
+                                    // Update badge if status changed
+                                    const badge = item.querySelector('.badge');
+                                    if (badge && localVersion.status) {
+                                        badge.textContent = localVersion.status;
+                                        // Reset classes and apply correct color
+                                        badge.className = 'badge'; 
+                                        if(localVersion.status === 'Approved' || localVersion.status === 'Published') badge.classList.add('badge-success');
+                                        else if(localVersion.status === 'Rejected') badge.classList.add('badge-danger');
+                                        else badge.classList.add('badge-warning');
+                                    }
+                                }
+                            });
+                
+                            // 5. Refresh the "Recent Content" cards to reflect these changes
+                            syncRecentFromYourContent();
+
+                        } catch (e) {
+                            console.warn("Could not apply local overrides:", e);
+                        }
+                    }
             }
         }
     </script>
