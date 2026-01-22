@@ -72,6 +72,28 @@
             const id = params.get('id');
             if (!id) return;
 
+            // UPDATED: Always fetch from server first to get latest data
+            await fetchFromServer(id);
+        }
+
+        async function fetchFromServer(id) {
+            try {
+                const res = await fetch(`${API_URL}/api/content/${id}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    renderData(data);
+                } else {
+                    // If server fetch fails, try IndexedDB as fallback
+                    tryLocalStorage(id);
+                }
+            } catch (err) { 
+                console.error('Server fetch failed:', err);
+                // Fallback to local storage
+                tryLocalStorage(id);
+            }
+        }
+
+        function tryLocalStorage(id) {
             const dbRequest = indexedDB.open('EcoJourneyDB', 1);
             dbRequest.onsuccess = (e) => {
                 const db = e.target.result;
@@ -83,20 +105,11 @@
                     if (getReq.result) {
                         renderData(getReq.result);
                     } else {
-                        fetchFromServer(id);
+                        document.getElementById('title').textContent = 'Content Not Found';
+                        document.getElementById('description').textContent = 'This content may have been deleted.';
                     }
                 };
             };
-        }
-
-        async function fetchFromServer(id) {
-            try {
-                const res = await fetch(`${API_URL}/api/content/${id}`);
-                if (res.ok) {
-                    const data = await res.json();
-                    renderData(data);
-                }
-            } catch (err) { console.error(err); }
         }
 
         function renderData(data) {
@@ -104,7 +117,8 @@
             document.getElementById('description').textContent = data.description || "No description provided.";
             document.getElementById('category').textContent = data.category;
             
-            const displayDate = data.date || data.uploadDate || null;
+            // UPDATED: Use the most recent date available (prioritize updatedAt, then date, then createdAt)
+            const displayDate = data.updatedAt || data.date || data.createdAt || null;
             document.getElementById('date').textContent = formatDate(displayDate);
             
             const mediaBox = document.getElementById('media-box');
@@ -113,7 +127,6 @@
             if (type.startsWith('image/')) {
                 mediaBox.innerHTML = `<img src="${data.mediaData}" alt="Project Image" style="width:100%; height:auto;">`;
             } else if (type.startsWith('video/')) {
-                // UPDATED: Added loop, muted, and playsinline for better autoplay/looping performance
                 mediaBox.innerHTML = `
                     <video controls autoplay loop muted playsinline style="width:100%;">
                         <source src="${data.mediaData}" type="${type}">

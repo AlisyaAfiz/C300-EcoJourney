@@ -285,16 +285,19 @@ router.put('/:id', upload.fields([
       content.fileType = documentFile.mimetype;
       content.fileSize = documentFile.size;
       
-      // Update type based on file extension
       if (req.body.type) {
         content.type = req.body.type;
       }
     }
 
-    // Update modification date
-    content.date = new Date().toISOString();
+    // UPDATED: Set both 'date' and 'updatedAt' to current time
+    const now = new Date().toISOString();
+    content.date = now;
+    content.updatedAt = now;
 
     await content.save();
+    
+    console.log('✅ Content updated with new timestamp:', now);
     
     res.json({ 
       message: 'Content updated successfully', 
