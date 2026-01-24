@@ -1028,28 +1028,7 @@
                                     <h5><i class="fas fa-history"></i> Recent Content</h5>
                                 </div>
                                 <div class="card-body" id="recent-content-container">
-                                    <div class="content-item">
-                                        <div>
-                                            <div class="content-title">Solar Energy Initiative</div>
-                                            <div class="content-meta">Created: Dec 20, 2025 | Category: Environmental
-                                            </div>
-                                        </div>
-                                        <span class="badge badge-success">Approved</span>
-                                    </div>
-                                    <div class="content-item">
-                                        <div>
-                                            <div class="content-title">Community Outreach Program</div>
-                                            <div class="content-meta">Created: Dec 19, 2025 | Category: Social</div>
-                                        </div>
-                                        <span class="badge badge-warning">Pending</span>
-                                    </div>
-                                    <div class="content-item">
-                                        <div>
-                                            <div class="content-title">Corporate Governance Report</div>
-                                            <div class="content-meta">Created: Dec 18, 2025 | Category: Governance</div>
-                                        </div>
-                                        <span class="badge badge-success">Approved</span>
-                                    </div>
+                                    <!-- 3 Recent content from backend -->
                                 </div>
                             </div>
                         </div>
@@ -1452,52 +1431,7 @@
                                 <h5>Pending Approvals (<span id="pending-count">3</span>)</h5>
                             </div>
                             <div class="card-body" id="approvals-container">
-                                <div class="content-item" data-id="pending-1" data-title="Community Outreach Program"
-                                    data-author="John Doe" data-date="Dec 19, 2025" data-category="Social"
-                                    data-description="A comprehensive community outreach initiative designed to engage local residents in environmental sustainability projects. This program includes educational workshops, volunteer opportunities, and partnerships with local organizations to promote social responsibility and community engagement."
-                                    data-status="Pending">
-                                    <div>
-                                        <div class="content-title">Community Outreach Program</div>
-                                        <div class="content-meta">Submitted by: John Doe | Dec 19, 2025 | Category:
-                                            Social</div>
-                                    </div>
-                                    <button class="btn btn-primary"
-                                        onclick="event.stopPropagation(); openReviewPage(document.querySelector('[data-id=\'pending-1\']'))"
-                                        style="padding: 6px 12px; font-size: 12px;">
-                                        <i class="fas fa-eye"></i> Review
-                                    </button>
-                                </div>
-                                <div class="content-item" data-id="pending-2" data-title="Water Conservation Plan"
-                                    data-author="Jane Smith" data-date="Dec 19, 2025" data-category="Environmental"
-                                    data-description="A detailed water conservation strategy outlining methods to reduce water consumption across our operations and facilities. The plan includes rainwater harvesting systems, water recycling technologies, and employee awareness programs to promote sustainable water usage practices."
-                                    data-status="Pending">
-                                    <div>
-                                        <div class="content-title">Water Conservation Plan</div>
-                                        <div class="content-meta">Submitted by: Jane Smith | Dec 19, 2025 | Category:
-                                            Environmental</div>
-                                    </div>
-                                    <button class="btn btn-primary"
-                                        onclick="event.stopPropagation(); openReviewPage(document.querySelector('[data-id=\'pending-2\']'))"
-                                        style="padding: 6px 12px; font-size: 12px;">
-                                        <i class="fas fa-eye"></i> Review
-                                    </button>
-                                </div>
-                                <div class="content-item" data-id="pending-3"
-                                    data-title="Ethical Supply Chain Standards" data-author="Mike Johnson"
-                                    data-date="Dec 18, 2025" data-category="Governance"
-                                    data-description="Comprehensive governance framework establishing ethical standards for our entire supply chain. Includes vendor compliance requirements, fair labor practices, conflict minerals policies, and regular audit procedures to ensure all suppliers meet our sustainability and ethical standards."
-                                    data-status="Pending">
-                                    <div>
-                                        <div class="content-title">Ethical Supply Chain Standards</div>
-                                        <div class="content-meta">Submitted by: Mike Johnson | Dec 18, 2025 | Category:
-                                            Governance</div>
-                                    </div>
-                                    <button class="btn btn-primary"
-                                        onclick="event.stopPropagation(); openReviewPage(document.querySelector('[data-id=\'pending-3\']'))"
-                                        style="padding: 6px 12px; font-size: 12px;">
-                                        <i class="fas fa-eye"></i> Review
-                                    </button>
-                                </div>
+                                <!-- Pending approvals from backend -->
                             </div>
                         </div>
                     </div>
@@ -1573,17 +1507,14 @@
                         <div class="detail-section">
                             <h4><i class="fas fa-tasks"></i> Review Decision</h4>
                             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                <button class="btn btn-primary" style="background: #27ae60; flex: 1; min-width: 150px;"
-                                    onclick="submitReview('approved')">
+                                <button class="btn btn-primary" style="background: #27ae60; flex: 1; min-width: 150px;" onclick="submitReview('approved')">
                                     <i class="fas fa-check"></i> Approve Content
                                 </button>
-                                <button class="btn btn-primary" style="background: #f39c12; flex: 1; min-width: 150px;"
-                                    onclick="submitReview('changes_requested')">
-                                    <i class="fas fa-edit"></i> Request Changes
-                                </button>
-                                <button class="btn btn-primary" style="background: #e74c3c; flex: 1; min-width: 150px;"
-                                    onclick="submitReview('rejected')">
+                                <button class="btn btn-primary" style="background: #e74c3c; flex: 1; min-width: 150px;" onclick="submitReview('rejected')">
                                     <i class="fas fa-times"></i> Reject Content
+                                </button>
+                                <button class="btn btn-primary" style="background: #9b59b6; flex: 1; min-width: 150px;" onclick="previewContent()">
+                                    <i class="fas fa-eye"></i> Preview Link
                                 </button>
                             </div>
                         </div>
@@ -1603,6 +1534,8 @@
                             description: element.dataset.description || 'No description available.',
                             status: element.dataset.status || 'Pending'
                         };
+
+                        currentViewingContentId = element.dataset.id;
 
                         console.log('Opening review for:', currentReviewingContent);
 
@@ -1630,6 +1563,73 @@
                         document.getElementById('approvals-list').style.display = 'block';
                         document.getElementById('review-page').style.display = 'none';
                         currentReviewingContent = null;
+                    }
+
+                    function submitReview(status) {
+                        if (!currentReviewingContent) return;
+
+                        const comments = document.getElementById('review-comments').value.trim();
+                        if (!comments) {
+                            alert('Please provide comments or reasons for your decision.');
+                            return;
+                        }
+
+                        // Determine new status and badge class
+                        let newStatus = '';
+                        let badgeClass = '';
+                        let message = '';
+
+                        if (status === 'approved') {
+                            newStatus = 'Approved';
+                            badgeClass = 'badge-success';
+                            message = 'Content approved successfully!';
+                        } else if (status === 'rejected') {
+                            newStatus = 'Rejected';
+                            badgeClass = 'badge-danger';
+                            message = 'Content rejected successfully!';
+                        } else {
+                            // Safety fallback - should not happen
+                            alert('Invalid review status');
+                            return;
+                        }
+
+                        // Update the item in the MAIN "My Content" list (this affects dashboard stats)
+                        const mainContentItem = document.querySelector(`#content-items-container [data-id="${currentReviewingContent.id}"]`);
+                        if (mainContentItem) {
+                            // Update data attribute
+                            mainContentItem.dataset.status = newStatus;
+
+                            // Update visible badge
+                            const badge = mainContentItem.querySelector('.badge');
+                            if (badge) {
+                                badge.textContent = newStatus;
+                                badge.className = `badge ${badgeClass}`;
+                            }
+                        }
+
+                        // Remove the item from the Approvals queue (since it's no longer pending)
+                        const approvalItem = document.querySelector(`#approvals-container [data-id="${currentReviewingContent.id}"]`);
+                        if (approvalItem) {
+                            approvalItem.remove();
+                        }
+
+                        // Refresh all affected UI sections
+                        syncRecentFromYourContent();      // Update recent cards (badges may have changed)
+                        syncApprovalsFromYourContent();   // Rebuild approvals list (should now have 1 less item)
+                        refreshDashboardStats();          // This will now see the updated status → correct counts
+
+                        // Show success message and close review panel
+                        showSuccessPopup(message);
+                        closeReviewPage();
+
+                        // Log for debugging (and eventual backend call)
+                        console.log(`Review submitted: ${status} for content ${currentReviewingContent.id} with comments: ${comments}`);
+
+                        fetch(`${API_URL}/api/content/${currentReviewingContent.id}/review`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ status: newStatus, comments })
+                        });
                     }
 
                     async function fetchContentForReview(contentId) {
@@ -1686,9 +1686,7 @@
                                 } else if (decision === 'rejected') {
                                     rejected++;
                                     pending = Math.max(0, pending - 1);
-                                } else if (decision === 'changes_requested') {
-                                    pending = Math.max(0, pending - 1);
-                                }
+                                };
 
                                 // Update display
                                 totalStat.textContent = total;
@@ -1891,75 +1889,176 @@
 
                 <!-- Profile Tab -->
                 <div id="profile" class="tab-content-area" style="display: none;">
-                    <h1 class="page-title">My Profile</h1>
+                    <h1 class="page-title" style="margin-bottom: 30px;">
+                        <i class="fas fa-user-circle"></i> My Profile
+                    </h1>
 
                     <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <div class="card" style="text-align: center;">
-                                <div class="card-body">
-                                    <div class="user-avatar"
-                                        style="width: 80px; height: 80px; margin: 0 auto 15px; font-size: 32px;">
-                                        A
-                                    </div>
-                                    <h5>Tom Smith</h5>
-                                    <p style="color: #2ecc71; font-weight: 600; margin-bottom: 15px;"
-                                        class="profile-role">Administrator</p>
-                                    <hr>
-                                    <p><strong>Email:</strong><br>tom@ecojourney.com</p>
+                        <!-- Profile Card -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card"
+                                style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 12px; overflow: hidden;">
+                                <div
+                                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 80px;">
                                 </div>
+                                <div class="card-body" style="text-align: center; padding: 30px 20px;">
+                                    <!-- Profile Picture Upload Area -->
+                                    <div style="position: relative; width: 120px; height: 120px; margin: -60px auto 20px; cursor: pointer;"
+                                        onclick="document.getElementById('profile-pic-input').click();"
+                                        title="Click to upload profile picture">
+                                        <img id="profile-pic-display" id="profile-avatar-pic"
+                                            src="https://ui-avatars.com/api/?name=Tom+Smith&background=667eea&color=fff&size=120&bold=true"
+                                            style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border: 4px solid #f8f9fa; display: block;">
+                                        <div
+                                            style="position: absolute; bottom: 0; right: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                                            <i class="fas fa-camera"></i>
+                                        </div>
+                                    </div>
+                                    <input type="file" id="profile-pic-input" style="display: none;" accept="image/*"
+                                        onchange="handleProfilePictureUpload(event)">
+                                    <p style="font-size: 12px; color: #7f8c8d; margin-top: 8px;">Click to upload photo
+                                    </p>
+
+                                    <h5 style="font-weight: 700; font-size: 18px; margin: 15px 0;"
+                                        id="profile-page-name">Tom Smith</h5>
+                                    <p style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: 700; margin-bottom: 20px; padding: 8px 16px; border-radius: 50px; display: inline-block; font-size: 13px;"
+                                        class="profile-role">Administrator</p>
+
+                                    <div
+                                        style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                                        <p
+                                            style="margin: 0; color: #7f8c8d; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">
+                                            Email Address</p>
+                                        <p style="margin: 8px 0 0 0; font-weight: 600; color: #2c3e50;">
+                                            tom@ecojourney.com</p>
+                                    </div>
+
+                                    <div style="border-top: 1px solid #ecf0f1; padding-top: 15px; margin-top: 15px;">
+                                        <p style="color: #7f8c8d; font-size: 12px; margin: 0;">Member Since</p>
+                                        <p style="font-weight: 600; color: #2c3e50; margin: 5px 0 0 0;">January 2024</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Quick Stats -->
+                            <div style="margin-top: 20px;" id="profile-stats">
+                                <!-- Stats will be dynamically loaded based on role -->
                             </div>
                         </div>
 
+                        <!-- Edit Profile Form -->
                         <div class="col-md-8">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5 style="margin: 0;">Edit Profile Information</h5>
+                            <div class="card"
+                                style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 12px;">
+                                <div class="card-header"
+                                    style="border: none; background: #f8f9fa; color: #2c3e50; padding: 25px; border-bottom: 2px solid #ecf0f1;">
+                                    <h5 style="margin: 0; font-weight: 700; font-size: 16px;">
+                                        <i class="fas fa-edit"></i> Edit Profile Information
+                                    </h5>
                                 </div>
-                                <div class="card-body">
-                                    <div class="row mb-3">
+                                <div class="card-body" style="padding: 30px;">
+                                    <!-- Personal Information Section -->
+                                    <h6
+                                        style="font-weight: 700; color: #2c3e50; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #ecf0f1;">
+                                        <i class="fas fa-user"></i> Personal Information
+                                    </h6>
+
+                                    <div class="row mb-4">
                                         <div class="col-md-6">
-                                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">First
-                                                Name</label>
-                                            <input type="text" class="form-control">
+                                            <label
+                                                style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50; font-size: 14px;">
+                                                <i class="fas fa-font"></i> First Name
+                                            </label>
+                                            <input type="text" class="form-control"
+                                                style="border-radius: 8px; border: 1px solid #ddd; padding: 12px;"
+                                                placeholder="Enter first name">
                                         </div>
                                         <div class="col-md-6">
-                                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Last
-                                                Name</label>
-                                            <input type="text" class="form-control">
+                                            <label
+                                                style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50; font-size: 14px;">
+                                                <i class="fas fa-font"></i> Last Name
+                                            </label>
+                                            <input type="text" class="form-control"
+                                                style="border-radius: 8px; border: 1px solid #ddd; padding: 12px;"
+                                                placeholder="Enter last name">
                                         </div>
                                     </div>
-                                    <div class="mb-3">
+
+                                    <div class="mb-4">
                                         <label
-                                            style="display: block; margin-bottom: 5px; font-weight: 600;">Organization</label>
-                                        <input type="text" class="form-control">
+                                            style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50; font-size: 14px;">
+                                            <i class="fas fa-building"></i> Organization
+                                        </label>
+                                        <input type="text" class="form-control"
+                                            style="border-radius: 8px; border: 1px solid #ddd; padding: 12px;"
+                                            placeholder="Enter organization name">
                                     </div>
-                                    <div class="mb-3">
-                                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Phone
-                                            Number</label>
-                                        <input type="tel" class="form-control">
+
+                                    <div class="mb-4">
+                                        <label
+                                            style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50; font-size: 14px;">
+                                            <i class="fas fa-phone"></i> Phone Number
+                                        </label>
+                                        <input type="tel" class="form-control"
+                                            style="border-radius: 8px; border: 1px solid #ddd; padding: 12px;"
+                                            placeholder="Enter phone number">
                                     </div>
-                                    <hr>
-                                    <h6 style="margin-bottom: 15px; font-weight: 600;">Change Password</h6>
-                                    <div class="mb-3">
-                                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Current
-                                            Password</label>
-                                        <input type="password" class="form-control">
-                                    </div>
-                                    <div class="row mb-3">
-                                        <div class="col-md-6">
-                                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">New
-                                                Password</label>
-                                            <input type="password" class="form-control">
-                                            <small style="color: #7f8c8d;">Min 8 chars, uppercase, lowercase, number,
-                                                special char</small>
+
+                                    <!-- Change Password Section -->
+                                    <div
+                                        style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 30px;">
+                                        <h6 style="margin: 0 0 20px 0; font-weight: 700; color: #2c3e50;">
+                                            <i class="fas fa-lock"></i> Change Password
+                                        </h6>
+
+                                        <div class="mb-4">
+                                            <label
+                                                style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50; font-size: 14px;">
+                                                Current Password
+                                            </label>
+                                            <input type="password" class="form-control"
+                                                style="border-radius: 8px; border: 1px solid #ddd; padding: 12px;"
+                                                placeholder="Enter current password">
                                         </div>
-                                        <div class="col-md-6">
-                                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Confirm
-                                                Password</label>
-                                            <input type="password" class="form-control">
+
+                                        <div class="row mb-4">
+                                            <div class="col-md-6">
+                                                <label
+                                                    style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50; font-size: 14px;">
+                                                    New Password
+                                                </label>
+                                                <input type="password" class="form-control"
+                                                    style="border-radius: 8px; border: 1px solid #ddd; padding: 12px;"
+                                                    placeholder="Enter new password">
+                                                <small
+                                                    style="color: #7f8c8d; font-size: 12px; margin-top: 5px; display: block;">
+                                                    <i class="fas fa-info-circle"></i> Min 8 chars, uppercase,
+                                                    lowercase, number, special char
+                                                </small>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label
+                                                    style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50; font-size: 14px;">
+                                                    Confirm Password
+                                                </label>
+                                                <input type="password" class="form-control"
+                                                    style="border-radius: 8px; border: 1px solid #ddd; padding: 12px;"
+                                                    placeholder="Confirm new password">
+                                            </div>
                                         </div>
                                     </div>
-                                    <button class="btn btn-primary">Save Changes</button>
+
+                                    <!-- Action Buttons -->
+                                    <div style="margin-top: 30px; display: flex; gap: 10px;">
+                                        <button class="btn"
+                                            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: 600; border: none; border-radius: 8px; padding: 12px 30px; cursor: pointer;">
+                                            <i class="fas fa-save"></i> Save Changes
+                                        </button>
+                                        <button class="btn"
+                                            style="background: #ecf0f1; color: #2c3e50; font-weight: 600; border: none; border-radius: 8px; padding: 12px 30px; cursor: pointer;">
+                                            <i class="fas fa-times"></i> Cancel
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -2095,7 +2194,9 @@
                     filterAndRenderContent(); // Re-render list
 
                     // Update Recent, Approvals, and Dashboard
-                    syncApprovalsFromYourContent();
+                    syncRecentFromYourContent();
+                    syncApprovalsFromYourContent();   
+                    refreshDashboardStats();
 
                     // If viewing this content, go back to list
                     if (currentViewingContentId === pendingDeleteId) backToContentList();
@@ -2255,6 +2356,16 @@
 
         // Global variable to store the raw data
         let allContentData = [];
+        
+        // Current logged-in user's identifier (should come from login / localStorage)
+        const currentUserId   = localStorage.getItem('user_id')   || 'unknown-user';
+        const currentUsername = localStorage.getItem('current_user') || 'You';
+        const userRole        = localStorage.getItem('user_role') || 'producer'; // admin / manager / producer
+
+        // For sorting (most recent first)
+        function sortByDateDesc(a, b) {
+            return new Date(b.date || b.createdAt || 0) - new Date(a.date || a.createdAt || 0);
+        }
 
         // 1. Modified Load Function
         async function loadStoredContents() {
@@ -2274,6 +2385,9 @@
                 
                 // Initial Render
                 filterAndRenderContent();
+                syncRecentFromYourContent();
+                syncApprovalsFromYourContent();  
+                refreshDashboardStats();
 
             } catch (error) {
                 console.error('Failed to load contents:', error);
@@ -2349,6 +2463,7 @@
                 newRow.setAttribute('data-status', content.status || 'Pending');
                 newRow.setAttribute('data-category', content.category || 'General');
                 newRow.setAttribute('data-description', content.description || '');
+                newRow.setAttribute('data-author', content.author || content.submittedBy || content.createdBy || localStorage.getItem('current_user') || 'Content Producer');
                 
                 newRow.onclick = function () { viewContentDetail(this); };
 
@@ -2385,6 +2500,52 @@
             refreshDashboardStats();
         }
 
+        // Handle profile picture upload
+        function handleProfilePictureUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Check file size (max 5MB)
+            const maxSize = 5 * 1024 * 1024;
+            if (file.size > maxSize) {
+                alert('File size must be less than 5MB');
+                return;
+            }
+
+            // Check file type
+            if (!file.type.startsWith('image/')) {
+                alert('Please upload an image file');
+                return;
+            }
+
+            // Read and display the image
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const imageData = e.target.result;
+
+                // Update the display image
+                document.getElementById('profile-pic-display').src = imageData;
+
+                // Save to localStorage
+                localStorage.setItem('profile-picture', imageData);
+
+                // Show success message
+                showSuccessPopup('Profile picture updated successfully!');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Load profile picture on page load
+        function loadProfilePicture() {
+            const savedPicture = localStorage.getItem('profile-picture');
+            if (savedPicture) {
+                const profilePicDisplay = document.getElementById('profile-pic-display');
+                if (profilePicDisplay) {
+                    profilePicDisplay.src = savedPicture;
+                }
+            }
+        }
+
         function updateProfileRole() {
             const role = localStorage.getItem('user_role');
             if (!role) return;
@@ -2395,12 +2556,99 @@
                 manager: 'Content Manager'
             };
 
-            const roleText = roleDisplayNames[role] || '';
+            const userNames = {
+                admin: { fullName: 'Tom Smith', initials: 'TS' },
+                manager: { fullName: 'Jane Smith', initials: 'JS' },
+                producer: { fullName: 'John Doe', initials: 'JD' }
+            };
 
+            const roleText = roleDisplayNames[role] || '';
+            const userData = userNames[role] || userNames.admin;
+
+            // Update role text in all elements
             const roleElements = document.getElementsByClassName('profile-role');
             for (let i = 0; i < roleElements.length; i++) {
                 roleElements[i].textContent = roleText;
             }
+
+            // Update user name in header
+            const userNameHeader = document.querySelector('.user-details h6');
+            if (userNameHeader) {
+                userNameHeader.textContent = userData.fullName;
+            }
+
+            // Update user name in profile page
+            const profilePageName = document.querySelector('#profile h5');
+            if (profilePageName) {
+                profilePageName.textContent = userData.fullName;
+            }
+
+            // Update avatar initials
+            const avatarElements = document.querySelectorAll('.user-avatar');
+            avatarElements.forEach(element => {
+                element.textContent = userData.initials;
+            });
+
+            // Update profile avatar image URL with user's name
+            const profileAvatarPic = document.getElementById('profile-pic-display');
+            if (profileAvatarPic) {
+                const avatarUrl = `https://ui-avatars.com/api/?name=${userData.fullName.replace(' ', '+')}&background=667eea&color=fff&size=120&bold=true`;
+                profileAvatarPic.src = avatarUrl;
+            }
+
+            // Update email in profile
+            const emailElement = document.querySelector('#profile p[style*="2c3e50"]');
+            if (emailElement) {
+                const email = userData.fullName.toLowerCase().replace(' ', '.') + '@ecojourney.com';
+                emailElement.textContent = email;
+            }
+
+            // Update role-specific stats
+            updateRoleSpecificStats(role);
+        }
+
+        function updateRoleSpecificStats(role) {
+            const statsContainer = document.getElementById('profile-stats');
+            if (!statsContainer) return;
+
+            let statsHTML = '';
+
+            if (role === 'admin') {
+                statsHTML = `
+                    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 20px; border-radius: 12px; color: white; text-align: center; margin-bottom: 12px;">
+                        <p style="margin: 0; font-size: 24px; font-weight: 700;">245</p>
+                        <p style="margin: 5px 0 0 0; font-size: 13px; opacity: 0.9;">Total Users</p>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); padding: 20px; border-radius: 12px; color: white; text-align: center;">
+                        <p style="margin: 0; font-size: 24px; font-weight: 700;">12</p>
+                        <p style="margin: 5px 0 0 0; font-size: 13px; opacity: 0.9;">System Alerts</p>
+                    </div>
+                `;
+            } else if (role === 'manager') {
+                statsHTML = `
+                    <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); padding: 20px; border-radius: 12px; color: white; text-align: center; margin-bottom: 12px;">
+                        <p style="margin: 0; font-size: 24px; font-weight: 700;">12</p>
+                        <p style="margin: 5px 0 0 0; font-size: 13px; opacity: 0.9;">Total Reviewed</p>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); padding: 20px; border-radius: 12px; color: white; text-align: center;">
+                        <p style="margin: 0; font-size: 24px; font-weight: 700;">8</p>
+                        <p style="margin: 5px 0 0 0; font-size: 13px; opacity: 0.9;">This Week</p>
+                    </div>
+                `;
+            } else if (role === 'producer') {
+                statsHTML = `
+                    <div style="background: linear-gradient(135deg, #67e0d1 0%, #37e0c9 100%); padding: 20px; border-radius: 12px; color: white; text-align: center; margin-bottom: 12px;">
+                        <p style="margin: 0; font-size: 24px; font-weight: 700;">18</p>
+                        <p style="margin: 5px 0 0 0; font-size: 13px; opacity: 0.9;">Content Uploaded</p>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 20px; border-radius: 12px; color: white; text-align: center;">
+                        <p style="margin: 0; font-size: 24px; font-weight: 700;">14</p>
+                        <p style="margin: 5px 0 0 0; font-size: 13px; opacity: 0.9;">Published Content</p>
+                    </div>
+                `;
+            }
+
+            statsContainer.innerHTML = statsHTML;
         }
 
         const ROLE_PERMISSIONS = {
@@ -2432,6 +2680,10 @@
         if (tabName === 'notifications') {
                 const badge = document.getElementById('notification-count');
                 if (badge) badge.style.display = 'none';
+            }
+
+        if (tabName === 'approvals') {
+            syncApprovalsFromYourContent();   // ← Refresh approvals when tab is opened
             }
         }
 
@@ -2767,7 +3019,10 @@
         window.addEventListener('DOMContentLoaded', async () => {
             applyRolePermissions();
             updateProfileRole();
+            loadProfilePicture();
             await loadStoredContents(); // Load content from backend
+            syncApprovalsFromYourContent();
+            refreshDashboardStats();
 
             // Attach listeners to filter controls
             const filterSearch = document.getElementById('filter-search');
@@ -2978,13 +3233,18 @@
 
                         const result = await response.json();
                         const newContent = result.content;
+
+                        newContent.author = localStorage.getItem('current_user') || 'Content Producer';
+                        console.log('Setting author for new content:', newContent.author);
                         
                         // Add to global data array
                         allContentData.unshift(newContent); // Add to beginning of array
                         filterAndRenderContent(); // Re-render list
                         
                         // Sync other parts
+                        syncRecentFromYourContent();
                         syncApprovalsFromYourContent();
+                        refreshDashboardStats();
 
                         // Reset button
                         submitBtn.innerHTML = originalText;
@@ -3076,29 +3336,34 @@
             }
         }
 
-        // Sync pending items from 'Your Content' into the Approvals queue
         function syncApprovalsFromYourContent() {
             try {
                 const yourContainer = document.getElementById('content-items-container');
                 const approvalsContainer = document.getElementById('approvals-container');
+                const emptyState = document.getElementById('approvals-empty-state');
+
                 if (!yourContainer || !approvalsContainer) return;
 
-                // Clear current approvals list
+                // Clear current list
                 approvalsContainer.innerHTML = '';
 
                 const items = yourContainer.querySelectorAll('.content-item');
-                let added = 0;
+                let pendingCount = 0;
 
                 items.forEach(item => {
-                    const status = (item.getAttribute('data-status') || item.dataset.status || '').toString().toLowerCase();
+                    const status = (item.dataset.status || '').toLowerCase();
                     if (!status.includes('pending')) return;
 
-                    const title = item.getAttribute('data-title') || item.dataset.title || 'Untitled';
-                    const date = item.getAttribute('data-date') || item.dataset.date || '-';
-                    const category = item.getAttribute('data-category') || item.dataset.category || '-';
-                    const author = item.getAttribute('data-author') || item.dataset.author || localStorage.getItem('current_user') || 'Unknown';
-                    const id = item.getAttribute('data-id') || item.dataset.id || '';
-                    const description = item.getAttribute('data-description') || item.dataset.description || '';
+                    pendingCount++;
+
+                    const title       = item.dataset.title       || 'Untitled';
+                    const date        = item.dataset.date        || '-';
+                    const category    = item.dataset.category    || '-';
+                    const description = item.dataset.description || '';
+                    const id          = item.dataset.id          || '';
+
+
+                    let author = item.dataset.author || 'Unknown Producer';
 
                     const node = document.createElement('div');
                     node.className = 'content-item';
@@ -3113,7 +3378,9 @@
                     node.innerHTML = `
                         <div>
                             <div class="content-title">${title}</div>
-                            <div class="content-meta">Submitted by: ${author} | ${date} | Category: ${category}</div>
+                            <div class="content-meta">
+                                Submitted by: ${author} | ${date} | Category: ${category}
+                            </div>
                         </div>
                         <button class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;">
                             <i class="fas fa-eye"></i> Review
@@ -3130,13 +3397,32 @@
                     }
 
                     approvalsContainer.appendChild(node);
-                    added++;
                 });
 
-                // Update pending count and badges
-                updateApprovalsList();
+                // Update count in header
+                const pendingCountEl = document.getElementById('pending-count');
+                if (pendingCountEl) {
+                    pendingCountEl.textContent = pendingCount;
+                }
+
+                // Show/hide empty state
+                if (emptyState) {
+                    emptyState.style.display = pendingCount === 0 ? 'block' : 'none';
+                }
+
+                // Optional: update sidebar badge
+                const sidebarBadge = document.querySelector('#nav-approvals .badge');
+                if (sidebarBadge) {
+                    if (pendingCount > 0) {
+                        sidebarBadge.textContent = pendingCount;
+                        sidebarBadge.style.display = 'inline-block';
+                    } else {
+                        sidebarBadge.style.display = 'none';
+                    }
+                }
+
             } catch (e) {
-                console.error('syncApprovalsFromYourContent error:', e);
+                console.error('syncApprovalsFromYourContent failed:', e);
             }
         }
 
