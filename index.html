@@ -931,7 +931,7 @@
                 </a>
                 <a id="nav-notifications" class="nav-link" onclick="switchTab('notifications')" style="display: none;">
                     <i class="fas fa-bell"></i> Notifications
-                    <span id="notification-count" class="badge bg-warning text-dark ms-2" style="display: none;">3</span>
+                    <span id="notification-count" class="badge bg-warning text-dark ms-2" style="display: none;">2</span>
                 </a>
                 <a id="nav-profile" class="nav-link" onclick="switchTab('profile')">
                     <i class="fas fa-user"></i> Profile
@@ -1376,28 +1376,11 @@
                                         Content Approved
                                     </div>
                                     <div class="content-meta">
-                                        Your <strong>Carbon Offset Initiative</strong> has been approved.
+                                        <strong>Carbon Offset Initiative</strong> has been approved.
                                     </div>
                                     <small class="text-muted">2 hours ago</small>
                                 </div>
-                                <span class="badge badge-success">New</span>
-                            </div>
-
-                            <!-- Manager Feedback Notification -->
-                            <div class="content-item">
-                                <div>
-                                    <div class="content-title">
-                                        <i class="fas fa-comment-dots text-warning"></i>
-                                        Feedback Received
-                                    </div>
-                                    <div class="content-meta">
-                                        <strong>Biodiversity Report 2024: </strong>Please revise the introduction section to include updated 2025 emissions data.
-                                    </div>
-                                    <small class="text-muted">
-                                        5 hours ago
-                                    </small>
-                                </div>
-                                <span class="badge badge-warning">Action Required</span>
+                                <span class="badge badge-success">Published</span>
                             </div>
 
                             <!-- Rejection Notification -->
@@ -1408,7 +1391,7 @@
                                         Content Rejected
                                     </div>
                                     <div class="content-meta">
-                                        <strong>Community Outreach Program</strong> was rejected. This content does not align with our guidelines.
+                                        <strong>Community Outreach Program</strong> was rejected: Please revise the introduction section to include updated 2025 emissions data.
                                     </div>
                                     <small class="text-muted">1 day ago</small>
                                 </div>
@@ -1753,7 +1736,7 @@
                     
                     const navNotifications = document.getElementById('nav-notifications');
                     const badge = document.getElementById('notification-count');
-                    const notifications = 3; // replace with your real notification count
+                    const notifications = 2; 
 
                     if (notifications > 0) {
                         navNotifications.style.display = 'block';  // show the link
@@ -1831,7 +1814,6 @@
                             <div class="card-header">
                                 <div style="display: flex; justify-content: space-between; align-items: center;">
                                     <h5 style="margin: 0;">Content Categories</h5>
-                                    <button class="btn btn-primary" style="font-size: 12px;">+ Add Category</button>
                                 </div>
                             </div>
                             <div class="card-body">
