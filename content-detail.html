@@ -49,27 +49,25 @@
         const API_URL = 'https://rpecocjourney-backend.onrender.com';
         
         function formatDate(dateString) {
-            if (!dateString || dateString === "Not available") {
-                // Only fallback to NOW if absolutely no date exists
-                return new Date().toLocaleString('en-SG', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
+            if (!dateString || dateString === "Not available" || dateString === "undefined") {
+                console.warn('formatDate called with invalid date:', dateString);
+                return '-';
             }
             
             const date = new Date(dateString);
-            if (isNaN(date.getTime())) return dateString;
+            if (isNaN(date.getTime())) {
+                console.warn('Invalid date format:', dateString);
+                return dateString;
+            }
 
-            // UPDATED: Added hour and minute to options to show time
+            // Format with time
             return date.toLocaleString('en-SG', {
                 year: 'numeric',
                 month: 'short',
                 day: 'numeric',
                 hour: '2-digit',
-                minute: '2-digit'
+                minute: '2-digit',
+                hour12: true
             });
         }
 
@@ -123,8 +121,8 @@
             document.getElementById('description').textContent = data.description || "No description provided.";
             document.getElementById('category').textContent = data.category;
             
-            // UPDATED: Use the most recent date available (prioritize updatedAt, then date, then createdAt)
-            const displayDate = data.updatedAt || data.date || data.createdAt || null;
+            // Use updatedAt from MongoDB for modified date
+            const displayDate = data.updatedAt || data.createdAt || data.date || null;
             document.getElementById('date').textContent = formatDate(displayDate);
             
             const mediaBox = document.getElementById('media-box');

@@ -1084,7 +1084,6 @@
                                         <option value="Approved">Approved</option>
                                         <option value="Pending">Pending</option>
                                         <option value="Rejected">Rejected</option>
-                                        <option value="Published">Published</option>
                                     </select>
                                 </div>
 
@@ -2265,8 +2264,18 @@
         }
 
         function formatToSGTime(isoString) {
-            if (!isoString) return '-';
+            if (!isoString || isoString === 'undefined') {
+                console.warn('formatToSGTime called with invalid date:', isoString);
+                return '-';
+            }
             const date = new Date(isoString);
+            
+            // Check if date is valid
+            if (isNaN(date.getTime())) {
+                console.warn('Invalid date format:', isoString);
+                return '-';
+            }
+            
             // Format as "MMM DD, YYYY" (e.g., "Dec 17, 2025")
             const options = {
                 year: 'numeric',
@@ -2277,11 +2286,17 @@
         }
 
         function formatDateTime(isoString) {
-            if (!isoString) return '-';
+            if (!isoString || isoString === 'undefined') {
+                console.warn('formatDateTime called with invalid date:', isoString);
+                return '-';
+            }
             const date = new Date(isoString);
             
             // Check if the date is valid
-            if (isNaN(date.getTime())) return isoString;
+            if (isNaN(date.getTime())) {
+                console.warn('Invalid date format:', isoString);
+                return isoString;
+            }
 
             // Use en-SG to match Singapore time formatting
             return date.toLocaleString('en-SG', {
@@ -2362,6 +2377,14 @@
                 // Store raw data globally
                 allContentData = await response.json();
                 
+                // Debug: Log date fields from MongoDB
+                console.log('Content loaded from MongoDB. Sample item dates:', allContentData[0] ? {
+                    title: allContentData[0].title,
+                    createdAt: allContentData[0].createdAt,
+                    updatedAt: allContentData[0].updatedAt,
+                    date: allContentData[0].date
+                } : 'No content available');
+                
                 // Initial Render
                 filterAndRenderContent();
                 syncRecentFromYourContent();
@@ -2381,6 +2404,10 @@
             const statusFilter = document.getElementById('filter-status')?.value || 'all';
             const sortOrder = document.getElementById('sort-order')?.value || 'newest';
 
+            // Debug logging
+            console.log('Filter Applied:', { searchTerm, categoryFilter, statusFilter, sortOrder });
+            console.log('Total content items:', allContentData.length);
+
             // A. Filter Data
             let filteredData = allContentData.filter(item => {
                 // Search (Title)
@@ -2396,6 +2423,8 @@
 
                 return matchesSearch && matchesCategory && matchesStatus;
             });
+
+            console.log('Filtered content items:', filteredData.length);
 
             // B. Sort Data
             filteredData.sort((a, b) => {
@@ -2429,17 +2458,32 @@
                 return;
             }
 
-            filteredData.forEach(content => {
+            filteredData.forEach((content, index) => {
                 const newRow = document.createElement('div');
                 newRow.className = 'content-item content-item-clickable';
+                
+                // Debug: Log first item's date values
+                if (index === 0) {
+                    console.log('First content item dates:', {
+                        title: content.title,
+                        createdAt: content.createdAt,
+                        updatedAt: content.updatedAt,
+                        date: content.date
+                    });
+                    console.log('Data attributes being set:', {
+                        uploadDate: content.createdAt || content.date,
+                        modifiedDate: content.updatedAt || content.createdAt || content.date
+                    });
+                }
                 
                 // Data Attributes
                 newRow.setAttribute('data-id', content._id || content.id);
                 newRow.setAttribute('data-title', content.title);
                 newRow.setAttribute('data-type', content.type || 'Document');
                 newRow.setAttribute('data-size', content.fileSize);
-                newRow.setAttribute('data-upload-date', content.date);
-                newRow.setAttribute('data-modified-date', content.updatedAt || content.date);
+                // Use createdAt for upload date, updatedAt for modified date (from MongoDB)
+                newRow.setAttribute('data-upload-date', content.createdAt || content.date);
+                newRow.setAttribute('data-modified-date', content.updatedAt || content.createdAt || content.date);
                 newRow.setAttribute('data-status', content.status || 'Pending');
                 newRow.setAttribute('data-category', content.category || 'General');
                 newRow.setAttribute('data-description', content.description || '');
@@ -2447,8 +2491,8 @@
                 
                 newRow.onclick = function () { viewContentDetail(this); };
 
-                // Formatting for display
-                const modifiedDate = content.updatedAt || content.date;
+                // Formatting for display - Use updatedAt from MongoDB
+                const modifiedDate = content.updatedAt || content.createdAt || content.date;
                 const formattedDate = formatToSGTime(modifiedDate);
                 const formattedSize = formatFileSize(content.fileSize);
                 
@@ -2756,6 +2800,15 @@
                 category: element.dataset.category,
                 description: element.dataset.description
             };
+            
+            // Debug: Log dates being passed to detail view
+            console.log('Content detail dates:', {
+                title: contentData.title,
+                uploadDate: contentData.uploadDate,
+                modifiedDate: contentData.modifiedDate,
+                uploadDateFormatted: formatDateTime(contentData.uploadDate),
+                modifiedDateFormatted: formatDateTime(contentData.modifiedDate)
+            });
 
             currentViewingContentId = contentData.id;
 
