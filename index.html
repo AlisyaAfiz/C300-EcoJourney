@@ -1038,15 +1038,10 @@
                                 <div class="card-header">
                                     <h5><i class="fas fa-folder"></i> Content by Category</h5>
                                 </div>
-                                <div class="card-body" style="text-align: center;">
-                                    <div style="margin-bottom: 15px;">
-                                        <span class="category-badge env">Environmental (8)</span>
-                                    </div>
-                                    <div style="margin-bottom: 15px;">
-                                        <span class="category-badge social">Social (7)</span>
-                                    </div>
-                                    <div style="margin-bottom: 15px;">
-                                        <span class="category-badge gov">Governance (6)</span>
+                                <div class="card-body" style="text-align: center;" id="category-counts-container">
+                                    <div id="category-empty-state" style="padding: 20px; color: #7f8c8d; display: none;">
+                                        <i class="fas fa-folder-open fa-2x mb-3"></i>
+                                        <p>No content categories yet</p>
                                     </div>
                                 </div>
                             </div>
@@ -1600,6 +1595,7 @@
                         syncRecentFromYourContent();      // Update recent cards (badges may have changed)
                         syncApprovalsFromYourContent();   // Rebuild approvals list (should now have 1 less item)
                         refreshDashboardStats();          // This will now see the updated status → correct counts
+                        refreshCategoryCounts();
 
                         // Show success message and close review panel
                         showSuccessPopup(message);
@@ -2179,6 +2175,7 @@
                     syncRecentFromYourContent();
                     syncApprovalsFromYourContent();   
                     refreshDashboardStats();
+                    refreshCategoryCounts();
 
                     // If viewing this content, go back to list
                     if (currentViewingContentId === pendingDeleteId) backToContentList();
@@ -2370,6 +2367,7 @@
                 syncRecentFromYourContent();
                 syncApprovalsFromYourContent();  
                 refreshDashboardStats();
+                refreshCategoryCounts();
 
             } catch (error) {
                 console.error('Failed to load contents:', error);
@@ -3097,6 +3095,7 @@
                         }
 
                         filterAndRenderContent(); // Re-render list
+                        refreshCategoryCounts();
 
                         // Get updated element for view refresh
                         const contentElement = document.querySelector(`[data-id="${currentViewingContentId}"]`);
@@ -3227,6 +3226,7 @@
                         syncRecentFromYourContent();
                         syncApprovalsFromYourContent();
                         refreshDashboardStats();
+                        refreshCategoryCounts();
 
                         // Reset button
                         submitBtn.innerHTML = originalText;
@@ -3611,6 +3611,54 @@
                         }
                     }
             }
+        }
+
+        function refreshCategoryCounts() {
+            const container = document.getElementById('category-counts-container');
+            const emptyState = document.getElementById('category-empty-state');
+            if (!container) return;
+
+            // Clear previous badges (but keep empty state element)
+            Array.from(container.children).forEach(child => {
+                if (child.id !== 'category-empty-state') child.remove();
+            });
+
+            // Count categories from the main content list
+            const items = document.querySelectorAll('#content-items-container .content-item');
+            const categoryMap = new Map();
+
+            items.forEach(item => {
+                const cat = item.dataset.category || 'Uncategorized';
+                categoryMap.set(cat, (categoryMap.get(cat) || 0) + 1);
+            });
+
+            if (categoryMap.size === 0) {
+                if (emptyState) emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+
+            // Define badge styles (match your CSS classes)
+            const badgeStyles = {
+                'Environmental': 'env',
+                'Social': 'social',
+                'Governance': 'gov',
+                'Uncategorized': 'badge-secondary'  // fallback
+            };
+
+            // Render badges
+            categoryMap.forEach((count, category) => {
+                const badge = document.createElement('div');
+                badge.style.marginBottom = '15px';
+
+                const span = document.createElement('span');
+                span.className = `category-badge ${badgeStyles[category] || 'badge-secondary'}`;
+                span.textContent = `${category} (${count})`;
+
+                badge.appendChild(span);
+                container.appendChild(badge);
+            });
         }
     </script>
 </body>
