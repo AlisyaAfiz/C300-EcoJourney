@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Login State</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 10px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>EcoJourney Auth Test</h1>
+    
+    <div class="test-box">
+        <h2>Current Auth State</h2>
+        <p><strong>Current User:</strong> <span id="current-user"></span></p>
+        <p><strong>User Role:</strong> <span id="user-role"></span></p>
+        <p><strong>Auth Token:</strong> <span id="auth-token"></span></p>
+    </div>
+    
+    <div class="test-box">
+        <h2>Quick Login</h2>
+        <button onclick="loginAs('producer')">Login as Producer</button>
+        <button onclick="loginAs('manager')">Login as Manager</button>
+        <button onclick="loginAs('admin')">Login as Admin</button>
+        <button onclick="clearAuth()">Clear Auth</button>
+    </div>
+    
+    <div class="test-box">
+        <h2>Test API Connection</h2>
+        <button onclick="testAPI()">Test Load Content API</button>
+        <div id="api-result"></div>
+    </div>
+    
+    <div class="test-box">
+        <h2>Navigation</h2>
+        <button onclick="window.location.href='login.html'">Go to Login Page</button>
+        <button onclick="window.location.href='producer.html'">Go to Producer Page</button>
+        <button onclick="window.location.href='index.html'">Go to Dashboard</button>
+    </div>
+
+    <script>
+        const API_URL = 'https://rpecocjourney-backend.onrender.com';
+        
+        function updateDisplay() {
+            document.getElementById('current-user').textContent = localStorage.getItem('current_user') || '(not set)';
+            document.getElementById('user-role').textContent = localStorage.getItem('user_role') || '(not set)';
+            document.getElementById('auth-token').textContent = localStorage.getItem('auth_token') || '(not set)';
+        }
+        
+        function loginAs(role) {
+            const usernames = {
+                producer: 'producer',
+                manager: 'manager',
+                admin: 'admin'
+            };
+            
+            localStorage.setItem('current_user', usernames[role]);
+            localStorage.setItem('user_role', role);
+            alert(`Logged in as ${role}!`);
+            updateDisplay();
+        }
+        
+        function clearAuth() {
+            localStorage.removeItem('current_user');
+            localStorage.removeItem('user_role');
+            localStorage.removeItem('auth_token');
+            alert('Auth cleared!');
+            updateDisplay();
+        }
+        
+        async function testAPI() {
+            const resultDiv = document.getElementById('api-result');
+            resultDiv.innerHTML = '<p class="info">Testing API...</p>';
+            
+            try {
+                console.log('Fetching from:', `${API_URL}/api/content/all`);
+                const response = await fetch(`${API_URL}/api/content/all`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    resultDiv.innerHTML = `<p class="error">API Error: ${response.status} - ${errorText}</p>`;
+                    return;
+                }
+                
+                const data = await response.json();
+                console.log('Data received:', data);
+                
+                resultDiv.innerHTML = `
+                    <p class="success">✓ API Connected Successfully!</p>
+                    <p><strong>Items loaded:</strong> ${data.length}</p>
+                    <pre style="max-height: 300px; overflow: auto; background: #f5f5f5; padding: 10px;">${JSON.stringify(data[0], null, 2)}</pre>
+                `;
+            } catch (error) {
+                console.error('API test error:', error);
+                resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+            }
+        }
+        
+        updateDisplay();
+    </script>
+</body>
+</html>

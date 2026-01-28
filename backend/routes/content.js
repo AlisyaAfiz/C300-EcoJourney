@@ -354,6 +354,19 @@ router.post('/:id/approve', authMiddleware, contentManagerOnly, async (req, res)
       comments: comments || '',
     });
 
+    // Create notification for producer
+    const Notification = require('../models/Notification');
+    await Notification.create({
+      recipient: content.creator,
+      recipientEmail: content.submittedBy,
+      content: req.params.id,
+      contentTitle: content.title,
+      type: 'approved',
+      message: `Your content "${content.title}" has been approved!`,
+      approverComments: comments || '',
+      approverName: req.user.name || 'Manager'
+    });
+
     const creator = await require('../models/User').findById(content.creator);
     await sendContentApprovedEmail(creator.email, content.title);
 
@@ -381,6 +394,19 @@ router.post('/:id/reject', authMiddleware, contentManagerOnly, async (req, res) 
       status: 'rejected',
       approver: req.user.id,
       comments: comments || '',
+    });
+
+    // Create notification for producer
+    const Notification = require('../models/Notification');
+    await Notification.create({
+      recipient: content.creator,
+      recipientEmail: content.submittedBy,
+      content: req.params.id,
+      contentTitle: content.title,
+      type: 'rejected',
+      message: `Your content "${content.title}" has been rejected.`,
+      approverComments: comments || 'No reason provided',
+      approverName: req.user.name || 'Manager'
     });
 
     const creator = await require('../models/User').findById(content.creator);

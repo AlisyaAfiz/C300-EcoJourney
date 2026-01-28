@@ -21,24 +21,7 @@
             </div>
 
             <div class="nav" id="sidebar-nav">
-                <a href="index.html" class="nav-link active">
-                    <i class="fas fa-chart-line"></i> Dashboard
-                </a>
-                <a href="producer.html" class="nav-link" id="nav-content" style="display: none;">
-                    <i class="fas fa-file-upload"></i> My Content
-                </a>
-                <a href="notifications.html" class="nav-link" id="nav-notifications" style="display: none;">
-                    <i class="fas fa-bell"></i> Notifications
-                </a>
-                <a href="manager.html" class="nav-link" id="nav-approvals" style="display: none;">
-                    <i class="fas fa-check-circle"></i> Approvals
-                </a>
-                <a href="admin.html" class="nav-link" id="nav-admin" style="display: none;">
-                    <i class="fas fa-cog"></i> Administration
-                </a>
-                <a href="profile.html" class="nav-link">
-                    <i class="fas fa-user"></i> Profile
-                </a>
+                <!-- Dynamically populated by common.js -->
             </div>
 
             <div class="sidebar-footer">
@@ -170,40 +153,23 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="frontend/static/js/auth.js"></script>
     <script src="frontend/static/js/common.js"></script>
     <script>
         // Dashboard-specific JavaScript
         async function loadDashboard() {
-            console.log('[Dashboard] Starting dashboard load...');
-            try {
-                // Load content data
-                const content = await EcoJourney.loadStoredContents();
-                console.log('[Dashboard] Received content array, length:', content ? content.length : 0);
-                
-                if (!content || content.length === 0) {
-                    console.warn('[Dashboard] ⚠️ No content loaded from API - displaying empty state');
-                    // Still call render functions to show empty state
-                } else {
-                    console.log('[Dashboard] ✓ Content loaded successfully, first item:', content[0]);
-                }
-                
-                // Update statistics
-                console.log('[Dashboard] Refreshing dashboard stats...');
-                EcoJourney.refreshDashboardStats();
-                
-                // Render recent content (top 3 items)
-                console.log('[Dashboard] Rendering recent content...');
-                renderRecentContent(content.slice(0, 3));
-                
-                // Render category counts
-                console.log('[Dashboard] Rendering category counts...');
-                renderCategoryCounts(content);
-                
-                console.log('[Dashboard] ✓ Dashboard load complete!');
-            } catch (error) {
-                console.error('[Dashboard] ❌ Dashboard load error:', error.message);
-                console.error('[Dashboard] Full error:', error);
-            }
+            // Load content data
+            const content = await EcoJourney.loadStoredContents();
+            window.EcoJourney.allContentData = content;
+            
+            // Update statistics
+            EcoJourney.refreshDashboardStats();
+            
+            // Render recent content (top 3 items)
+            renderRecentContent(content.slice(0, 3));
+            
+            // Render category counts
+            renderCategoryCounts(content);
         }
         
         function renderRecentContent(items) {
@@ -289,9 +255,6 @@
         
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('[Dashboard] DOM loaded, initializing...');
-            console.log('[Dashboard] Current user:', localStorage.getItem('current_user'));
-            console.log('[Dashboard] User role:', localStorage.getItem('user_role'));
             EcoJourney.initializePage('dashboard');
             loadDashboard();
         });

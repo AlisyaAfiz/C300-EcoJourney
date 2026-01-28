@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoJourney CMS - Approvals</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="frontend/static/css/style.css">
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="brand">
+                    <img src="frontend/static/logo.png" alt="EcoJourney Logo" class="sidebar-logo">
+                    <h3>EcoJourney</h3>
+                </div>
+                <p>Content Management System</p>
+            </div>
+
+            <div class="nav" id="sidebar-nav">
+                <a href="index.html" class="nav-link">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </a>
+                <a href="producer.html" class="nav-link" id="nav-content" style="display: none;">
+                    <i class="fas fa-file-upload"></i> My Content
+                </a>
+                <a href="manager.html" class="nav-link active" id="nav-approvals">
+                    <i class="fas fa-check-circle"></i> Approvals
+                </a>
+                <a href="admin.html" class="nav-link" id="nav-admin" style="display: none;">
+                    <i class="fas fa-cog"></i> Administration
+                </a>
+                <a href="profile.html" class="nav-link">
+                    <i class="fas fa-user"></i> Profile
+                </a>
+            </div>
+
+            <div class="sidebar-footer">
+                <a class="nav-link" href="#" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="content">
+            <!-- Top Navigation Bar -->
+            <nav class="topbar">
+                <div class="topbar-left">
+                    <h4>Content Approvals</h4>
+                </div>
+
+                <div class="topbar-right">
+                    <div class="user-info">
+                        <div class="user-avatar">M</div>
+                        <div class="user-details">
+                            <h6>User Name</h6>
+                            <small class="profile-role">Manager</small>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Main Content Area -->
+            <div class="main-content">
+                <!-- Approvals List View -->
+                <div id="approvals-list-view">
+                    <h1 class="page-title">Content Approval Queue</h1>
+                    <p class="page-subtitle">Review and approve pending content submissions</p>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Pending Approvals (<span id="pending-count">0</span>)</h5>
+                        </div>
+                        <div class="card-body" id="approvals-container">
+                            <div class="text-center p-5 text-muted">
+                                <i class="fas fa-spinner fa-spin fa-3x mb-3"></i>
+                                <p>Loading approvals...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review Page View -->
+                <div id="review-page" style="display: none;">
+                    <button class="btn btn-secondary mb-3" onclick="closeReviewPage()">
+                        <i class="fas fa-arrow-left"></i> Back to Approvals
+                    </button>
+
+                    <div class="detail-header">
+                        <h2 id="review-title">Content Title</h2>
+                        <div class="detail-meta-row">
+                            <div class="detail-meta-item">
+                                <i class="fas fa-user"></i>
+                                <span id="review-author">Author Name</span>
+                            </div>
+                            <div class="detail-meta-item">
+                                <i class="fas fa-calendar"></i>
+                                <span id="review-date">-</span>
+                            </div>
+                            <div class="detail-meta-item">
+                                <i class="fas fa-tag"></i>
+                                <span id="review-category">-</span>
+                            </div>
+                            <div class="detail-meta-item">
+                                <i class="fas fa-info-circle"></i>
+                                <span id="review-status" class="badge badge-warning">Pending</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Media Preview -->
+                    <div id="review-media-section" class="detail-section" style="display: none;">
+                        <h4><i class="fas fa-image"></i> Media Preview</h4>
+                        <div style="text-align: center; padding: 20px;">
+                            <img id="review-image" style="max-width: 100%; max-height: 500px; border-radius: 8px; display: none; margin: 0 auto;" />
+                            <video id="review-video" controls style="max-width: 100%; max-height: 500px; border-radius: 8px; display: none; margin: 0 auto;"></video>
+                            <div id="review-no-media" class="text-muted p-5" style="display: none;">
+                                <i class="fas fa-image fa-3x mb-3"></i>
+                                <p>No media available for preview</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-section">
+                        <h4><i class="fas fa-align-left"></i> Description</h4>
+                        <p id="review-description">No description available.</p>
+                    </div>
+
+                    <div class="detail-section">
+                        <h4><i class="fas fa-comments"></i> Manager Review & Comments</h4>
+                        <textarea id="review-comments" class="form-control" rows="5" placeholder="Add your review comments, feedback, or reasons for approval/rejection..."></textarea>
+                    </div>
+
+                    <div class="detail-section">
+                        <h4><i class="fas fa-tasks"></i> Review Decision</h4>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button class="btn" style="background: #27ae60; color: white; flex: 1; min-width: 150px;" onclick="submitReview('approved')">
+                                <i class="fas fa-check"></i> Approve Content
+                            </button>
+                            <button class="btn" style="background: #e74c3c; color: white; flex: 1; min-width: 150px;" onclick="submitReview('rejected')">
+                                <i class="fas fa-times"></i> Reject Content
+                            </button>
+                            <button class="btn" style="background: #9b59b6; color: white; flex: 1; min-width: 150px;" onclick="previewCurrentContent()">
+                                <i class="fas fa-eye"></i> Preview Link
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Success Popup -->
+    <div id="successPopup" class="success-popup-overlay">
+        <div class="success-popup">
+            <div class="success-popup-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            <h3>Success!</h3>
+            <p id="successPopupMessage">Review submitted successfully!</p>
+            <button class="success-popup-btn" onclick="EcoJourney.closeSuccessPopup()">Great!</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="frontend/static/js/common.js"></script>
+    <script>
+        // Manager page specific JavaScript
+        let allContent = [];
+        let currentReviewContent = null;
+        
+        async function loadApprovals() {
+            console.log('[Manager] Starting approvals load...');
+            try {
+                allContent = await EcoJourney.loadStoredContents();
+                console.log('[Manager] Received content array, length:', allContent ? allContent.length : 0);
+                
+                if (!allContent || allContent.length === 0) {
+                    console.warn('[Manager] ⚠️ No content loaded - will show empty state');
+                }
+                
+                renderApprovalsList();
+                console.log('[Manager] ✓ Approvals display complete!');
+            } catch (error) {
+                console.error('[Manager] ❌ Load error:', error.message);
+                console.error('[Manager] Full error:', error);
+                document.getElementById('approvals-container').innerHTML = `
+                    <div class="text-center p-5 text-muted">
+                        <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+                        <p>Error loading approvals. Please refresh the page.</p>
+                        <small class="d-block mt-2">${error.message}</small>
+                    </div>
+                `;
+            }
+        }
+        
+        function renderApprovalsList() {
+            const container = document.getElementById('approvals-container');
+            const countEl = document.getElementById('pending-count');
+            
+            if (!container) return;
+            
+            // Filter pending items only
+            const pendingItems = allContent.filter(item => 
+                (item.status || 'Pending').toLowerCase() === 'pending'
+            );
+            
+            container.innerHTML = '';
+            
+            if (countEl) countEl.textContent = pendingItems.length;
+            
+            if (pendingItems.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center p-5 text-muted">
+                        <i class="fas fa-check-circle fa-3x mb-3"></i>
+                        <p>All content has been reviewed!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            pendingItems.forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'content-item';
+                
+                const author = item.author || item.submittedBy || item.createdBy || 'Unknown Producer';
+                const date = EcoJourney.formatToSGTime(item.createdAt || item.date);
+                
+                row.innerHTML = `
+                    <div>
+                        <div class="content-title">${item.title}</div>
+                        <div class="content-meta">
+                            Submitted by: ${author} | ${date} | Category: ${item.category || 'General'}
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-sm" onclick="openReviewPage('${item._id || item.id}')">
+                        <i class="fas fa-eye"></i> Review
+                    </button>
+                `;
+                
+                container.appendChild(row);
+            });
+        }
+        
+        async function openReviewPage(contentId) {
+            const content = allContent.find(c => (c._id || c.id) === contentId);
+            if (!content) return;
+            
+            currentReviewContent = content;
+            
+            // Populate review page
+            document.getElementById('review-title').textContent = content.title;
+            document.getElementById('review-author').textContent = content.author || content.submittedBy || 'Unknown';
+            document.getElementById('review-date').textContent = EcoJourney.formatToSGTime(content.createdAt || content.date);
+            document.getElementById('review-category').textContent = content.category || 'General';
+            document.getElementById('review-description').textContent = content.description || 'No description available.';
+            document.getElementById('review-comments').value = '';
+            
+            // Try to load media
+            try {
+                const response = await fetch(`${EcoJourney.API_URL}/api/content/${contentId}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.mediaData) {
+                        const mediaSection = document.getElementById('review-media-section');
+                        const img = document.getElementById('review-image');
+                        const video = document.getElementById('review-video');
+                        const noMedia = document.getElementById('review-no-media');
+                        
+                        img.style.display = 'none';
+                        video.style.display = 'none';
+                        noMedia.style.display = 'none';
+                        
+                        if (data.mediaFileType?.startsWith('image/')) {
+                            img.src = data.mediaData;
+                            img.style.display = 'block';
+                            mediaSection.style.display = 'block';
+                        } else if (data.mediaFileType?.startsWith('video/')) {
+                            video.src = data.mediaData;
+                            video.style.display = 'block';
+                            mediaSection.style.display = 'block';
+                        } else {
+                            noMedia.style.display = 'block';
+                            mediaSection.style.display = 'block';
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error('Failed to load media:', err);
+            }
+            
+            // Show review page
+            document.getElementById('approvals-list-view').style.display = 'none';
+            document.getElementById('review-page').style.display = 'block';
+            window.scrollTo(0, 0);
+        }
+        
+        function closeReviewPage() {
+            document.getElementById('approvals-list-view').style.display = 'block';
+            document.getElementById('review-page').style.display = 'none';
+            currentReviewContent = null;
+        }
+        
+        async function submitReview(status) {
+            if (!currentReviewContent) return;
+            
+            const comments = document.getElementById('review-comments').value.trim();
+            if (!comments) {
+                alert('Please provide comments or reasons for your decision.');
+                return;
+            }
+            
+            const message = status === 'approved' ? 'Content approved successfully!' : 'Content rejected successfully!';
+            const endpoint = status === 'approved' ? 'approve' : 'reject';
+            const contentId = currentReviewContent._id || currentReviewContent.id;
+            
+            try {
+                const token = localStorage.getItem(EcoJourney.STORAGE_KEY);
+                if (!token) {
+                    alert('Session expired. Please login again.');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const url = `${EcoJourney.API_URL}/api/content/${contentId}/${endpoint}`;
+                console.log('Submitting review to:', url);
+                console.log('Content ID:', contentId);
+                console.log('Endpoint:', endpoint);
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ comments })
+                });
+                
+                console.log('Response status:', response.status);
+                const responseData = await response.json();
+                console.log('Response data:', responseData);
+                
+                if (!response.ok) {
+                    throw new Error(responseData.message || 'Review submission failed');
+                }
+                
+                EcoJourney.showSuccessPopup(message);
+                closeReviewPage();
+                
+                // Reload approvals
+                setTimeout(() => loadApprovals(), 1500);
+                
+            } catch (error) {
+                console.error('Review failed:', error);
+                alert('Review submission failed: ' + error.message);
+            }
+        }
+        
+        function previewCurrentContent() {
+            if (!currentReviewContent) return;
+            EcoJourney.previewContent(currentReviewContent._id || currentReviewContent.id);
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('[Manager] DOM loaded, initializing...');
+            console.log('[Manager] Current user:', localStorage.getItem('current_user'));
+            console.log('[Manager] User role:', localStorage.getItem('user_role'));
+            EcoJourney.initializePage('approvals');
+            loadApprovals();
+        });
+    </script>
+</body>
+</html>

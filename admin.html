@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoJourney CMS - Administration</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="frontend/static/css/style.css">
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="brand">
+                    <img src="frontend/static/logo.png" alt="EcoJourney Logo" class="sidebar-logo">
+                    <h3>EcoJourney</h3>
+                </div>
+                <p>Content Management System</p>
+            </div>
+
+            <div class="nav" id="sidebar-nav">
+                <a href="index.html" class="nav-link">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </a>
+                <a href="producer.html" class="nav-link" id="nav-content" style="display: none;">
+                    <i class="fas fa-file-upload"></i> My Content
+                </a>
+                <a href="manager.html" class="nav-link" id="nav-approvals" style="display: none;">
+                    <i class="fas fa-check-circle"></i> Approvals
+                </a>
+                <a href="admin.html" class="nav-link active" id="nav-admin">
+                    <i class="fas fa-cog"></i> Administration
+                </a>
+                <a href="profile.html" class="nav-link">
+                    <i class="fas fa-user"></i> Profile
+                </a>
+            </div>
+
+            <div class="sidebar-footer">
+                <a class="nav-link" href="#" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="content">
+            <!-- Top Navigation Bar -->
+            <nav class="topbar">
+                <div class="topbar-left">
+                    <h4>Administration Panel</h4>
+                </div>
+
+                <div class="topbar-right">
+                    <div class="user-info">
+                        <div class="user-avatar">A</div>
+                        <div class="user-details">
+                            <h6>User Name</h6>
+                            <small class="profile-role">Administrator</small>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Main Content Area -->
+            <div class="main-content">
+                <h1 class="page-title">Administration Panel</h1>
+
+                <!-- Tabs -->
+                <div class="mb-4">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" onclick="switchAdminTab('users', event)">
+                                <i class="fas fa-users"></i> Users (12)
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="switchAdminTab('categories', event)">
+                                <i class="fas fa-folder"></i> Categories (3)
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="switchAdminTab('settings', event)">
+                                <i class="fas fa-sliders-h"></i> Settings
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Users Tab -->
+                <div id="admin-users" class="admin-tab">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="m-0">User Management</h5>
+                                <button class="btn btn-primary btn-sm">
+                                    <i class="fas fa-plus"></i> Add User
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="content-item">
+                                <div>
+                                    <div class="content-title">Tom Smith</div>
+                                    <div class="content-meta">tom@ecojourney.com | Administrator</div>
+                                </div>
+                                <span class="badge badge-success">Active</span>
+                            </div>
+                            <div class="content-item">
+                                <div>
+                                    <div class="content-title">John Doe</div>
+                                    <div class="content-meta">john@ecojourney.com | Content Producer</div>
+                                </div>
+                                <span class="badge badge-success">Active</span>
+                            </div>
+                            <div class="content-item">
+                                <div>
+                                    <div class="content-title">Jane Smith</div>
+                                    <div class="content-meta">jane@ecojourney.com | Content Manager</div>
+                                </div>
+                                <span class="badge badge-success">Active</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Categories Tab -->
+                <div id="admin-categories" class="admin-tab" style="display: none;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="m-0">Content Categories</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="content-item">
+                                <div>
+                                    <div class="content-title">Environmental</div>
+                                    <div class="content-meta">Focus on environmental sustainability initiatives</div>
+                                </div>
+                                <span class="badge env">8 items</span>
+                            </div>
+                            <div class="content-item">
+                                <div>
+                                    <div class="content-title">Social</div>
+                                    <div class="content-meta">Community and social responsibility projects</div>
+                                </div>
+                                <span class="badge social">7 items</span>
+                            </div>
+                            <div class="content-item">
+                                <div>
+                                    <div class="content-title">Governance</div>
+                                    <div class="content-meta">Corporate governance and ethics policies</div>
+                                </div>
+                                <span class="badge gov">6 items</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Tab -->
+                <div id="admin-settings" class="admin-tab" style="display: none;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="m-0">System Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="d-flex align-items-center gap-2">
+                                    <input type="checkbox" checked>
+                                    <span>Enable Email Notifications</span>
+                                </label>
+                            </div>
+                            <div class="mb-3">
+                                <label class="d-flex align-items-center gap-2">
+                                    <input type="checkbox">
+                                    <span>Auto-publish Approved Content</span>
+                                </label>
+                            </div>
+                            <div class="mb-3">
+                                <label class="d-flex align-items-center gap-2">
+                                    <input type="checkbox">
+                                    <span>Enable Interactive Mode</span>
+                                </label>
+                            </div>
+                            <button class="btn btn-primary mt-3">
+                                <i class="fas fa-save"></i> Save Settings
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Success Popup -->
+    <div id="successPopup" class="success-popup-overlay">
+        <div class="success-popup">
+            <div class="success-popup-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            <h3>Success!</h3>
+            <p id="successPopupMessage">Settings saved successfully!</p>
+            <button class="success-popup-btn" onclick="EcoJourney.closeSuccessPopup()">Great!</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="frontend/static/js/common.js"></script>
+    <script>
+        function switchAdminTab(tabName, event) {
+            if (event) event.preventDefault();
+            
+            // Hide all tabs
+            document.querySelectorAll('.admin-tab').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            
+            // Show selected tab
+            document.getElementById('admin-' + tabName).style.display = 'block';
+            
+            // Update active link
+            document.querySelectorAll('.nav-tabs .nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event?.target.classList.add('active');
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            EcoJourney.initializePage('admin');
+        });
+    </script>
+</body>
+</html>

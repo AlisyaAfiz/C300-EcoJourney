@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        #output {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        button {
+            padding: 10px 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>EcoJourney API Test</h1>
+    <button onclick="testAPI()">Test API /api/content/all</button>
+    <button onclick="clearOutput()">Clear</button>
+    <div id="output">Click the button to test the API...</div>
+
+    <script>
+        const API_URL = 'https://rpecocjourney-backend.onrender.com';
+        
+        async function testAPI() {
+            const output = document.getElementById('output');
+            output.textContent = 'Testing API...\n\n';
+            
+            try {
+                output.textContent += `Fetching: ${API_URL}/api/content/all\n\n`;
+                
+                const response = await fetch(`${API_URL}/api/content/all`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                output.textContent += `Response Status: ${response.status} ${response.statusText}\n\n`;
+                
+                if (!response.ok) {
+                    output.textContent += 'Response not OK!\n';
+                    const errorText = await response.text();
+                    output.textContent += `Error: ${errorText}\n`;
+                    return;
+                }
+                
+                const data = await response.json();
+                output.textContent += `Success! Received ${data.length} items\n\n`;
+                output.textContent += 'First 3 items:\n';
+                output.textContent += JSON.stringify(data.slice(0, 3), null, 2);
+                
+            } catch (error) {
+                output.textContent += `\nERROR: ${error.message}\n`;
+                output.textContent += error.stack;
+            }
+        }
+        
+        function clearOutput() {
+            document.getElementById('output').textContent = 'Click the button to test the API...';
+        }
+    </script>
+</body>
+</html>

@@ -33,11 +33,13 @@ const authRoutes = require('./routes/auth');
 const contentRoutes = require('./routes/content');
 const userRoutes = require('./routes/users');
 const downloadRoutes = require('./routes/download');
+const notificationRoutes = require('./routes/notifications');
 
 // Mount routes
 app.use('/api/auth', authRoutes);
 app.use('/api/content', contentRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/notifications', notificationRoutes);
 app.use('/api/download', downloadRoutes);
 
 app.get('/', (req, res) => {
