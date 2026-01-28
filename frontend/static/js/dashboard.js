@@ -288,7 +288,7 @@ async function handleContentUpload(e) {
     formData.append('tags_list', tags.split(',').map(t => t.trim()));
     
     try {
-        const response = await fetch(`${API_BASE_URL}/content/create/`, {
+        const response = await fetch(`${API_BASE_URL}/content/`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
@@ -798,16 +798,227 @@ function viewContent(contentId) {
     console.log('Viewing content:', contentId);
 }
 
+// Current content being edited
+let currentEditingContentId = null;
+
 function editContent(contentId) {
-    console.log('Editing content:', contentId);
+    currentEditingContentId = contentId;
+    
+    // Fetch content details
+    fetch(`${API_BASE_URL}/content/${contentId}`, {
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem(STORAGE_KEY)}`
+        }
+    })
+    .then(response => response.json())
+    .then(content => {
+        // Populate edit form with content data
+        document.getElementById('edit-title').value = content.title;
+        document.getElementById('edit-description').value = content.description;
+        document.getElementById('edit-category').value = content.category;
+        
+        // Show current media if available
+        if (content.mediaData) {
+            const currentMediaDiv = document.getElementById('edit-current-media');
+            const currentImage = document.getElementById('edit-current-image');
+            const currentVideo = document.getElementById('edit-current-video');
+            
+            currentImage.style.display = 'none';
+            currentVideo.style.display = 'none';
+            
+            if (content.mediaData.includes('image') || /\.(jpg|jpeg|png|gif|webp)$/i.test(content.mediaData)) {
+                currentImage.src = content.mediaData;
+                currentImage.style.display = 'block';
+            } else if (content.mediaData.includes('video') || /\.(mp4|webm|ogg)$/i.test(content.mediaData)) {
+                currentVideo.src = content.mediaData;
+                currentVideo.style.display = 'block';
+            }
+            
+            currentMediaDiv.style.display = 'block';
+        } else {
+            document.getElementById('edit-current-media').style.display = 'none';
+        }
+        
+        // Show current file info if available
+        if (content.fileData) {
+            const fileInfoDiv = document.getElementById('current-file-info');
+            const fileDisplay = document.getElementById('current-file-display');
+            fileDisplay.textContent = content.fileData.split('/').pop() || 'Document.pdf';
+            fileInfoDiv.style.display = 'block';
+        } else {
+            document.getElementById('current-file-info').style.display = 'none';
+        }
+        
+        // Hide content detail view and show edit form
+        document.getElementById('content-detail-view').style.display = 'none';
+        document.getElementById('content-edit-form').style.display = 'block';
+        
+        // Setup form submission
+        const editForm = document.getElementById('edit-content-form');
+        editForm.onsubmit = handleContentUpdate;
+    })
+    .catch(error => {
+        console.error('Error loading content for edit:', error);
+        showAlert('Error loading content', 'danger');
+    });
+}
+
+function cancelEdit() {
+    document.getElementById('content-edit-form').style.display = 'none';
+    document.getElementById('content-detail-view').style.display = 'block';
+    currentEditingContentId = null;
+}
+
+async function handleContentUpdate(e) {
+    e.preventDefault();
+    
+    if (!currentEditingContentId) {
+        showAlert('Error: No content selected', 'danger');
+        return;
+    }
+    
+    const title = document.getElementById('edit-title').value;
+    const description = document.getElementById('edit-description').value;
+    const category = document.getElementById('edit-category').value;
+    
+    const updateData = {
+        title: title,
+        description: description,
+        category: category
+    };
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/content/${currentEditingContentId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify(updateData)
+        });
+        
+        if (response.ok) {
+            showAlert('Content updated successfully!', 'success');
+            cancelEdit();
+            loadUserContent(); // Refresh the content list
+        } else {
+            const error = await response.json();
+            showAlert(error.message || 'Error updating content', 'danger');
+        }
+    } catch (error) {
+        console.error('Error updating content:', error);
+        showAlert('Error updating content', 'danger');
+    }
 }
 
 function submitContent(contentId) {
-    console.log('Submitting content:', contentId);
+    if (!confirm('Are you sure you want to submit this content for approval?')) {
+        return;
+    }
+    
+    fetch(`${API_BASE_URL}/content/${contentId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({ status: 'pending' })
+    })
+    .then(response => response.json())
+    .then(data => {
+        showAlert('Content submitted for approval!', 'success');
+        loadUserContent();
+    })
+    .catch(error => {
+        console.error('Error submitting content:', error);
+        showAlert('Error submitting content', 'danger');
+    });
 }
 
-function reviewContent(contentId) {
-    console.log('Reviewing content:', contentId);
+function viewContent(contentId) {
+    fetch(`${API_BASE_URL}/content/${contentId}`, {
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem(STORAGE_KEY)}`
+        }
+    })
+    .then(response => response.json())
+    .then(content => {
+        // Display content details
+        document.getElementById('detail-title').textContent = content.title;
+        document.getElementById('detail-title').textContent = content.title;
+        
+        // Populate other detail fields
+        const detailContainer = document.getElementById('content-detail-view');
+        if (detailContainer) {
+            let html = `
+                <button class="btn btn-primary" onclick="goBackToList()" style="margin-bottom: 20px; background: #7f8c8d;">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <div class="card">
+                    <div class="card-header">
+                        <h5>${content.title}</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Description:</strong></p>
+                        <p>${content.description}</p>
+                        
+                        <p><strong>Category:</strong> ${content.category_name || content.category}</p>
+                        <p><strong>Type:</strong> ${content.content_type}</p>
+                        <p><strong>Status:</strong> <span class="badge bg-${getStatusColor(content.status)}">${content.status.toUpperCase()}</span></p>
+                        
+                        ${content.mediaData ? `
+                            <div style="margin-top: 20px;">
+                                <strong>Media:</strong>
+                                ${content.mediaData.includes('image') || /\.(jpg|jpeg|png|gif|webp)$/i.test(content.mediaData) ? 
+                                    `<img src="${content.mediaData}" style="max-width: 100%; max-height: 400px; margin-top: 10px; border-radius: 8px;">` :
+                                    `<video controls style="max-width: 100%; max-height: 400px; margin-top: 10px; border-radius: 8px;"><source src="${content.mediaData}"></video>`
+                                }
+                            </div>
+                        ` : ''}
+                        
+                        ${content.fileData ? `
+                            <div style="margin-top: 20px;">
+                                <strong>Document:</strong>
+                                <a href="${content.fileData}" target="_blank" class="btn btn-sm btn-info" style="margin-top: 10px;">
+                                    <i class="fas fa-download"></i> Download
+                                </a>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+                ${content.status === 'draft' ? `
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button class="btn btn-primary" onclick="editContent('${content._id}')">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-success" onclick="submitContent('${content._id}')">
+                            <i class="fas fa-paper-plane"></i> Submit for Approval
+                        </button>
+                        <button class="btn btn-danger" onclick="deleteContent('${content._id}')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                ` : ''}
+            `;
+            detailContainer.innerHTML = html;
+        }
+        
+        // Hide content list and show detail view
+        document.getElementById('content-list').style.display = 'none';
+        document.getElementById('content-edit-form').style.display = 'none';
+        document.getElementById('content-detail-view').style.display = 'block';
+    })
+    .catch(error => {
+        console.error('Error loading content details:', error);
+        showAlert('Error loading content details', 'danger');
+    });
+}
+
+function goBackToList() {
+    document.getElementById('content-detail-view').style.display = 'none';
+    document.getElementById('content-list').style.display = 'block';
 }
 
 function editUser(userId) {
@@ -827,7 +1038,28 @@ function deleteCategory(categoryId) {
 }
 
 function deleteContent(contentId) {
-    console.log('Deleting content:', contentId);
+    if (!confirm('Are you sure you want to delete this content? This action cannot be undone.')) {
+        return;
+    }
+    
+    fetch(`${API_BASE_URL}/content/${contentId}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
+            'X-CSRFToken': getCookie('csrftoken')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        showAlert('Content deleted successfully!', 'success');
+        loadUserContent();
+        document.getElementById('content-detail-view').style.display = 'none';
+        document.getElementById('content-list').style.display = 'block';
+    })
+    .catch(error => {
+        console.error('Error deleting content:', error);
+        showAlert('Error deleting content', 'danger');
+    });
 }
 
 // --- EXPORT TO WINDOW (Immediate Assignment) ---

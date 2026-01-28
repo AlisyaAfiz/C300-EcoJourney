@@ -41,6 +41,7 @@
         }
 
         .sidebar-header {
+            text-align: center;
             margin-bottom: 20px;
             border-bottom: 2px solid rgba(255, 255, 255, 0.2);
             padding-bottom: 15px;
@@ -49,12 +50,28 @@
         .sidebar-header h3 {
             font-size: 24px;
             margin-bottom: 5px;
+            font-size: 22px;
+            margin: 0;
             color: #2ecc71;
+            white-space: nowrap;
         }
 
         .sidebar-header p {
             font-size: 12px;
             color: rgba(255, 255, 255, 0.7);
+        }
+
+        .sidebar-logo {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            justify-content: center; 
+            gap: 10px;               
         }
 
         .nav {
@@ -891,7 +908,10 @@
         <!-- Sidebar Navigation -->
         <nav class="sidebar">
             <div class="sidebar-header">
-                <h3><i class="fas fa-leaf"></i> EcoJourney</h3>
+                <div class="brand">
+                    <img src="frontend\static\logo.png" alt="EcoJourney Logo" class="sidebar-logo">
+                    <h3>EcoJourney</h3>
+                </div>
                 <p>Content Management System</p>
             </div>
 
@@ -911,7 +931,7 @@
                 </a>
                 <a id="nav-notifications" class="nav-link" onclick="switchTab('notifications')" style="display: none;">
                     <i class="fas fa-bell"></i> Notifications
-                    <span id="notification-count" class="badge bg-warning text-dark ms-2" style="display: none;">3</span>
+                    <span id="notification-count" class="badge bg-warning text-dark ms-2" style="display: none;">2</span>
                 </a>
                 <a id="nav-profile" class="nav-link" onclick="switchTab('profile')">
                     <i class="fas fa-user"></i> Profile
@@ -1008,28 +1028,7 @@
                                     <h5><i class="fas fa-history"></i> Recent Content</h5>
                                 </div>
                                 <div class="card-body" id="recent-content-container">
-                                    <div class="content-item">
-                                        <div>
-                                            <div class="content-title">Solar Energy Initiative</div>
-                                            <div class="content-meta">Created: Dec 20, 2025 | Category: Environmental
-                                            </div>
-                                        </div>
-                                        <span class="badge badge-success">Approved</span>
-                                    </div>
-                                    <div class="content-item">
-                                        <div>
-                                            <div class="content-title">Community Outreach Program</div>
-                                            <div class="content-meta">Created: Dec 19, 2025 | Category: Social</div>
-                                        </div>
-                                        <span class="badge badge-warning">Pending</span>
-                                    </div>
-                                    <div class="content-item">
-                                        <div>
-                                            <div class="content-title">Corporate Governance Report</div>
-                                            <div class="content-meta">Created: Dec 18, 2025 | Category: Governance</div>
-                                        </div>
-                                        <span class="badge badge-success">Approved</span>
-                                    </div>
+                                    <!-- 3 Recent content from backend -->
                                 </div>
                             </div>
                         </div>
@@ -1039,15 +1038,10 @@
                                 <div class="card-header">
                                     <h5><i class="fas fa-folder"></i> Content by Category</h5>
                                 </div>
-                                <div class="card-body" style="text-align: center;">
-                                    <div style="margin-bottom: 15px;">
-                                        <span class="category-badge env">Environmental (8)</span>
-                                    </div>
-                                    <div style="margin-bottom: 15px;">
-                                        <span class="category-badge social">Social (7)</span>
-                                    </div>
-                                    <div style="margin-bottom: 15px;">
-                                        <span class="category-badge gov">Governance (6)</span>
+                                <div class="card-body" style="text-align: center;" id="category-counts-container">
+                                    <div id="category-empty-state" style="padding: 20px; color: #7f8c8d; display: none;">
+                                        <i class="fas fa-folder-open fa-2x mb-3"></i>
+                                        <p>No content categories yet</p>
                                     </div>
                                 </div>
                             </div>
@@ -1065,62 +1059,55 @@
                         </button>
                     </div>
 
+                    <div class="card mb-3" id="content-filters">
+                        <div class="card-body p-3">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
+                                        <input type="text" class="form-control border-start-0" id="filter-search" placeholder="Search by title...">
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-2">
+                                    <select class="form-select" id="filter-category">
+                                        <option value="all">All Categories</option>
+                                        <option value="Environmental">Environmental</option>
+                                        <option value="Social">Social</option>
+                                        <option value="Governance">Governance</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <select class="form-select" id="filter-status">
+                                        <option value="all">All Statuses</option>
+                                        <option value="Approved">Approved</option>
+                                        <option value="Pending">Pending</option>
+                                        <option value="Rejected">Rejected</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="input-group">
+                                        <span class="input-group-text">Sort By:</span>
+                                        <select class="form-select" id="sort-order">
+                                            <option value="newest">Newest Modified (Default)</option>
+                                            <option value="oldest">Oldest Modified</option>
+                                            <option value="az">A-Z (Title)</option>
+                                            <option value="za">Z-A (Title)</option>
+                                            <option value="largest">File Size (Largest)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="card" id="content-list">
                         <div class="card-header">
                             <h5>Your Content</h5>
                         </div>
                         <div class="card-body" id="content-items-container">
-                            <div class="content-item content-item-clickable" data-id="default-1"
-                                data-title="Wind Energy Project" data-type="Video" data-size="125 MB"
-                                data-date="Dec 17, 2025" data-status="Published" data-category="Environmental"
-                                data-description="Comprehensive video documentation of our latest wind energy project, showcasing the installation and benefits of renewable energy infrastructure. This project demonstrates our commitment to sustainable energy solutions and reducing carbon emissions."
-                                onclick="viewContentDetail(this)">
-                                <div>
-                                    <div class="content-title">Wind Energy Project</div>
-                                    <div class="content-meta">Video | 125 MB | Modified: Dec 17, 2025</div>
-                                </div>
-                                <div class="content-item-actions">
-                                    <span class="badge badge-success">Published</span>
-                                    <button class="delete-btn"
-                                        onclick="event.stopPropagation(); deleteContent('default-1')" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="content-item content-item-clickable" data-id="default-2"
-                                data-title="Biodiversity Report 2024" data-type="Document" data-size="3.2 MB"
-                                data-date="Dec 16, 2025" data-status="Pending" data-category="Environmental"
-                                data-description="Annual biodiversity assessment report documenting local ecosystem health, species population trends, and conservation efforts. This report includes detailed analysis of flora and fauna in protected areas and recommendations for future conservation strategies."
-                                onclick="viewContentDetail(this)">
-                                <div>
-                                    <div class="content-title">Biodiversity Report 2024</div>
-                                    <div class="content-meta">Document | 3.2 MB | Modified: Dec 16, 2025</div>
-                                </div>
-                                <div class="content-item-actions">
-                                    <span class="badge badge-warning">Pending</span>
-                                    <button class="delete-btn"
-                                        onclick="event.stopPropagation(); deleteContent('default-2')" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="content-item content-item-clickable" data-id="default-3"
-                                data-title="Carbon Offset Initiative" data-type="Article" data-size="256 KB"
-                                data-date="Dec 15, 2025" data-status="Approved" data-category="Environmental"
-                                data-description="Detailed article about our carbon offset program, including methodologies for calculating carbon footprint, offset strategies, and partnerships with reforestation projects. This initiative aims to achieve carbon neutrality by 2030."
-                                onclick="viewContentDetail(this)">
-                                <div>
-                                    <div class="content-title">Carbon Offset Initiative</div>
-                                    <div class="content-meta">Article | 256 KB | Modified: Dec 15, 2025</div>
-                                </div>
-                                <div class="content-item-actions">
-                                    <span class="badge badge-success">Approved</span>
-                                    <button class="delete-btn"
-                                        onclick="event.stopPropagation(); deleteContent('default-3')" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
                         </div>
                     </div>
 
@@ -1383,28 +1370,11 @@
                                         Content Approved
                                     </div>
                                     <div class="content-meta">
-                                        Your <strong>Carbon Offset Initiative</strong> has been approved.
+                                        <strong>Carbon Offset Initiative</strong> has been approved and published.
                                     </div>
                                     <small class="text-muted">2 hours ago</small>
                                 </div>
-                                <span class="badge badge-success">New</span>
-                            </div>
-
-                            <!-- Manager Feedback Notification -->
-                            <div class="content-item">
-                                <div>
-                                    <div class="content-title">
-                                        <i class="fas fa-comment-dots text-warning"></i>
-                                        Feedback Received
-                                    </div>
-                                    <div class="content-meta">
-                                        <strong>Biodiversity Report 2024: </strong>Please revise the introduction section to include updated 2025 emissions data.
-                                    </div>
-                                    <small class="text-muted">
-                                        5 hours ago
-                                    </small>
-                                </div>
-                                <span class="badge badge-warning">Action Required</span>
+                                <span class="badge badge-success">Approved</span>
                             </div>
 
                             <!-- Rejection Notification -->
@@ -1415,7 +1385,7 @@
                                         Content Rejected
                                     </div>
                                     <div class="content-meta">
-                                        <strong>Community Outreach Program</strong> was rejected. This content does not align with our guidelines.
+                                        <strong>Community Outreach Program</strong> was rejected: Please revise the introduction section to include updated 2025 emissions data.
                                     </div>
                                     <small class="text-muted">1 day ago</small>
                                 </div>
@@ -1438,52 +1408,7 @@
                                 <h5>Pending Approvals (<span id="pending-count">3</span>)</h5>
                             </div>
                             <div class="card-body" id="approvals-container">
-                                <div class="content-item" data-id="pending-1" data-title="Community Outreach Program"
-                                    data-author="John Doe" data-date="Dec 19, 2025" data-category="Social"
-                                    data-description="A comprehensive community outreach initiative designed to engage local residents in environmental sustainability projects. This program includes educational workshops, volunteer opportunities, and partnerships with local organizations to promote social responsibility and community engagement."
-                                    data-status="Pending">
-                                    <div>
-                                        <div class="content-title">Community Outreach Program</div>
-                                        <div class="content-meta">Submitted by: John Doe | Dec 19, 2025 | Category:
-                                            Social</div>
-                                    </div>
-                                    <button class="btn btn-primary"
-                                        onclick="event.stopPropagation(); openReviewPage(document.querySelector('[data-id=\'pending-1\']'))"
-                                        style="padding: 6px 12px; font-size: 12px;">
-                                        <i class="fas fa-eye"></i> Review
-                                    </button>
-                                </div>
-                                <div class="content-item" data-id="pending-2" data-title="Water Conservation Plan"
-                                    data-author="Jane Smith" data-date="Dec 19, 2025" data-category="Environmental"
-                                    data-description="A detailed water conservation strategy outlining methods to reduce water consumption across our operations and facilities. The plan includes rainwater harvesting systems, water recycling technologies, and employee awareness programs to promote sustainable water usage practices."
-                                    data-status="Pending">
-                                    <div>
-                                        <div class="content-title">Water Conservation Plan</div>
-                                        <div class="content-meta">Submitted by: Jane Smith | Dec 19, 2025 | Category:
-                                            Environmental</div>
-                                    </div>
-                                    <button class="btn btn-primary"
-                                        onclick="event.stopPropagation(); openReviewPage(document.querySelector('[data-id=\'pending-2\']'))"
-                                        style="padding: 6px 12px; font-size: 12px;">
-                                        <i class="fas fa-eye"></i> Review
-                                    </button>
-                                </div>
-                                <div class="content-item" data-id="pending-3"
-                                    data-title="Ethical Supply Chain Standards" data-author="Mike Johnson"
-                                    data-date="Dec 18, 2025" data-category="Governance"
-                                    data-description="Comprehensive governance framework establishing ethical standards for our entire supply chain. Includes vendor compliance requirements, fair labor practices, conflict minerals policies, and regular audit procedures to ensure all suppliers meet our sustainability and ethical standards."
-                                    data-status="Pending">
-                                    <div>
-                                        <div class="content-title">Ethical Supply Chain Standards</div>
-                                        <div class="content-meta">Submitted by: Mike Johnson | Dec 18, 2025 | Category:
-                                            Governance</div>
-                                    </div>
-                                    <button class="btn btn-primary"
-                                        onclick="event.stopPropagation(); openReviewPage(document.querySelector('[data-id=\'pending-3\']'))"
-                                        style="padding: 6px 12px; font-size: 12px;">
-                                        <i class="fas fa-eye"></i> Review
-                                    </button>
-                                </div>
+                                <!-- Pending approvals from backend -->
                             </div>
                         </div>
                     </div>
@@ -1559,17 +1484,14 @@
                         <div class="detail-section">
                             <h4><i class="fas fa-tasks"></i> Review Decision</h4>
                             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                <button class="btn btn-primary" style="background: #27ae60; flex: 1; min-width: 150px;"
-                                    onclick="submitReview('approved')">
+                                <button class="btn btn-primary" style="background: #27ae60; flex: 1; min-width: 150px;" onclick="submitReview('approved')">
                                     <i class="fas fa-check"></i> Approve Content
                                 </button>
-                                <button class="btn btn-primary" style="background: #f39c12; flex: 1; min-width: 150px;"
-                                    onclick="submitReview('changes_requested')">
-                                    <i class="fas fa-edit"></i> Request Changes
-                                </button>
-                                <button class="btn btn-primary" style="background: #e74c3c; flex: 1; min-width: 150px;"
-                                    onclick="submitReview('rejected')">
+                                <button class="btn btn-primary" style="background: #e74c3c; flex: 1; min-width: 150px;" onclick="submitReview('rejected')">
                                     <i class="fas fa-times"></i> Reject Content
+                                </button>
+                                <button class="btn btn-primary" style="background: #9b59b6; flex: 1; min-width: 150px;" onclick="previewContent()">
+                                    <i class="fas fa-eye"></i> Preview Link
                                 </button>
                             </div>
                         </div>
@@ -1589,6 +1511,8 @@
                             description: element.dataset.description || 'No description available.',
                             status: element.dataset.status || 'Pending'
                         };
+
+                        currentViewingContentId = element.dataset.id;
 
                         console.log('Opening review for:', currentReviewingContent);
 
@@ -1616,6 +1540,74 @@
                         document.getElementById('approvals-list').style.display = 'block';
                         document.getElementById('review-page').style.display = 'none';
                         currentReviewingContent = null;
+                    }
+
+                    function submitReview(status) {
+                        if (!currentReviewingContent) return;
+
+                        const comments = document.getElementById('review-comments').value.trim();
+                        if (!comments) {
+                            alert('Please provide comments or reasons for your decision.');
+                            return;
+                        }
+
+                        // Determine new status and badge class
+                        let newStatus = '';
+                        let badgeClass = '';
+                        let message = '';
+
+                        if (status === 'approved') {
+                            newStatus = 'Approved';
+                            badgeClass = 'badge-success';
+                            message = 'Content approved successfully!';
+                        } else if (status === 'rejected') {
+                            newStatus = 'Rejected';
+                            badgeClass = 'badge-danger';
+                            message = 'Content rejected successfully!';
+                        } else {
+                            // Safety fallback - should not happen
+                            alert('Invalid review status');
+                            return;
+                        }
+
+                        // Update the item in the MAIN "My Content" list (this affects dashboard stats)
+                        const mainContentItem = document.querySelector(`#content-items-container [data-id="${currentReviewingContent.id}"]`);
+                        if (mainContentItem) {
+                            // Update data attribute
+                            mainContentItem.dataset.status = newStatus;
+
+                            // Update visible badge
+                            const badge = mainContentItem.querySelector('.badge');
+                            if (badge) {
+                                badge.textContent = newStatus;
+                                badge.className = `badge ${badgeClass}`;
+                            }
+                        }
+
+                        // Remove the item from the Approvals queue (since it's no longer pending)
+                        const approvalItem = document.querySelector(`#approvals-container [data-id="${currentReviewingContent.id}"]`);
+                        if (approvalItem) {
+                            approvalItem.remove();
+                        }
+
+                        // Refresh all affected UI sections
+                        syncRecentFromYourContent();      // Update recent cards (badges may have changed)
+                        syncApprovalsFromYourContent();   // Rebuild approvals list (should now have 1 less item)
+                        refreshDashboardStats();          // This will now see the updated status → correct counts
+                        refreshCategoryCounts();
+
+                        // Show success message and close review panel
+                        showSuccessPopup(message);
+                        closeReviewPage();
+
+                        // Log for debugging (and eventual backend call)
+                        console.log(`Review submitted: ${status} for content ${currentReviewingContent.id} with comments: ${comments}`);
+
+                        fetch(`${API_URL}/api/content/${currentReviewingContent.id}/review`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ status: newStatus, comments })
+                        });
                     }
 
                     async function fetchContentForReview(contentId) {
@@ -1672,9 +1664,7 @@
                                 } else if (decision === 'rejected') {
                                     rejected++;
                                     pending = Math.max(0, pending - 1);
-                                } else if (decision === 'changes_requested') {
-                                    pending = Math.max(0, pending - 1);
-                                }
+                                };
 
                                 // Update display
                                 totalStat.textContent = total;
@@ -1741,7 +1731,7 @@
                     
                     const navNotifications = document.getElementById('nav-notifications');
                     const badge = document.getElementById('notification-count');
-                    const notifications = 3; // replace with your real notification count
+                    const notifications = 2; 
 
                     if (notifications > 0) {
                         navNotifications.style.display = 'block';  // show the link
@@ -1819,7 +1809,6 @@
                             <div class="card-header">
                                 <div style="display: flex; justify-content: space-between; align-items: center;">
                                     <h5 style="margin: 0;">Content Categories</h5>
-                                    <button class="btn btn-primary" style="font-size: 12px;">+ Add Category</button>
                                 </div>
                             </div>
                             <div class="card-body">
@@ -1877,75 +1866,176 @@
 
                 <!-- Profile Tab -->
                 <div id="profile" class="tab-content-area" style="display: none;">
-                    <h1 class="page-title">My Profile</h1>
+                    <h1 class="page-title" style="margin-bottom: 30px;">
+                        <i class="fas fa-user-circle"></i> My Profile
+                    </h1>
 
                     <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <div class="card" style="text-align: center;">
-                                <div class="card-body">
-                                    <div class="user-avatar"
-                                        style="width: 80px; height: 80px; margin: 0 auto 15px; font-size: 32px;">
-                                        A
-                                    </div>
-                                    <h5>Tom Smith</h5>
-                                    <p style="color: #2ecc71; font-weight: 600; margin-bottom: 15px;"
-                                        class="profile-role">Administrator</p>
-                                    <hr>
-                                    <p><strong>Email:</strong><br>tom@ecojourney.com</p>
+                        <!-- Profile Card -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card"
+                                style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 12px; overflow: hidden;">
+                                <div
+                                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 80px;">
                                 </div>
+                                <div class="card-body" style="text-align: center; padding: 30px 20px;">
+                                    <!-- Profile Picture Upload Area -->
+                                    <div style="position: relative; width: 120px; height: 120px; margin: -60px auto 20px; cursor: pointer;"
+                                        onclick="document.getElementById('profile-pic-input').click();"
+                                        title="Click to upload profile picture">
+                                        <img id="profile-pic-display" id="profile-avatar-pic"
+                                            src="https://ui-avatars.com/api/?name=Tom+Smith&background=667eea&color=fff&size=120&bold=true"
+                                            style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border: 4px solid #f8f9fa; display: block;">
+                                        <div
+                                            style="position: absolute; bottom: 0; right: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                                            <i class="fas fa-camera"></i>
+                                        </div>
+                                    </div>
+                                    <input type="file" id="profile-pic-input" style="display: none;" accept="image/*"
+                                        onchange="handleProfilePictureUpload(event)">
+                                    <p style="font-size: 12px; color: #7f8c8d; margin-top: 8px;">Click to upload photo
+                                    </p>
+
+                                    <h5 style="font-weight: 700; font-size: 18px; margin: 15px 0;"
+                                        id="profile-page-name">Tom Smith</h5>
+                                    <p style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: 700; margin-bottom: 20px; padding: 8px 16px; border-radius: 50px; display: inline-block; font-size: 13px;"
+                                        class="profile-role">Administrator</p>
+
+                                    <div
+                                        style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                                        <p
+                                            style="margin: 0; color: #7f8c8d; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">
+                                            Email Address</p>
+                                        <p style="margin: 8px 0 0 0; font-weight: 600; color: #2c3e50;">
+                                            tom@ecojourney.com</p>
+                                    </div>
+
+                                    <div style="border-top: 1px solid #ecf0f1; padding-top: 15px; margin-top: 15px;">
+                                        <p style="color: #7f8c8d; font-size: 12px; margin: 0;">Member Since</p>
+                                        <p style="font-weight: 600; color: #2c3e50; margin: 5px 0 0 0;">January 2024</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Quick Stats -->
+                            <div style="margin-top: 20px;" id="profile-stats">
+                                <!-- Stats will be dynamically loaded based on role -->
                             </div>
                         </div>
 
+                        <!-- Edit Profile Form -->
                         <div class="col-md-8">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5 style="margin: 0;">Edit Profile Information</h5>
+                            <div class="card"
+                                style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 12px;">
+                                <div class="card-header"
+                                    style="border: none; background: #f8f9fa; color: #2c3e50; padding: 25px; border-bottom: 2px solid #ecf0f1;">
+                                    <h5 style="margin: 0; font-weight: 700; font-size: 16px;">
+                                        <i class="fas fa-edit"></i> Edit Profile Information
+                                    </h5>
                                 </div>
-                                <div class="card-body">
-                                    <div class="row mb-3">
+                                <div class="card-body" style="padding: 30px;">
+                                    <!-- Personal Information Section -->
+                                    <h6
+                                        style="font-weight: 700; color: #2c3e50; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #ecf0f1;">
+                                        <i class="fas fa-user"></i> Personal Information
+                                    </h6>
+
+                                    <div class="row mb-4">
                                         <div class="col-md-6">
-                                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">First
-                                                Name</label>
-                                            <input type="text" class="form-control">
+                                            <label
+                                                style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50; font-size: 14px;">
+                                                <i class="fas fa-font"></i> First Name
+                                            </label>
+                                            <input type="text" class="form-control"
+                                                style="border-radius: 8px; border: 1px solid #ddd; padding: 12px;"
+                                                placeholder="Enter first name">
                                         </div>
                                         <div class="col-md-6">
-                                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Last
-                                                Name</label>
-                                            <input type="text" class="form-control">
+                                            <label
+                                                style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50; font-size: 14px;">
+                                                <i class="fas fa-font"></i> Last Name
+                                            </label>
+                                            <input type="text" class="form-control"
+                                                style="border-radius: 8px; border: 1px solid #ddd; padding: 12px;"
+                                                placeholder="Enter last name">
                                         </div>
                                     </div>
-                                    <div class="mb-3">
+
+                                    <div class="mb-4">
                                         <label
-                                            style="display: block; margin-bottom: 5px; font-weight: 600;">Organization</label>
-                                        <input type="text" class="form-control">
+                                            style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50; font-size: 14px;">
+                                            <i class="fas fa-building"></i> Organization
+                                        </label>
+                                        <input type="text" class="form-control"
+                                            style="border-radius: 8px; border: 1px solid #ddd; padding: 12px;"
+                                            placeholder="Enter organization name">
                                     </div>
-                                    <div class="mb-3">
-                                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Phone
-                                            Number</label>
-                                        <input type="tel" class="form-control">
+
+                                    <div class="mb-4">
+                                        <label
+                                            style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50; font-size: 14px;">
+                                            <i class="fas fa-phone"></i> Phone Number
+                                        </label>
+                                        <input type="tel" class="form-control"
+                                            style="border-radius: 8px; border: 1px solid #ddd; padding: 12px;"
+                                            placeholder="Enter phone number">
                                     </div>
-                                    <hr>
-                                    <h6 style="margin-bottom: 15px; font-weight: 600;">Change Password</h6>
-                                    <div class="mb-3">
-                                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Current
-                                            Password</label>
-                                        <input type="password" class="form-control">
-                                    </div>
-                                    <div class="row mb-3">
-                                        <div class="col-md-6">
-                                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">New
-                                                Password</label>
-                                            <input type="password" class="form-control">
-                                            <small style="color: #7f8c8d;">Min 8 chars, uppercase, lowercase, number,
-                                                special char</small>
+
+                                    <!-- Change Password Section -->
+                                    <div
+                                        style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 30px;">
+                                        <h6 style="margin: 0 0 20px 0; font-weight: 700; color: #2c3e50;">
+                                            <i class="fas fa-lock"></i> Change Password
+                                        </h6>
+
+                                        <div class="mb-4">
+                                            <label
+                                                style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50; font-size: 14px;">
+                                                Current Password
+                                            </label>
+                                            <input type="password" class="form-control"
+                                                style="border-radius: 8px; border: 1px solid #ddd; padding: 12px;"
+                                                placeholder="Enter current password">
                                         </div>
-                                        <div class="col-md-6">
-                                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Confirm
-                                                Password</label>
-                                            <input type="password" class="form-control">
+
+                                        <div class="row mb-4">
+                                            <div class="col-md-6">
+                                                <label
+                                                    style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50; font-size: 14px;">
+                                                    New Password
+                                                </label>
+                                                <input type="password" class="form-control"
+                                                    style="border-radius: 8px; border: 1px solid #ddd; padding: 12px;"
+                                                    placeholder="Enter new password">
+                                                <small
+                                                    style="color: #7f8c8d; font-size: 12px; margin-top: 5px; display: block;">
+                                                    <i class="fas fa-info-circle"></i> Min 8 chars, uppercase,
+                                                    lowercase, number, special char
+                                                </small>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label
+                                                    style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50; font-size: 14px;">
+                                                    Confirm Password
+                                                </label>
+                                                <input type="password" class="form-control"
+                                                    style="border-radius: 8px; border: 1px solid #ddd; padding: 12px;"
+                                                    placeholder="Confirm new password">
+                                            </div>
                                         </div>
                                     </div>
-                                    <button class="btn btn-primary">Save Changes</button>
+
+                                    <!-- Action Buttons -->
+                                    <div style="margin-top: 30px; display: flex; gap: 10px;">
+                                        <button class="btn"
+                                            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: 600; border: none; border-radius: 8px; padding: 12px 30px; cursor: pointer;">
+                                            <i class="fas fa-save"></i> Save Changes
+                                        </button>
+                                        <button class="btn"
+                                            style="background: #ecf0f1; color: #2c3e50; font-weight: 600; border: none; border-radius: 8px; padding: 12px 30px; cursor: pointer;">
+                                            <i class="fas fa-times"></i> Cancel
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1962,7 +2052,7 @@
                 <button class="preview-close-btn" onclick="closePreview()">
                     <i class="fas fa-times"></i>
                 </button>
-                <img src="https://www.moe.gov.sg/-/media/images/school-logos/post-secondary/republic-polytechnic.png?h=140&iar=0&w=500&hash=1EE0F782E863E3DB9FF95982A0BA8973"
+                <img src="https://www.rp.edu.sg/images/default-source/default-album/rp-logo.png?sfvrsn=41990045_3"
                     alt="Republic Polytechnic Logo" class="preview-logo">
             </div>
             <div class="preview-content">
@@ -2062,50 +2152,37 @@
             popup.classList.remove('show');
 
             if (confirmed && pendingDeleteId) {
-                // Optimistic local delete: remove from DOM and local storage first
                 try {
-                    // Remove ALL elements with this data-id (may exist in both lists)
-                    const contentItems = document.querySelectorAll(`[data-id="${pendingDeleteId}"]`);
-                    if (contentItems && contentItems.length) {
-                        contentItems.forEach(ci => ci.remove());
+                    // Delete from backend first
+                    const response = await fetch(`${API_URL}/api/content/${pendingDeleteId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Delete failed');
                     }
 
-                    // Remove from IndexedDB if present
-                    try {
-                        await deleteContentFromStorage(pendingDeleteId);
-                    } catch (e) {
-                        console.warn('Failed to remove from local storage:', e);
-                    }
+                    // Remove from global data array
+                    allContentData = allContentData.filter(item => item._id !== pendingDeleteId && item.id !== pendingDeleteId);
+                    filterAndRenderContent(); // Re-render list
 
                     // Update Recent, Approvals, and Dashboard
                     syncRecentFromYourContent();
-                    syncApprovalsFromYourContent();
+                    syncApprovalsFromYourContent();   
                     refreshDashboardStats();
+                    refreshCategoryCounts();
 
                     // If viewing this content, go back to list
                     if (currentViewingContentId === pendingDeleteId) backToContentList();
 
                     showSuccessPopup('Content deleted successfully!');
-
-                    // Attempt backend delete but don't block UI
-                    try {
-                        const response = await fetch(`${API_URL}/api/content/${pendingDeleteId}`, {
-                            method: 'DELETE',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            }
-                        });
-
-                        if (!response.ok) {
-                            console.error('Server delete failed:', await response.text());
-                            // Optionally notify user later; keep UI consistent for now
-                        }
-                    } catch (err) {
-                        console.error('Failed to reach server for delete:', err);
-                    }
                 } catch (error) {
-                    console.error('Failed to perform local delete:', error);
-                    alert('Failed to delete content locally: ' + (error.message || error));
+                    console.error('Failed to delete content:', error);
+                    alert('Failed to delete content: ' + (error.message || error));
                 }
             }
 
@@ -2187,8 +2264,18 @@
         }
 
         function formatToSGTime(isoString) {
-            if (!isoString) return '-';
+            if (!isoString || isoString === 'undefined') {
+                console.warn('formatToSGTime called with invalid date:', isoString);
+                return '-';
+            }
             const date = new Date(isoString);
+            
+            // Check if date is valid
+            if (isNaN(date.getTime())) {
+                console.warn('Invalid date format:', isoString);
+                return '-';
+            }
+            
             // Format as "MMM DD, YYYY" (e.g., "Dec 17, 2025")
             const options = {
                 year: 'numeric',
@@ -2199,11 +2286,17 @@
         }
 
         function formatDateTime(isoString) {
-            if (!isoString) return '-';
+            if (!isoString || isoString === 'undefined') {
+                console.warn('formatDateTime called with invalid date:', isoString);
+                return '-';
+            }
             const date = new Date(isoString);
             
             // Check if the date is valid
-            if (isNaN(date.getTime())) return isoString;
+            if (isNaN(date.getTime())) {
+                console.warn('Invalid date format:', isoString);
+                return isoString;
+            }
 
             // Use en-SG to match Singapore time formatting
             return date.toLocaleString('en-SG', {
@@ -2255,61 +2348,225 @@
             }
         }
 
+        // Global variable to store the raw data
+        let allContentData = [];
+        
+        // Current logged-in user's identifier (should come from login / localStorage)
+        const currentUserId   = localStorage.getItem('user_id')   || 'unknown-user';
+        const currentUsername = localStorage.getItem('current_user') || 'You';
+        const userRole        = localStorage.getItem('user_role') || 'producer'; // admin / manager / producer
+
+        // For sorting (most recent first)
+        function sortByDateDesc(a, b) {
+            return new Date(b.date || b.createdAt || 0) - new Date(a.date || a.createdAt || 0);
+        }
+
+        // 1. Modified Load Function
         async function loadStoredContents() {
             try {
                 const response = await fetch(`${API_URL}/api/content/all`, {
                     method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
+                    headers: { 'Content-Type': 'application/json' }
                 });
 
                 if (!response.ok) {
-                    console.error('Failed to fetch contents from server');
-                    return; // Silently fail and show default content
+                    console.error('Failed to fetch contents');
+                    return;
                 }
 
-                const contents = await response.json();
-                const container = document.getElementById('content-items-container');
-
-                if (!container) return;
-
-                contents.forEach(content => {
-                    const newRow = document.createElement('div');
-                    newRow.className = 'content-item content-item-clickable';
-                    newRow.setAttribute('data-id', content._id || content.id);
-                    newRow.setAttribute('data-title', content.title);
-                    newRow.setAttribute('data-type', content.type || 'Document');
-                    newRow.setAttribute('data-size', content.fileSize);
-                    newRow.setAttribute('data-date', content.date);
-                    newRow.setAttribute('data-status', content.status || 'Pending');
-                    newRow.setAttribute('data-category', content.category || 'General');
-                    newRow.setAttribute('data-description', content.description || 'No description available.');
-                    newRow.onclick = function () { viewContentDetail(this); };
-
-                    const formattedDate = formatToSGTime(content.date);
-                    const formattedSize = formatFileSize(content.fileSize);
-                    newRow.innerHTML = `
-                        <div>
-                            <div class="content-title">${content.title}</div>
-                            <div class="content-meta">${content.type || 'Document'} | ${formattedSize} | Modified: ${formattedDate}</div>
-                        </div>
-                        <div class="content-item-actions">
-                            <span class="badge badge-warning">${content.status || 'Pending'}</span>
-                            <button class="delete-btn" onclick="event.stopPropagation(); deleteContent('${content._id || content.id}')" title="Delete">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    `;
-                    container.insertBefore(newRow, container.firstChild);
-                });
-                // Sync top 3 items into Recent Content, approvals list, and dashboard stats
+                // Store raw data globally
+                allContentData = await response.json();
+                
+                // Debug: Log date fields from MongoDB
+                console.log('Content loaded from MongoDB. Sample item dates:', allContentData[0] ? {
+                    title: allContentData[0].title,
+                    createdAt: allContentData[0].createdAt,
+                    updatedAt: allContentData[0].updatedAt,
+                    date: allContentData[0].date
+                } : 'No content available');
+                
+                // Initial Render
+                filterAndRenderContent();
                 syncRecentFromYourContent();
-                syncApprovalsFromYourContent();
+                syncApprovalsFromYourContent();  
                 refreshDashboardStats();
+                refreshCategoryCounts();
+
             } catch (error) {
                 console.error('Failed to load contents:', error);
-                // Silently fail and show default content instead of alerting
+            }
+        }
+
+        // 2. The Filter & Sort Logic
+        function filterAndRenderContent() {
+            const searchTerm = document.getElementById('filter-search')?.value.toLowerCase() || '';
+            const categoryFilter = document.getElementById('filter-category')?.value || 'all';
+            const statusFilter = document.getElementById('filter-status')?.value || 'all';
+            const sortOrder = document.getElementById('sort-order')?.value || 'newest';
+
+            // Debug logging
+            console.log('Filter Applied:', { searchTerm, categoryFilter, statusFilter, sortOrder });
+            console.log('Total content items:', allContentData.length);
+
+            // A. Filter Data
+            let filteredData = allContentData.filter(item => {
+                // Search (Title)
+                const matchesSearch = item.title.toLowerCase().includes(searchTerm);
+                
+                // Category
+                const matchesCategory = categoryFilter === 'all' || (item.category === categoryFilter);
+                
+                // Status (Case insensitive check)
+                const itemStatus = (item.status || 'Pending').toLowerCase();
+                const filterStatusLower = statusFilter.toLowerCase();
+                const matchesStatus = statusFilter === 'all' || itemStatus === filterStatusLower;
+
+                return matchesSearch && matchesCategory && matchesStatus;
+            });
+
+            console.log('Filtered content items:', filteredData.length);
+
+            // B. Sort Data
+            filteredData.sort((a, b) => {
+                const dateA = new Date(a.updatedAt || a.date);
+                const dateB = new Date(b.updatedAt || b.date);
+                const titleA = a.title.toLowerCase();
+                const titleB = b.title.toLowerCase();
+                
+                switch (sortOrder) {
+                    case 'newest': return dateB - dateA;
+                    case 'oldest': return dateA - dateB;
+                    case 'az': return titleA.localeCompare(titleB);
+                    case 'za': return titleB.localeCompare(titleA);
+                    case 'largest': return (b.fileSize || 0) - (a.fileSize || 0);
+                    default: return dateB - dateA;
+                }
+            });
+
+            // C. Render Data
+            const container = document.getElementById('content-items-container');
+            if (!container) return;
+            
+            container.innerHTML = ''; // Clear current list
+
+            if (filteredData.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center p-5 text-muted">
+                        <i class="fas fa-search fa-3x mb-3"></i>
+                        <p>No content found matching your filters.</p>
+                    </div>`;
+                return;
+            }
+
+            filteredData.forEach((content, index) => {
+                const newRow = document.createElement('div');
+                newRow.className = 'content-item content-item-clickable';
+                
+                // Debug: Log first item's date values
+                if (index === 0) {
+                    console.log('First content item dates:', {
+                        title: content.title,
+                        createdAt: content.createdAt,
+                        updatedAt: content.updatedAt,
+                        date: content.date
+                    });
+                    console.log('Data attributes being set:', {
+                        uploadDate: content.createdAt || content.date,
+                        modifiedDate: content.updatedAt || content.createdAt || content.date
+                    });
+                }
+                
+                // Data Attributes
+                newRow.setAttribute('data-id', content._id || content.id);
+                newRow.setAttribute('data-title', content.title);
+                newRow.setAttribute('data-type', content.type || 'Document');
+                newRow.setAttribute('data-size', content.fileSize);
+                // Use createdAt for upload date, updatedAt for modified date (from MongoDB)
+                newRow.setAttribute('data-upload-date', content.createdAt || content.date);
+                newRow.setAttribute('data-modified-date', content.updatedAt || content.createdAt || content.date);
+                newRow.setAttribute('data-status', content.status || 'Pending');
+                newRow.setAttribute('data-category', content.category || 'General');
+                newRow.setAttribute('data-description', content.description || '');
+                newRow.setAttribute('data-author', content.author || content.submittedBy || content.createdBy || localStorage.getItem('current_user') || 'Content Producer');
+                
+                newRow.onclick = function () { viewContentDetail(this); };
+
+                // Formatting for display - Use updatedAt from MongoDB
+                const modifiedDate = content.updatedAt || content.createdAt || content.date;
+                const formattedDate = formatToSGTime(modifiedDate);
+                const formattedSize = formatFileSize(content.fileSize);
+                
+                // Badge Logic
+                let badgeClass = 'badge-warning';
+                const st = (content.status || 'Pending').toLowerCase();
+                if (st.includes('approved') || st.includes('published')) badgeClass = 'badge-success';
+                else if (st.includes('rejected')) badgeClass = 'badge-danger';
+
+                newRow.innerHTML = `
+                    <div>
+                        <div class="content-title">${content.title}</div>
+                        <div class="content-meta">
+                            ${content.type || 'Document'} | ${formattedSize} | Modified: ${formattedDate}
+                        </div>
+                    </div>
+                    <div class="content-item-actions">
+                        <span class="badge ${badgeClass}">${content.status || 'Pending'}</span>
+                        <button class="delete-btn" onclick="event.stopPropagation(); deleteContent('${content._id || content.id}')" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(newRow);
+            });
+
+            // Sync other UI parts
+            syncRecentFromYourContent();
+            refreshDashboardStats();
+        }
+
+        // Handle profile picture upload
+        function handleProfilePictureUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Check file size (max 5MB)
+            const maxSize = 5 * 1024 * 1024;
+            if (file.size > maxSize) {
+                alert('File size must be less than 5MB');
+                return;
+            }
+
+            // Check file type
+            if (!file.type.startsWith('image/')) {
+                alert('Please upload an image file');
+                return;
+            }
+
+            // Read and display the image
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const imageData = e.target.result;
+
+                // Update the display image
+                document.getElementById('profile-pic-display').src = imageData;
+
+                // Save to localStorage
+                localStorage.setItem('profile-picture', imageData);
+
+                // Show success message
+                showSuccessPopup('Profile picture updated successfully!');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Load profile picture on page load
+        function loadProfilePicture() {
+            const savedPicture = localStorage.getItem('profile-picture');
+            if (savedPicture) {
+                const profilePicDisplay = document.getElementById('profile-pic-display');
+                if (profilePicDisplay) {
+                    profilePicDisplay.src = savedPicture;
+                }
             }
         }
 
@@ -2323,12 +2580,99 @@
                 manager: 'Content Manager'
             };
 
-            const roleText = roleDisplayNames[role] || '';
+            const userNames = {
+                admin: { fullName: 'Tom Smith', initials: 'TS' },
+                manager: { fullName: 'Jane Smith', initials: 'JS' },
+                producer: { fullName: 'John Doe', initials: 'JD' }
+            };
 
+            const roleText = roleDisplayNames[role] || '';
+            const userData = userNames[role] || userNames.admin;
+
+            // Update role text in all elements
             const roleElements = document.getElementsByClassName('profile-role');
             for (let i = 0; i < roleElements.length; i++) {
                 roleElements[i].textContent = roleText;
             }
+
+            // Update user name in header
+            const userNameHeader = document.querySelector('.user-details h6');
+            if (userNameHeader) {
+                userNameHeader.textContent = userData.fullName;
+            }
+
+            // Update user name in profile page
+            const profilePageName = document.querySelector('#profile h5');
+            if (profilePageName) {
+                profilePageName.textContent = userData.fullName;
+            }
+
+            // Update avatar initials
+            const avatarElements = document.querySelectorAll('.user-avatar');
+            avatarElements.forEach(element => {
+                element.textContent = userData.initials;
+            });
+
+            // Update profile avatar image URL with user's name
+            const profileAvatarPic = document.getElementById('profile-pic-display');
+            if (profileAvatarPic) {
+                const avatarUrl = `https://ui-avatars.com/api/?name=${userData.fullName.replace(' ', '+')}&background=667eea&color=fff&size=120&bold=true`;
+                profileAvatarPic.src = avatarUrl;
+            }
+
+            // Update email in profile
+            const emailElement = document.querySelector('#profile p[style*="2c3e50"]');
+            if (emailElement) {
+                const email = userData.fullName.toLowerCase().replace(' ', '.') + '@ecojourney.com';
+                emailElement.textContent = email;
+            }
+
+            // Update role-specific stats
+            updateRoleSpecificStats(role);
+        }
+
+        function updateRoleSpecificStats(role) {
+            const statsContainer = document.getElementById('profile-stats');
+            if (!statsContainer) return;
+
+            let statsHTML = '';
+
+            if (role === 'admin') {
+                statsHTML = `
+                    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 20px; border-radius: 12px; color: white; text-align: center; margin-bottom: 12px;">
+                        <p style="margin: 0; font-size: 24px; font-weight: 700;">245</p>
+                        <p style="margin: 5px 0 0 0; font-size: 13px; opacity: 0.9;">Total Users</p>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); padding: 20px; border-radius: 12px; color: white; text-align: center;">
+                        <p style="margin: 0; font-size: 24px; font-weight: 700;">12</p>
+                        <p style="margin: 5px 0 0 0; font-size: 13px; opacity: 0.9;">System Alerts</p>
+                    </div>
+                `;
+            } else if (role === 'manager') {
+                statsHTML = `
+                    <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); padding: 20px; border-radius: 12px; color: white; text-align: center; margin-bottom: 12px;">
+                        <p style="margin: 0; font-size: 24px; font-weight: 700;">12</p>
+                        <p style="margin: 5px 0 0 0; font-size: 13px; opacity: 0.9;">Total Reviewed</p>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); padding: 20px; border-radius: 12px; color: white; text-align: center;">
+                        <p style="margin: 0; font-size: 24px; font-weight: 700;">8</p>
+                        <p style="margin: 5px 0 0 0; font-size: 13px; opacity: 0.9;">This Week</p>
+                    </div>
+                `;
+            } else if (role === 'producer') {
+                statsHTML = `
+                    <div style="background: linear-gradient(135deg, #67e0d1 0%, #37e0c9 100%); padding: 20px; border-radius: 12px; color: white; text-align: center; margin-bottom: 12px;">
+                        <p style="margin: 0; font-size: 24px; font-weight: 700;">18</p>
+                        <p style="margin: 5px 0 0 0; font-size: 13px; opacity: 0.9;">Content Uploaded</p>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 20px; border-radius: 12px; color: white; text-align: center;">
+                        <p style="margin: 0; font-size: 24px; font-weight: 700;">14</p>
+                        <p style="margin: 5px 0 0 0; font-size: 13px; opacity: 0.9;">Published Content</p>
+                    </div>
+                `;
+            }
+
+            statsContainer.innerHTML = statsHTML;
         }
 
         const ROLE_PERMISSIONS = {
@@ -2360,6 +2704,10 @@
         if (tabName === 'notifications') {
                 const badge = document.getElementById('notification-count');
                 if (badge) badge.style.display = 'none';
+            }
+
+        if (tabName === 'approvals') {
+            syncApprovalsFromYourContent();   // ← Refresh approvals when tab is opened
             }
         }
 
@@ -2425,6 +2773,7 @@
             document.getElementById('upload-form-section').style.display = 'block';
             document.getElementById('content-detail-view').style.display = 'none';
             document.getElementById('content-edit-form').style.display = 'none';
+            document.getElementById('content-filters').style.display = 'none';
         }
 
         function hideUploadForm() {
@@ -2432,6 +2781,7 @@
             document.getElementById('upload-form-section').style.display = 'none';
             document.getElementById('content-detail-view').style.display = 'none';
             document.getElementById('content-edit-form').style.display = 'none';
+            document.getElementById('content-filters').style.display = 'block';
             document.getElementById('upload-form').reset();
         }
 
@@ -2443,11 +2793,22 @@
                 title: element.dataset.title,
                 type: element.dataset.type,
                 size: element.dataset.size,
-                date: element.dataset.date,
+                // FIX: Retrieve both dates from the data attributes
+                uploadDate: element.dataset.uploadDate,
+                modifiedDate: element.dataset.modifiedDate,
                 status: element.dataset.status,
                 category: element.dataset.category,
                 description: element.dataset.description
             };
+            
+            // Debug: Log dates being passed to detail view
+            console.log('Content detail dates:', {
+                title: contentData.title,
+                uploadDate: contentData.uploadDate,
+                modifiedDate: contentData.modifiedDate,
+                uploadDateFormatted: formatDateTime(contentData.uploadDate),
+                modifiedDateFormatted: formatDateTime(contentData.modifiedDate)
+            });
 
             currentViewingContentId = contentData.id;
 
@@ -2456,40 +2817,30 @@
             document.getElementById('upload-form-section').style.display = 'none';
             document.getElementById('content-detail-view').style.display = 'block';
             document.getElementById('content-edit-form').style.display = 'none';
+            document.getElementById('content-filters').style.display = 'none';
 
             // Populate detail view
             document.getElementById('detail-title').textContent = contentData.title;
             document.getElementById('detail-type').textContent = contentData.type;
             document.getElementById('detail-size').textContent = formatFileSize(contentData.size);
-            document.getElementById('detail-date').textContent = formatToSGTime(contentData.date);
+            // Use modified date for the small header info
+            document.getElementById('detail-date').textContent = formatToSGTime(contentData.modifiedDate);
             document.getElementById('detail-category').textContent = contentData.category;
             document.getElementById('detail-status').textContent = contentData.status;
             document.getElementById('detail-description').textContent = contentData.description || 'No description available.';
             document.getElementById('detail-id').textContent = formatContentId(contentData.id);
             document.getElementById('detail-format').textContent = contentData.type;
             
-                // Create a "Now" timestamp for Last Modified if you just edited it, 
-                // otherwise use the stored date.
-                const currentTime = new Date().toLocaleString('en-SG', {
-                    timeZone: 'Asia/Singapore',
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: true
-                });
-
-                // Update the UI
+                // FIX: Render separate Upload and Modified times
                 const uploadDateElement = document.getElementById('detail-upload-date');
                 uploadDateElement.innerHTML = `
                     <div style="margin-bottom: 8px;">
                         <span class="text-dark fw-bold">Upload Date:</span> 
-                        <span class="text-secondary">${formatDateTime(contentData.date)}</span>
+                        <span class="text-secondary">${formatDateTime(contentData.uploadDate)}</span>
                     </div>
                     <div>
                         <span class="text-dark fw-bold">Last Modified:</span> 
-                        <span class="text-secondary">${currentTime}</span>
+                        <span class="text-secondary">${formatDateTime(contentData.modifiedDate)}</span>
                     </div>
                 `;
             
@@ -2504,31 +2855,35 @@
             imagePreview.style.display = 'none';
             videoPreview.style.display = 'none';
 
-            // Logic to fetch and display
+            // Always fetch fresh data from backend
             try {
-                const contents = await getStoredContents();
-                const localContent = contents.find(c => c.id === contentData.id);
-                
-                // Use data from local storage or fetch from server
-                const displayData = localContent || await fetch(`${API_URL}/api/content/${contentData.id}`).then(r => r.json());
+                const response = await fetch(`${API_URL}/api/content/${contentData.id}`);
+                if (!response.ok) {
+                    console.warn('Could not fetch content from backend');
+                    mediaPreview.style.display = 'none';
+                    return;
+                }
+
+                const displayData = await response.json();
 
                 if (displayData && displayData.mediaData) {
                     const mType = displayData.mediaFileType || "";
                     if (mType.startsWith('image/')) {
                         imagePreview.src = displayData.mediaData;
                         imagePreview.style.display = 'block';
-                        videoPreview.style.display = 'none'; // Ensure video is hidden
+                        videoPreview.style.display = 'none';
                     } else if (mType.startsWith('video/')) {
                         videoPreview.src = displayData.mediaData;
                         videoPreview.style.display = 'block';
-                        imagePreview.style.display = 'none'; // Ensure image is hidden
+                        imagePreview.style.display = 'none';
                     }
                     mediaPreview.style.display = 'block';
                 } else {
-                    mediaPreview.style.display = 'none'; // Hide if no media exists
+                    mediaPreview.style.display = 'none';
                 }
             } catch (e) {
                 console.error("Preview failed", e);
+                mediaPreview.style.display = 'none';
             }
         }
 
@@ -2537,6 +2892,7 @@
             document.getElementById('upload-form-section').style.display = 'none';
             document.getElementById('content-detail-view').style.display = 'none';
             document.getElementById('content-edit-form').style.display = 'none';
+            document.getElementById('content-filters').style.display = 'block';
             currentViewingContentId = null;
         }
 
@@ -2695,65 +3051,26 @@
             document.getElementById('content-detail-view').style.display = 'block';
         }
 
-        async function updateContentData(contentId, updatedData) {
-            // 1. Update the DOM element attributes in the list (The hidden data index uses)
-            const contentElement = document.querySelector(`[data-id="${contentId}"]`);
-            if (contentElement) {
-                // This syncs the attributes so the Side Panel shows the new text
-                contentElement.dataset.title = updatedData.title;
-                contentElement.dataset.description = updatedData.description; 
-                contentElement.dataset.category = updatedData.category;
-                
-                if (updatedData.fileSize) contentElement.dataset.size = updatedData.fileSize;
-                if (updatedData.type) contentElement.dataset.type = updatedData.type;
-                
-                // Update the date in the list attribute
-                contentElement.dataset.date = updatedData.date; 
-
-                // Update the visible text in the list row
-                const titleElement = contentElement.querySelector('.content-title');
-                if (titleElement) titleElement.textContent = updatedData.title;
-                
-                const metaElement = contentElement.querySelector('.content-meta');
-                if (metaElement) {
-                    const type = updatedData.type || contentElement.dataset.type;
-                    const size = updatedData.fileSize || contentElement.dataset.size;
-                    metaElement.textContent = `${type} | ${formatFileSize(size)} | Modified: ${formatToSGTime(updatedData.date)}`;
-                }
-            }
-
-            // 2. Update Storage (IndexedDB)
-            try {
-                const contents = await getStoredContents();
-                const contentIndex = contents.findIndex(c => c.id === contentId);
-                
-                if (contentIndex !== -1) {
-                    const existingItem = contents[contentIndex];
-                    const mergedData = { ...existingItem, ...updatedData };
-                    await saveContentToStorage(mergedData);
-                }
-            } catch (error) {
-                console.error('Failed to update local storage:', error);
-            }
-
-            // 3. Immediately refresh the Side Panel to show the changes
-            if (contentElement) {
-                viewContentDetail(contentElement);
-            }
-        }
+        // Function removed - edit form now sends directly to backend via PUT request
 
         window.addEventListener('DOMContentLoaded', async () => {
-            // Initialize IndexedDB
-            try {
-                await initDB();
-            } catch (error) {
-                console.error('Failed to initialize database:', error);
-                alert('Failed to initialize storage. Some features may not work properly.');
-            }
-
             applyRolePermissions();
             updateProfileRole();
-            await loadStoredContents(); // Load persisted content
+            loadProfilePicture();
+            await loadStoredContents(); // Load content from backend
+            syncApprovalsFromYourContent();
+            refreshDashboardStats();
+
+            // Attach listeners to filter controls
+            const filterSearch = document.getElementById('filter-search');
+            const filterCategory = document.getElementById('filter-category');
+            const filterStatus = document.getElementById('filter-status');
+            const sortOrder = document.getElementById('sort-order');
+            
+            if (filterSearch) filterSearch.addEventListener('input', filterAndRenderContent);
+            if (filterCategory) filterCategory.addEventListener('change', filterAndRenderContent);
+            if (filterStatus) filterStatus.addEventListener('change', filterAndRenderContent);
+            if (sortOrder) sortOrder.addEventListener('change', filterAndRenderContent);
 
             // Handle edit form submission
             const editForm = document.getElementById('edit-content-form');
@@ -2784,80 +3101,84 @@
                             return;
                         }
 
-                        const updatedData = {
-                            title: title,
-                            description: description,
-                            category: category,
-                            // Ensure we save a fresh ISO string for the backend/storage
-                            date: new Date().toISOString()
-                        };
+                        // Show loading state
+                        const submitBtn = editForm.querySelector('button[type="submit"]');
+                        const originalText = submitBtn.innerHTML;
+                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+                        submitBtn.disabled = true;
 
-                        // If a new media file was uploaded, update media info
+                        // Create FormData to send to backend
+                        const formData = new FormData();
+                        formData.append('title', title);
+                        formData.append('description', description);
+                        formData.append('category', category);
+                        
+                        // Append files only if new ones were selected (this replaces old files)
                         if (newMediaFile) {
-                            const mediaData = await new Promise((resolve, reject) => {
-                                const reader = new FileReader();
-                                reader.onload = (e) => resolve(e.target.result);
-                                reader.onerror = () => reject(new Error('Failed to read media file'));
-                                reader.readAsDataURL(newMediaFile);
-                            });
-
-                            updatedData.mediaFileName = newMediaFile.name;
-                            updatedData.mediaFileType = newMediaFile.type;
-                            updatedData.mediaData = mediaData;
+                            formData.append('mediaFile', newMediaFile);
                         }
-
-                        // If a new document file was uploaded, update document info
                         if (newDocFile) {
-                            // Read the new document file data
-                            const fileData = await new Promise((resolve, reject) => {
-                                const reader = new FileReader();
-                                reader.onload = (e) => resolve(e.target.result);
-                                reader.onerror = () => reject(new Error('Failed to read document file'));
-                                reader.readAsDataURL(newDocFile);
-                            });
-
-                            const fileSize = newDocFile.size < 1024 * 1024 ?
-                                (newDocFile.size / 1024).toFixed(1) + ' KB' :
-                                (newDocFile.size / (1024 * 1024)).toFixed(1) + ' MB';
-
-                            // Determine file type from extension
-                            const fileName = newDocFile.name.toLowerCase();
-                            let fileType = 'Document';
-                            if (fileName.endsWith('.pdf')) {
-                                fileType = 'PDF';
-                            } else if (fileName.endsWith('.doc') || fileName.endsWith('.docx')) {
-                                fileType = 'Document';
+                            formData.append('documentFile', newDocFile);
+                            
+                            // Determine document type
+                            const docName = newDocFile.name.toLowerCase();
+                            let docType = 'Document';
+                            if (docName.endsWith('.pdf')) {
+                                docType = 'PDF';
+                            } else if (docName.endsWith('.doc') || docName.endsWith('.docx')) {
+                                docType = 'Document';
                             }
-
-                            updatedData.fileSize = fileSize;
-                            updatedData.type = fileType;
-                            updatedData.fileName = newDocFile.name;
-                            updatedData.fileType = newDocFile.type;
-                            updatedData.fileData = fileData;
-                            updatedData.date = new Date().toLocaleDateString('en-US', {
-                                month: 'short',
-                                day: 'numeric',
-                                year: 'numeric'
-                            });
+                            formData.append('type', docType);
                         }
 
-                        // Update the content
-                        await updateContentData(currentViewingContentId, updatedData);
+                        // Send update to backend
+                        const response = await fetch(`${API_URL}/api/content/${currentViewingContentId}`, {
+                            method: 'PUT',
+                            body: formData
+                        });
 
-                        // REFRESH the dashboard recent list so it doesn't show old data
-                        syncRecentFromYourContent(); 
-                        refreshDashboardStats();
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.message || 'Update failed');
+                        }
+
+                        const result = await response.json();
+                        const updatedContent = result.content;
+
+                        // Update the item in our global array
+                        const index = allContentData.findIndex(item => item._id === currentViewingContentId || item.id === currentViewingContentId);
+                        if (index !== -1) {
+                            allContentData[index] = updatedContent;
+                        }
+
+                        filterAndRenderContent(); // Re-render list
+                        refreshCategoryCounts();
+
+                        // Get updated element for view refresh
+                        const contentElement = document.querySelector(`[data-id="${currentViewingContentId}"]`);
+
+                        // Reset button
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
 
                         // Show success popup
                         showSuccessPopup('Content updated successfully!');
 
-                        // Go back to detail view (updateContentData already refreshed it)
+                        // Go back to detail view and refresh it
+                        if (contentElement) {
+                            viewContentDetail(contentElement);
+                        }
                         document.getElementById('content-edit-form').style.display = 'none';
                         document.getElementById('content-detail-view').style.display = 'block';
 
                     } catch (error) {
                         console.error('Update failed:', error);
                         alert('Update failed: ' + error.message);
+                        
+                        // Reset button on error
+                        const submitBtn = editForm.querySelector('button[type="submit"]');
+                        submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+                        submitBtn.disabled = false;
                     }
                 });
             }
@@ -2949,41 +3270,20 @@
                         }
 
                         const result = await response.json();
-                        const contentId = result.content._id || result.content.id;
+                        const newContent = result.content;
 
-                        // Add new content to the list immediately
-                        const contentList = document.getElementById('content-items-container');
-                        if (contentList) {
-                            const newRow = document.createElement('div');
-                            newRow.className = 'content-item content-item-clickable';
-                            newRow.setAttribute('data-id', contentId);
-                            newRow.setAttribute('data-title', title);
-                            newRow.setAttribute('data-type', docType);
-                            newRow.setAttribute('data-size', docSize);
-                            newRow.setAttribute('data-date', today);
-                            newRow.setAttribute('data-status', 'Pending');
-                            newRow.setAttribute('data-category', category);
-                            newRow.setAttribute('data-description', description);
-                            newRow.onclick = function () { viewContentDetail(this); };
-
-                            newRow.innerHTML = `
-                                <div>
-                                    <div class="content-title">${title}</div>
-                                    <div class="content-meta">${docType} | ${docSize} | Modified: ${today}</div>
-                                </div>
-                                <div class="content-item-actions">
-                                    <span class="badge badge-warning">Pending</span>
-                                    <button class="delete-btn" onclick="event.stopPropagation(); deleteContent('${contentId}')" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            `;
-                            contentList.insertBefore(newRow, contentList.firstChild);
-                            // Sync Recent, Approvals, and dashboard stats to reflect newly uploaded item
-                            syncRecentFromYourContent();
-                            syncApprovalsFromYourContent();
-                            refreshDashboardStats();
-                        }
+                        newContent.author = localStorage.getItem('current_user') || 'Content Producer';
+                        console.log('Setting author for new content:', newContent.author);
+                        
+                        // Add to global data array
+                        allContentData.unshift(newContent); // Add to beginning of array
+                        filterAndRenderContent(); // Re-render list
+                        
+                        // Sync other parts
+                        syncRecentFromYourContent();
+                        syncApprovalsFromYourContent();
+                        refreshDashboardStats();
+                        refreshCategoryCounts();
 
                         // Reset button
                         submitBtn.innerHTML = originalText;
@@ -3041,8 +3341,7 @@
                     node.className = 'content-item content-item-clickable';
                     // Mirror data attributes so viewContentDetail can use them
                     const srcId = item.getAttribute('data-id') || item.dataset.id || '';
-                    // Use a distinct data-id for recent items so they are not removed when the original
-                    // content item is deleted/approved. Preserve original id in data-src-id for lookups.
+                    
                     node.setAttribute('data-src-id', srcId);
                     if (srcId) node.setAttribute('data-id', 'recent-' + srcId);
                     node.setAttribute('data-title', item.getAttribute('data-title') || title);
@@ -3053,8 +3352,12 @@
                     node.setAttribute('data-category', item.getAttribute('data-category') || item.dataset.category || '');
                     node.setAttribute('data-description', item.getAttribute('data-description') || item.dataset.description || '');
 
-                    // When clicked from Dashboard recent list, open preview overlay instead
-                    node.onclick = function () { openPreviewFromElement(this); };
+                    // UPDATED: Instead of opening the popup overlay, open the content-detail page
+                    node.onclick = function () { 
+                        if (srcId) {
+                            window.open(`content-detail.html?id=${srcId}`, '_blank'); 
+                        }
+                    };
 
                     node.innerHTML = `
                         <div>
@@ -3072,29 +3375,34 @@
             }
         }
 
-        // Sync pending items from 'Your Content' into the Approvals queue
         function syncApprovalsFromYourContent() {
             try {
                 const yourContainer = document.getElementById('content-items-container');
                 const approvalsContainer = document.getElementById('approvals-container');
+                const emptyState = document.getElementById('approvals-empty-state');
+
                 if (!yourContainer || !approvalsContainer) return;
 
-                // Clear current approvals list
+                // Clear current list
                 approvalsContainer.innerHTML = '';
 
                 const items = yourContainer.querySelectorAll('.content-item');
-                let added = 0;
+                let pendingCount = 0;
 
                 items.forEach(item => {
-                    const status = (item.getAttribute('data-status') || item.dataset.status || '').toString().toLowerCase();
+                    const status = (item.dataset.status || '').toLowerCase();
                     if (!status.includes('pending')) return;
 
-                    const title = item.getAttribute('data-title') || item.dataset.title || 'Untitled';
-                    const date = item.getAttribute('data-date') || item.dataset.date || '-';
-                    const category = item.getAttribute('data-category') || item.dataset.category || '-';
-                    const author = item.getAttribute('data-author') || item.dataset.author || localStorage.getItem('current_user') || 'Unknown';
-                    const id = item.getAttribute('data-id') || item.dataset.id || '';
-                    const description = item.getAttribute('data-description') || item.dataset.description || '';
+                    pendingCount++;
+
+                    const title       = item.dataset.title       || 'Untitled';
+                    const date        = item.dataset.date        || '-';
+                    const category    = item.dataset.category    || '-';
+                    const description = item.dataset.description || '';
+                    const id          = item.dataset.id          || '';
+
+
+                    let author = item.dataset.author || 'Unknown Producer';
 
                     const node = document.createElement('div');
                     node.className = 'content-item';
@@ -3109,7 +3417,9 @@
                     node.innerHTML = `
                         <div>
                             <div class="content-title">${title}</div>
-                            <div class="content-meta">Submitted by: ${author} | ${date} | Category: ${category}</div>
+                            <div class="content-meta">
+                                Submitted by: ${author} | ${date} | Category: ${category}
+                            </div>
                         </div>
                         <button class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;">
                             <i class="fas fa-eye"></i> Review
@@ -3126,13 +3436,32 @@
                     }
 
                     approvalsContainer.appendChild(node);
-                    added++;
                 });
 
-                // Update pending count and badges
-                updateApprovalsList();
+                // Update count in header
+                const pendingCountEl = document.getElementById('pending-count');
+                if (pendingCountEl) {
+                    pendingCountEl.textContent = pendingCount;
+                }
+
+                // Show/hide empty state
+                if (emptyState) {
+                    emptyState.style.display = pendingCount === 0 ? 'block' : 'none';
+                }
+
+                // Optional: update sidebar badge
+                const sidebarBadge = document.querySelector('#nav-approvals .badge');
+                if (sidebarBadge) {
+                    if (pendingCount > 0) {
+                        sidebarBadge.textContent = pendingCount;
+                        sidebarBadge.style.display = 'inline-block';
+                    } else {
+                        sidebarBadge.style.display = 'none';
+                    }
+                }
+
             } catch (e) {
-                console.error('syncApprovalsFromYourContent error:', e);
+                console.error('syncApprovalsFromYourContent failed:', e);
             }
         }
 
@@ -3275,7 +3604,118 @@
                 }
             } catch (e) {
                 console.error('refreshDashboardStats error:', e);
+
+                    // --- NEW FIX: Sync Local Edits to Dashboard ---
+                    async function applyLocalOverrides() {
+                        try {
+                            // 1. Get all your saved edits from the local database
+                            const localContents = await getStoredContents();
+                            if (!localContents || localContents.length === 0) return;
+
+                            // 2. Loop through every item currently visible on the screen
+                            const uiItems = document.querySelectorAll('.content-item[data-id]');
+                
+                            uiItems.forEach(item => {
+                                const id = item.getAttribute('data-id');
+                                // 3. Check if we have a newer version of this item in the database
+                                const localVersion = localContents.find(c => c.id === id || c._id === id);
+
+                                if (localVersion) {
+                                    // 4. FOUND ONE! Overwrite the stale HTML with the saved local data
+                        
+                                    // Update hidden data attributes (crucial for View Detail to work)
+                                    item.setAttribute('data-title', localVersion.title);
+                                    item.setAttribute('data-description', localVersion.description); // <--- This fixes your description bug
+                                    item.setAttribute('data-category', localVersion.category);
+                                    if (localVersion.date) item.setAttribute('data-date', localVersion.date);
+                                    if (localVersion.status) item.setAttribute('data-status', localVersion.status);
+
+                                    // Update visible text in the list
+                                    const titleEl = item.querySelector('.content-title');
+                                    if (titleEl) titleEl.textContent = localVersion.title;
+
+                                    const metaEl = item.querySelector('.content-meta');
+                                    if (metaEl) {
+                                        // Re-format the meta line
+                                        const type = localVersion.type || item.getAttribute('data-type');
+                                        const size = localVersion.fileSize || item.getAttribute('data-size');
+                                        const date = localVersion.date || item.getAttribute('data-date');
+                                        // Helper to reuse your existing formatting
+                                        const formattedSize = typeof formatFileSize === 'function' ? formatFileSize(size) : size;
+                                        const formattedDate = typeof formatToSGTime === 'function' ? formatToSGTime(date) : date;
+                            
+                                        metaEl.textContent = `${type} | ${formattedSize} | Modified: ${formattedDate}`;
+                                    }
+                        
+                                    // Update badge if status changed
+                                    const badge = item.querySelector('.badge');
+                                    if (badge && localVersion.status) {
+                                        badge.textContent = localVersion.status;
+                                        // Reset classes and apply correct color
+                                        badge.className = 'badge'; 
+                                        if(localVersion.status === 'Approved' || localVersion.status === 'Published') badge.classList.add('badge-success');
+                                        else if(localVersion.status === 'Rejected') badge.classList.add('badge-danger');
+                                        else badge.classList.add('badge-warning');
+                                    }
+                                }
+                            });
+                
+                            // 5. Refresh the "Recent Content" cards to reflect these changes
+                            syncRecentFromYourContent();
+
+                        } catch (e) {
+                            console.warn("Could not apply local overrides:", e);
+                        }
+                    }
             }
+        }
+
+        function refreshCategoryCounts() {
+            const container = document.getElementById('category-counts-container');
+            const emptyState = document.getElementById('category-empty-state');
+            if (!container) return;
+
+            // Clear previous badges (but keep empty state element)
+            Array.from(container.children).forEach(child => {
+                if (child.id !== 'category-empty-state') child.remove();
+            });
+
+            // Count categories from the main content list
+            const items = document.querySelectorAll('#content-items-container .content-item');
+            const categoryMap = new Map();
+
+            items.forEach(item => {
+                const cat = item.dataset.category || 'Uncategorized';
+                categoryMap.set(cat, (categoryMap.get(cat) || 0) + 1);
+            });
+
+            if (categoryMap.size === 0) {
+                if (emptyState) emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+
+            // Define badge styles (match your CSS classes)
+            const badgeStyles = {
+                'Environmental': 'env',
+                'Social': 'social',
+                'Governance': 'gov',
+                'Uncategorized': 'badge-secondary'  // fallback
+            };
+
+            // Render badges
+            categoryMap.forEach((count, category) => {
+                const badge = document.createElement('div');
+                badge.style.marginBottom = '15px';
+
+                const span = document.createElement('span');
+                span.className = `category-badge ${badgeStyles[category] || 'badge-secondary'}`;
+                span.textContent = `${category} (${count})`;
+
+                badge.appendChild(span);
+                container.appendChild(badge);
+            });
         }
     </script>
 </body>
