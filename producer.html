@@ -425,10 +425,7 @@
             try {
                 const response = await fetch(`${API_URL}/api/content/all`, {
                     method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + (localStorage.getItem('auth_token') || '')
-                    }
+                    headers: { 'Content-Type': 'application/json' }
                 });
 
                 if (!response.ok) {
@@ -592,10 +589,7 @@
             try {
                 const response = await fetch(`${API_URL}/api/content/${pendingDeleteId}`, {
                     method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + (localStorage.getItem('auth_token') || '')
-                    }
+                    headers: { 'Content-Type': 'application/json' }
                 });
                 
                 if (!response.ok) throw new Error('Delete failed');

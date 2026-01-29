@@ -262,13 +262,7 @@
             
             // Try to load media
             try {
-                const response = await fetch(`${EcoJourney.API_URL}/api/content/${contentId}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + (localStorage.getItem(EcoJourney.STORAGE_KEY) || '')
-                    }
-                });
+                const response = await fetch(`${EcoJourney.API_URL}/api/content/${contentId}`);
                 if (response.ok) {
                     const data = await response.json();
                     if (data && data.mediaData) {

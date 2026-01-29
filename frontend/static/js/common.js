@@ -1,10 +1,6 @@
 // EcoJourney CMS - Common JavaScript
 // API Configuration
-const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    ? 'http://localhost:8001'
-    : 'https://rpecocjourney-backend.onrender.com';
-console.log('API_URL set to:', API_URL);
-
+const API_URL = 'https://rpecocjourney-backend.onrender.com';
 const STORAGE_KEY = 'auth_token';
 
 // Global Variables
@@ -45,18 +41,7 @@ const ROLE_PERMISSIONS = {
 // Render Sidebar
 function renderSidebar(activePage) {
     console.log('[Sidebar] Applying role-based visibility...');
-    const rawRole = localStorage.getItem('user_role') || 'producer';
-    const roleMap = {
-        'producer': 'producer',
-        'content_producer': 'producer',
-        'manager': 'manager',
-        'content_manager': 'manager',
-        'admin': 'admin',
-        'administrator': 'admin'
-    };
-    const role = roleMap[rawRole] || 'producer';
-    // Persist normalized role for consistency
-    try { localStorage.setItem('user_role', role); } catch (e) {}
+    const role = localStorage.getItem('user_role') || 'producer';
     console.log('[Sidebar] User role:', role);
     
     // Show/hide nav items based on role
@@ -81,13 +66,12 @@ function renderSidebar(activePage) {
             navNotifications.style.display = '';  // Show with default display
             console.log('[Sidebar] Showing Notifications for producer');
         }
-    } else if (role === 'manager' || role === 'admin') {
+    } else if (role === 'manager') {
         if (navApprovals) {
             navApprovals.style.display = '';  // Show with default display
-            console.log('[Sidebar] Showing Approvals for role:', role);
+            console.log('[Sidebar] Showing Approvals for manager');
         }
-    }
-    if (role === 'admin') {
+    } else if (role === 'admin') {
         if (navAdmin) {
             navAdmin.style.display = '';  // Show with default display
             console.log('[Sidebar] Showing Administration for admin');
@@ -100,16 +84,7 @@ function renderSidebar(activePage) {
 // Update User Info in Topbar
 function updateUserInfo() {
     console.log('[UserInfo] Updating user info...');
-    const rawRole = localStorage.getItem('user_role') || 'producer';
-    const roleMap = {
-        'producer': 'producer',
-        'content_producer': 'producer',
-        'manager': 'manager',
-        'content_manager': 'manager',
-        'admin': 'admin',
-        'administrator': 'admin'
-    };
-    const role = roleMap[rawRole] || 'producer';
+    const role = localStorage.getItem('user_role') || 'producer';
     console.log('[UserInfo] Role:', role);
     
     const roleDisplayNames = {
@@ -286,9 +261,8 @@ async function loadStoredContents() {
     try {
         const response = await fetch(`${API_URL}/api/content/all`, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + (localStorage.getItem(STORAGE_KEY) || '')
+            headers: { 
+                'Content-Type': 'application/json'
             }
         });
         
