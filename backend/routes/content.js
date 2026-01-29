@@ -25,7 +25,7 @@ router.get('/all', async (req, res) => {
 });
 
 // Upload new content with Cloudinary (supports both media and document files)
-router.post('/upload', upload.fields([
+router.post('/upload', authMiddleware, upload.fields([
   { name: 'mediaFile', maxCount: 1 },
   { name: 'documentFile', maxCount: 1 }
 ]), async (req, res) => {
@@ -113,7 +113,7 @@ router.post('/upload', upload.fields([
       category: category,
       file: documentCloudURL || mediaCloudURL || 'no-file',
       status: 'pending',
-      creator: 'system',
+      creator: req.user ? req.user.id : 'system',
       fileData: documentCloudURL, // ✅ Cloudinary URL for document
       mediaData: mediaCloudURL, // ✅ Cloudinary URL for media
       fileSize: documentFile?.size || mediaFile?.size || 0,
@@ -347,7 +347,7 @@ router.post('/:id/approve', authMiddleware, contentManagerOnly, async (req, res)
     content.status = 'approved';
     await content.save();
 
-    await ContentApprovalWorkflow.create({
+    await ContentApproval.create({
       content: req.params.id,
       status: 'approved',
       approver: req.user.id,
@@ -356,19 +356,30 @@ router.post('/:id/approve', authMiddleware, contentManagerOnly, async (req, res)
 
     // Create notification for producer
     const Notification = require('../models/Notification');
-    await Notification.create({
-      recipient: content.creator,
-      recipientEmail: content.submittedBy,
-      content: req.params.id,
-      contentTitle: content.title,
-      type: 'approved',
-      message: `Your content "${content.title}" has been approved!`,
-      approverComments: comments || '',
-      approverName: req.user.name || 'Manager'
-    });
+    try {
+      await Notification.create({
+        recipient: content.creator || 'unknown',
+        recipientEmail: content.submittedBy || '',
+        content: req.params.id,
+        contentTitle: content.title,
+        type: 'approved',
+        message: `Your content "${content.title}" has been approved!`,
+        approverComments: comments || '',
+        approverName: req.user.name || 'Manager'
+      });
+    } catch (notificationError) {
+      console.error('Notification creation failed:', notificationError);
+      // Continue execution - do not fail the request just because notification failed
+    }
 
-    const creator = await require('../models/User').findById(content.creator);
-    await sendContentApprovedEmail(creator.email, content.title);
+    try {
+      const creator = await require('../models/User').findById(content.creator);
+      if (creator) {
+        await sendContentApprovedEmail(creator.email, content.title);
+      }
+    } catch (emailError) {
+      console.error('Email sending failed:', emailError);
+    }
 
     res.json({ message: 'Content approved', content });
   } catch (error) {
@@ -389,7 +400,7 @@ router.post('/:id/reject', authMiddleware, contentManagerOnly, async (req, res) 
     content.status = 'rejected';
     await content.save();
 
-    await ContentApprovalWorkflow.create({
+    await ContentApproval.create({
       content: req.params.id,
       status: 'rejected',
       approver: req.user.id,
@@ -398,19 +409,29 @@ router.post('/:id/reject', authMiddleware, contentManagerOnly, async (req, res) 
 
     // Create notification for producer
     const Notification = require('../models/Notification');
-    await Notification.create({
-      recipient: content.creator,
-      recipientEmail: content.submittedBy,
-      content: req.params.id,
-      contentTitle: content.title,
-      type: 'rejected',
-      message: `Your content "${content.title}" has been rejected.`,
-      approverComments: comments || 'No reason provided',
-      approverName: req.user.name || 'Manager'
-    });
+    try {
+      await Notification.create({
+        recipient: content.creator || 'unknown',
+        recipientEmail: content.submittedBy || '',
+        content: req.params.id,
+        contentTitle: content.title,
+        type: 'rejected',
+        message: `Your content "${content.title}" has been rejected.`,
+        approverComments: comments || 'No reason provided',
+        approverName: req.user.name || 'Manager'
+      });
+    } catch (notificationError) {
+      console.error('Notification creation failed:', notificationError);
+    }
 
-    const creator = await require('../models/User').findById(content.creator);
-    await sendContentRejectedEmail(creator.email, content.title, comments || 'No reason provided');
+    try {
+      const creator = await require('../models/User').findById(content.creator);
+      if (creator) {
+        await sendContentRejectedEmail(creator.email, content.title, comments || 'No reason provided');
+      }
+    } catch (emailError) {
+      console.error('Email sending failed:', emailError);
+    }
 
     res.json({ message: 'Content rejected', content });
   } catch (error) {

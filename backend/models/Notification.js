@@ -3,13 +3,13 @@ const mongoose = require('mongoose');
 const NotificationSchema = new mongoose.Schema(
   {
     recipient: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: String,
       ref: 'User',
       required: true
     },
     recipientEmail: String,
     content: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: String,
       ref: 'MultimediaContent',
       required: true
     },

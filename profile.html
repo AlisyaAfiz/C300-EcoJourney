@@ -383,7 +383,10 @@
             try {
                 const response = await fetch(`${EcoJourney.API_URL}/api/content/all`, {
                     method: 'GET',
-                    headers: { 'Content-Type': 'application/json' }
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + (localStorage.getItem(EcoJourney.STORAGE_KEY) || '')
+                    }
                 });
                 
                 if (!response.ok) {

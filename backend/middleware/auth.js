@@ -19,7 +19,7 @@ const authMiddleware = (req, res, next) => {
 
 // Content manager only middleware
 const contentManagerOnly = (req, res, next) => {
-  if (req.user && (req.user.role === 'manager' || req.user.role === 'admin')) {
+  if (req.user && (req.user.role === 'manager' || req.user.role === 'content_manager' || req.user.role === 'admin')) {
     next();
   } else {
     res.status(403).json({ message: 'Access denied. Content managers only.' });

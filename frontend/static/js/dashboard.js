@@ -1,7 +1,34 @@
 // Dashboard JavaScript
 
-const API_BASE_URL = '/api';
-const STORAGE_KEY = 'auth_token';
+// Use global EcoJourney config if available, otherwise fallback
+const API_BASE_URL = window.EcoJourney ? window.EcoJourney.API_URL : 'http://localhost:8001';
+const STORAGE_KEY = window.EcoJourney ? window.EcoJourney.STORAGE_KEY : 'auth_token';
+
+// Helper for API calls
+async function fetchAPI(endpoint, method = 'GET', body = null) {
+    const token = localStorage.getItem(STORAGE_KEY);
+    const headers = {
+        'Content-Type': 'application/json'
+    };
+    
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    const config = {
+        method,
+        headers
+    };
+    
+    if (body) {
+        config.body = JSON.stringify(body);
+    }
+    
+    // Remove leading slash if present to avoid double slashes with API_BASE_URL
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
+    
+    return fetch(`${API_BASE_URL}/api/${cleanEndpoint}`, config);
+}
 
 // User Data
 let currentUser = null;
@@ -288,7 +315,7 @@ async function handleContentUpload(e) {
     formData.append('tags_list', tags.split(',').map(t => t.trim()));
     
     try {
-        const response = await fetch(`${API_BASE_URL}/content/`, {
+        const response = await fetch(`${API_BASE_URL}/api/content/`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
