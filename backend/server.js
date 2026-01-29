@@ -5,6 +5,21 @@ require('dotenv').config();
 
 const app = express();
 
+// Environment diagnostics for production stability
+console.log('🔍 Environment Diagnostic Report:');
+console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+if (process.env.JWT_SECRET) {
+    console.log('✅ JWT_SECRET: Configured');
+} else {
+    console.error('❌ JWT_SECRET: NOT CONFIGURED - Authentication will fail');
+}
+if (process.env.MONGODB_URI) {
+    console.log('✅ MONGODB_URI: Configured');
+} else {
+    console.warn('⚠️  MONGODB_URI: Using default local database');
+}
+console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
 // Connect to MongoDB using environment variable
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/ecojourney';
 

@@ -20,6 +20,16 @@ router.post('/register', [
       return res.status(400).json({ errors: errors.array() });
     }
 
+    // Validate JWT_SECRET before proceeding
+    if (!process.env.JWT_SECRET) {
+      console.error('❌ JWT_SECRET environment variable is not configured');
+      console.error('⚠️  Environment check: Missing required variables for token generation');
+      return res.status(500).json({ 
+        message: 'Server misconfigured: Authentication system not properly initialized',
+        details: 'JWT_SECRET is missing from environment configuration' 
+      });
+    }
+
     const { username, email, password, firstName, lastName } = req.body;
 
     // Check if user already exists
@@ -47,7 +57,14 @@ router.post('/register', [
       user: user.toJSON(),
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error('❌ Registration error:', error.message);
+    if (error.message.includes('JWT')) {
+      return res.status(500).json({ 
+        message: 'Authentication system error during registration',
+        details: error.message 
+      });
+    }
+    res.status(500).json({ message: 'Registration failed', error: error.message });
   }
 });
 
@@ -59,6 +76,16 @@ router.post('/login', [
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
+    }
+
+    // Validate JWT_SECRET before proceeding
+    if (!process.env.JWT_SECRET) {
+      console.error('❌ JWT_SECRET environment variable is not configured');
+      console.error('⚠️  Environment check: Missing required variables for token generation');
+      return res.status(500).json({ 
+        message: 'Server misconfigured: Authentication system not properly initialized',
+        details: 'JWT_SECRET is missing from environment configuration' 
+      });
     }
 
     const { email, username, password } = req.body;
@@ -107,7 +134,14 @@ router.post('/login', [
       user: user.toJSON(),
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error('❌ Login error:', error.message);
+    if (error.message.includes('JWT')) {
+      return res.status(500).json({ 
+        message: 'Authentication system error during login',
+        details: error.message 
+      });
+    }
+    res.status(500).json({ message: 'Login failed', error: error.message });
   }
 });
 

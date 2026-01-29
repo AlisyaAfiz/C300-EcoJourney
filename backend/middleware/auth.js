@@ -1,5 +1,16 @@
 const jwt = require('jsonwebtoken');
 
+// Get JWT secret with validation
+const getJwtSecret = () => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    console.error('❌ CRITICAL: JWT_SECRET is not configured in environment variables');
+    console.error('⚠️  This will cause authentication failures across the application');
+    throw new Error('JWT_SECRET not configured');
+  }
+  return secret;
+};
+
 // Basic auth middleware
 const authMiddleware = (req, res, next) => {
   try {
@@ -9,10 +20,19 @@ const authMiddleware = (req, res, next) => {
       return res.status(401).json({ message: 'No token provided' });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    // Use unified secret handling
+    const secret = getJwtSecret();
+    const decoded = jwt.verify(token, secret);
     req.user = decoded;
     next();
   } catch (error) {
+    if (error.message.includes('JWT_SECRET')) {
+      console.error('❌ Authentication middleware error:', error.message);
+      return res.status(500).json({ 
+        message: 'Server misconfigured: Authentication system not available',
+        details: 'JWT_SECRET is missing from environment configuration'
+      });
+    }
     return res.status(401).json({ message: 'Invalid token' });
   }
 };
