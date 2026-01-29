@@ -29,7 +29,6 @@
                 </a>
                 <a href="manager.html" class="nav-link active" id="nav-approvals">
                     <i class="fas fa-check-circle"></i> Approvals
-                    <span class="badge bg-danger rounded-pill ms-2" id="approvals-badge" style="display: none;">0</span>
                 </a>
                 <a href="admin.html" class="nav-link" id="nav-admin" style="display: none;">
                     <i class="fas fa-cog"></i> Administration
@@ -173,18 +172,6 @@
         // Manager page specific JavaScript
         let allContent = [];
         let currentReviewContent = null;
-
-        function updateApprovalsBadge(count) {
-            const badge = document.getElementById('approvals-badge');
-            if (!badge) return;
-
-            if (count > 0) {
-                badge.textContent = count;
-                badge.style.display = 'inline-block';
-            } else {
-                badge.style.display = 'none';
-            }
-        }
         
         async function loadApprovals() {
             console.log('[Manager] Starting approvals load...');
@@ -223,11 +210,6 @@
             );
             
             container.innerHTML = '';
-
-            const pendingCount = pendingItems.length;
-    
-            // Update badge in sidebar
-            updateApprovalsBadge(pendingCount);
             
             if (countEl) countEl.textContent = pendingItems.length;
             
@@ -280,13 +262,7 @@
             
             // Try to load media
             try {
-                const response = await fetch(`${EcoJourney.API_URL}/api/content/${contentId}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + (localStorage.getItem(EcoJourney.STORAGE_KEY) || '')
-                    }
-                });
+                const response = await fetch(`${EcoJourney.API_URL}/api/content/${contentId}`);
                 if (response.ok) {
                     const data = await response.json();
                     if (data && data.mediaData) {

@@ -3,205 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notifications - EcoJourney CMS</title>
+    <title>EcoJourney CMS - Notifications</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="frontend/static/css/style.css">
     <style>
-        /* Notifications Page Specific Styles */
-        .notification-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .notification-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.25rem;
-            border: 1px solid #eef2f7;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-            transition: all 0.2s ease;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            gap: 1.25rem;
-        }
-
-        .notification-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.06);
-            border-color: #e0e6ed;
-        }
-
-        .notification-card.unread {
-            background-color: #f8fbff;
-            border-left: 4px solid #3498db;
-        }
-
-        .notification-card.read {
-            border-left: 4px solid #eef2f7;
-            opacity: 0.85;
-        }
-
-        .notification-card.read:hover {
-            opacity: 1;
-        }
-
-        /* Status Colors */
-        .status-indicator {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            flex-shrink: 0;
-        }
-
-        .status-approved { background: rgba(46, 204, 113, 0.1); color: #2ecc71; }
-        .status-rejected { background: rgba(231, 76, 60, 0.1); color: #e74c3c; }
-        .status-info { background: rgba(52, 152, 219, 0.1); color: #3498db; }
-        .status-warning { background: rgba(241, 196, 15, 0.1); color: #f1c40f; }
-
-        .notification-content {
-            flex: 1;
-            min-width: 0; /* Prevent flex overflow */
-        }
-
-        .notification-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 0.5rem;
-        }
-
-        .notification-title {
-            font-weight: 600;
-            color: #2c3e50;
-            font-size: 1.05rem;
-            margin: 0;
-        }
-
-        .notification-time {
-            font-size: 0.85rem;
-            color: #95a5a6;
-            white-space: nowrap;
-            margin-left: 1rem;
-        }
-
-        .notification-body {
-            color: #576574;
-            font-size: 0.95rem;
-            line-height: 1.5;
-            margin-bottom: 0.75rem;
-        }
-
-        .approver-comment {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 0.75rem 1rem;
-            margin-top: 0.75rem;
-            border-left: 3px solid #dfe6e9;
-            font-size: 0.9rem;
-            color: #636e72;
-        }
-
-        .notification-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-            opacity: 0.8;
-            transition: opacity 0.2s;
-        }
-
-        .notification-card:hover .notification-actions {
-            opacity: 1;
-        }
-
-        /* Toolbar */
-        .toolbar {
-            background: white;
-            padding: 1rem;
-            border-radius: 12px;
-            margin-bottom: 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .filter-group {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .filter-btn {
-            padding: 0.4rem 1rem;
-            border-radius: 20px;
-            border: 1px solid #e0e6ed;
-            background: white;
-            color: #636e72;
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .filter-btn:hover {
-            background: #f8f9fa;
-            color: #2d3436;
-        }
-
-        .filter-btn.active {
-            background: #3498db;
-            color: white;
-            border-color: #3498db;
-            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
-        }
-
-        /* Loading & Empty States */
-        .state-container {
-            text-align: center;
-            padding: 4rem 2rem;
-            color: #95a5a6;
-        }
-
-        .state-icon {
-            font-size: 4rem;
-            margin-bottom: 1.5rem;
-            color: #dcdde1;
-        }
-
-        .loading-spinner {
-            width: 3rem;
-            height: 3rem;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1.5rem;
-        }
-
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Badges */
-        .badge-new {
-            background: #e74c3c;
-            color: white;
-            font-size: 0.7rem;
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-left: 8px;
-            vertical-align: middle;
-            font-weight: 600;
-            text-transform: uppercase;
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -221,19 +30,11 @@
                 <a href="index.html" class="nav-link">
                     <i class="fas fa-chart-line"></i> Dashboard
                 </a>
-                <a href="producer.html" class="nav-link" id="nav-content">
+                <a href="producer.html" class="nav-link">
                     <i class="fas fa-file-upload"></i> My Content
                 </a>
                 <a href="notifications.html" class="nav-link active" id="nav-notifications">
                     <i class="fas fa-bell"></i> Notifications
-                    <span class="badge bg-danger rounded-pill ms-auto" id="nav-badge" style="display:none">0</span>
-                </a>
-                <a href="manager.html" class="nav-link active" id="nav-approvals">
-                    <i class="fas fa-check-circle"></i> Approvals
-                    <span class="badge bg-danger rounded-pill ms-2" id="approvals-badge" style="display: none;">0</span>
-                </a>
-                <a href="admin.html" class="nav-link" id="nav-admin" style="display: none;">
-                    <i class="fas fa-cog"></i> Administration
                 </a>
                 <a href="profile.html" class="nav-link">
                     <i class="fas fa-user"></i> Profile
@@ -252,7 +53,7 @@
             <!-- Top Navigation Bar -->
             <nav class="topbar">
                 <div class="topbar-left">
-                    <h4><i class="fas fa-bell me-2"></i>Notifications</h4>
+                    <h4>Notifications</h4>
                 </div>
 
                 <div class="topbar-right">
@@ -268,28 +69,34 @@
 
             <!-- Main Content Area -->
             <div class="main-content">
-                <!-- Toolbar -->
-                <div class="toolbar">
-                    <div class="filter-group">
-                        <button class="filter-btn active" onclick="setFilter('all')">All</button>
-                        <button class="filter-btn" onclick="setFilter('unread')">Unread</button>
-                        <button class="filter-btn" onclick="setFilter('approved')">Approved</button>
-                        <button class="filter-btn" onclick="setFilter('rejected')">Rejected</button>
-                    </div>
-                    
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-outline-primary btn-sm" onclick="markAllRead()">
-                            <i class="fas fa-check-double me-1"></i> Mark All Read
-                        </button>
-                        <button class="btn btn-outline-secondary btn-sm" onclick="refreshData()">
-                            <i class="fas fa-sync-alt me-1"></i> Refresh
-                        </button>
-                    </div>
+                <h1 class="page-title">Your Notifications</h1>
+                <p class="page-subtitle">Track updates on your submitted content</p>
+
+                <!-- Filter Buttons -->
+                <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-sm" style="background: #2ecc71; color: white;" onclick="filterNotifications('all')">
+                        <i class="fas fa-list"></i> All
+                    </button>
+                    <button class="btn btn-sm" style="background: #3498db; color: white;" onclick="filterNotifications('approved')">
+                        <i class="fas fa-check"></i> Approved
+                    </button>
+                    <button class="btn btn-sm" style="background: #e74c3c; color: white;" onclick="filterNotifications('rejected')">
+                        <i class="fas fa-times"></i> Rejected
+                    </button>
+                    <button class="btn btn-sm" style="background: #95a5a6; color: white;" onclick="markAllAsRead()">
+                        <i class="fas fa-envelope-open"></i> Mark All as Read
+                    </button>
+                    <button class="btn btn-sm" style="background: #16a085; color: white;" onclick="loadNotifications()">
+                        <i class="fas fa-sync"></i> Refresh
+                    </button>
                 </div>
 
                 <!-- Notifications Container -->
                 <div id="notifications-container">
-                    <!-- Content will be injected here -->
+                    <div class="text-center p-5 text-muted">
+                        <i class="fas fa-spinner fa-spin fa-3x mb-3"></i>
+                        <p>Loading notifications...</p>
+                    </div>
                 </div>
             </div>
         </main>
@@ -307,360 +114,422 @@
         </div>
     </div>
 
+    <style>
+        .notification-item {
+            background: white;
+            border: 1px solid #ecf0f1;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+            transition: all 0.3s ease;
+            border-left: 4px solid #3498db;
+        }
+
+        .notification-item.unread {
+            background: #f0f9ff;
+            border-left-color: #2ecc71;
+        }
+
+        .notification-item.approved {
+            border-left-color: #2ecc71;
+        }
+
+        .notification-item.rejected {
+            border-left-color: #e74c3c;
+        }
+
+        .notification-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .notification-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .notification-icon.approved {
+            background: #2ecc71;
+        }
+
+        .notification-icon.rejected {
+            background: #e74c3c;
+        }
+
+        .notification-icon.pending {
+            background: #f39c12;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+
+        .notification-message {
+            color: #5a6c7d;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .notification-comments {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 6px;
+            border-left: 3px solid #3498db;
+            margin: 10px 0;
+            font-size: 13px;
+            color: #555;
+            font-style: italic;
+        }
+
+        .notification-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+            color: #7f8c8d;
+            flex-wrap: wrap;
+        }
+
+        .notification-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .notification-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .notification-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .notification-btn-view {
+            background: #3498db;
+            color: white;
+        }
+
+        .notification-btn-view:hover {
+            background: #2980b9;
+        }
+
+        .notification-btn-delete {
+            background: #ecf0f1;
+            color: #e74c3c;
+        }
+
+        .notification-btn-delete:hover {
+            background: #bdc3c7;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .empty-state i {
+            font-size: 80px;
+            color: #bdc3c7;
+            margin-bottom: 20px;
+            opacity: 0.7;
+        }
+
+        .empty-state h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .empty-state p {
+            color: #7f8c8d;
+            font-size: 16px;
+            margin: 0;
+        }
+
+        /* Success Popup Styles */
+        .success-popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .success-popup-overlay.show {
+            display: flex;
+        }
+
+        .success-popup {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.4s ease;
+        }
+
+        .success-popup-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: scaleUp 0.5s ease;
+        }
+
+        .success-popup-icon i {
+            color: white;
+            font-size: 40px;
+        }
+
+        .success-popup h3 {
+            color: #2c3e50;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .success-popup p {
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+
+        .success-popup-btn {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            border: none;
+            padding: 12px 40px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .success-popup-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(46, 204, 113, 0.4);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleUp {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .unread-badge {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #2ecc71;
+            margin-right: 8px;
+        }
+    </style>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="frontend/static/js/common.js"></script>
     
     <script>
-        // State Management
-        let state = {
-            notifications: [],
-            filter: 'all',
-            loading: true,
-            error: null
-        };
+    let allNotifications = [];
+    let currentFilter = 'all';
 
-        // Constants
-        // Use existing API_URL from common.js if available, otherwise fallback
-        const BASE_API_URL = (typeof API_URL !== 'undefined') 
-            ? API_URL 
-            : ((typeof EcoJourney !== 'undefined' && EcoJourney.API_URL) ? EcoJourney.API_URL : 'http://localhost:8001');
+    // Use the central API URL from common.js
+    const API_URL = EcoJourney.API_URL || 'https://rpecocjourney-backend.onrender.com';
 
-        // Initialize Page
-        window.addEventListener('DOMContentLoaded', () => {
-            console.log('[Notifications] Page initializing...');
-            
-            // Check auth first
-            if (typeof checkAuth === 'function') {
-                if (!checkAuth()) return;
-            } else if (typeof EcoJourney !== 'undefined' && EcoJourney.checkAuth) {
-                if (!EcoJourney.checkAuth()) return;
-            } else {
-                // Fallback auth check
-                if (!localStorage.getItem('auth_token')) {
-                    window.location.href = 'login.html';
-                    return;
-                }
+    async function loadNotifications() {
+        try {
+            const token = localStorage.getItem('auth_token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
             }
 
-            if (typeof renderSidebar === 'function') {
-                renderSidebar('notifications');
-            } else if (typeof EcoJourney !== 'undefined' && EcoJourney.renderSidebar) {
-                EcoJourney.renderSidebar('notifications');
-            }
-
-            // Initial Load
-            loadNotifications();
-
-            // Auto-refresh every 60 seconds
-            setInterval(() => loadNotifications(true), 60000);
-        });
-
-        // Fetch Data
-        async function loadNotifications(silent = false) {
-            if (!silent) {
-                setLoading(true);
-            }
-
-            try {
-                const token = localStorage.getItem('auth_token');
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
-
-                const response = await fetch(`${BASE_API_URL}/api/notifications`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    signal: controller.signal
-                });
-
-                clearTimeout(timeoutId);
-
-                if (response.status === 401) {
-                    if (EcoJourney.logout) EcoJourney.logout();
-                    return;
-                }
-
-                if (!response.ok) {
-                    throw new Error(`Server returned ${response.status}: ${response.statusText}`);
-                }
-
-                const data = await response.json();
-                
-                state.notifications = Array.isArray(data) ? data : [];
-                state.error = null;
-                
-                // Update Badge
-                updateUnreadBadge();
-
-            } catch (err) {
-                console.error('[Notifications] Load error:', err);
-                state.error = err.message;
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        // UI Rendering
-        function render() {
+            // Only show the spinner on the first load
             const container = document.getElementById('notifications-container');
-            
-            // 1. Loading State
-            if (state.loading && state.notifications.length === 0) {
+            if (allNotifications.length === 0) {
                 container.innerHTML = `
-                    <div class="state-container">
-                        <div class="loading-spinner"></div>
-                        <h4>Loading Notifications...</h4>
-                        <p>Fetching your latest updates</p>
+                    <div class="empty-state">
+                        <div style="font-size: 60px; color: #2ecc71; animation: spin 2s linear infinite; margin-bottom: 20px;">
+                            <i class="fas fa-spinner"></i>
+                        </div>
+                        <h4>Loading...</h4>
+                        <p>Checking for new updates</p>
+                    </div>
+                `;
+            }
+
+            // Fetch with timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+            const response = await fetch(`${API_URL}/api/notifications`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+
+            if (!response.ok) throw new Error('Could not reach server');
+
+            allNotifications = await response.json();
+            
+            // "dh" check: if fetch is finished and no notifications, show empty state
+            if (!allNotifications || allNotifications.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div style="font-size: 80px; color: #bdc3c7; margin-bottom: 20px; opacity: 0.7;">
+                            <i class="fas fa-bell-slash"></i>
+                        </div>
+                        <h4>No notifications (dh)</h4>
+                        <p>You're all caught up! Check back later.</p>
                     </div>
                 `;
                 return;
             }
-
-            // 2. Error State
-            if (state.error) {
-                container.innerHTML = `
-                    <div class="state-container">
-                        <i class="fas fa-exclamation-circle state-icon" style="color: #e74c3c"></i>
-                        <h4>Unable to Load Notifications</h4>
-                        <p class="text-danger mb-3">${state.error}</p>
-                        <button class="btn btn-primary" onclick="loadNotifications()">
-                            <i class="fas fa-redo me-2"></i> Try Again
+            
+            renderNotifications();
+        } catch (error) {
+            console.error('Error:', error);
+            // If it's already loading and fails, show error state
+            if (allNotifications.length === 0) {
+                document.getElementById('notifications-container').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-circle" style="color: #e74c3c; font-size: 80px;"></i>
+                        <h4 class="mt-3">Connection Issue</h4>
+                        <p>Unable to load notifications. Please check your internet.</p>
+                        <button class="btn btn-primary mt-3" onclick="loadNotifications()" style="background: #2ecc71; border: none;">
+                            <i class="fas fa-sync"></i> Retry
                         </button>
                     </div>
                 `;
-                return;
             }
+        }
+    }
 
-            // 3. Filter Data
-            const filtered = filterNotifications();
-
-            // 4. Empty State
-            if (filtered.length === 0) {
-                const emptyMessages = {
-                    'all': 'You have no notifications yet.',
-                    'unread': 'You are all caught up!',
-                    'approved': 'No approved content notifications.',
-                    'rejected': 'No rejected content notifications.'
-                };
-                
-                container.innerHTML = `
-                    <div class="state-container">
-                        <i class="far fa-bell-slash state-icon"></i>
-                        <h4>No Notifications</h4>
-                        <p>${emptyMessages[state.filter] || 'No notifications found.'}</p>
-                    </div>
-                `;
-                return;
-            }
-
-            // 5. Data List
-            container.innerHTML = `<div class="notification-list">
-                ${filtered.map(n => createNotificationCard(n)).join('')}
-            </div>`;
+    function renderNotifications() {
+        const container = document.getElementById('notifications-container');
+        let filtered = allNotifications;
+        if (currentFilter !== 'all') {
+            filtered = allNotifications.filter(n => n.type === currentFilter);
         }
 
-        function createNotificationCard(notification) {
-            const isUnread = !notification.read;
-            const type = notification.type || 'info';
-            const date = new Date(notification.createdAt);
-            const timeAgo = getTimeAgo(date);
-            const fullDate = date.toLocaleString('en-SG', { 
-                day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
-            });
+        if (filtered.length === 0) {
+            container.innerHTML = `<div class="empty-state"><h4>No notifications found in this category.</h4></div>`;
+            return;
+        }
 
-            // Status Config
-            const config = {
-                approved: { icon: 'fa-check', class: 'status-approved', title: 'Content Approved' },
-                rejected: { icon: 'fa-times', class: 'status-rejected', title: 'Content Rejected' },
-                info: { icon: 'fa-info', class: 'status-info', title: 'Information' }
-            };
-            
-            const statusCfg = config[type] || config.info;
-
-            return `
-                <div class="notification-card ${isUnread ? 'unread' : 'read'}" data-id="${notification._id}">
-                    <div class="status-indicator ${statusCfg.class}">
-                        <i class="fas ${statusCfg.icon}"></i>
+        container.innerHTML = filtered.map(notification => `
+            <div class="notification-item ${notification.read ? '' : 'unread'} ${notification.type}">
+                <div class="notification-icon ${notification.type}">
+                    ${notification.type === 'approved' ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>'}
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">
+                        ${notification.read ? '' : '<span class="unread-badge"></span>'}
+                        ${notification.type === 'approved' ? '✓ Content Approved' : '✗ Content Rejected'}
                     </div>
-                    
-                    <div class="notification-content">
-                        <div class="notification-header">
-                            <h5 class="notification-title">
-                                ${statusCfg.title}
-                                ${isUnread ? '<span class="badge-new">NEW</span>' : ''}
-                            </h5>
-                            <span class="notification-time" title="${fullDate}">${timeAgo}</span>
-                        </div>
-                        
-                        <div class="notification-body">
-                            <strong>${escapeHtml(notification.contentTitle || 'Untitled')}</strong>
-                            <br>
-                            ${escapeHtml(notification.message)}
-                        </div>
-
-                        ${notification.approverComments ? `
-                            <div class="approver-comment">
-                                <i class="fas fa-quote-left me-2 opacity-50"></i>
-                                <strong>${escapeHtml(notification.approverName || 'Manager')}:</strong> 
-                                ${escapeHtml(notification.approverComments)}
-                            </div>
-                        ` : ''}
-
-                        <div class="notification-actions">
-                            ${isUnread ? `
-                                <button class="btn btn-sm btn-light text-primary" onclick="markAsRead('${notification._id}')">
-                                    <i class="fas fa-check me-1"></i> Mark Read
-                                </button>
-                            ` : ''}
-                            <button class="btn btn-sm btn-light text-danger" onclick="deleteNotification('${notification._id}')">
-                                <i class="fas fa-trash me-1"></i> Delete
-                            </button>
-                        </div>
+                    <div class="notification-message"><strong>${notification.contentTitle}</strong></div>
+                    <div class="notification-message">${notification.message}</div>
+                    ${notification.approverComments ? `<div class="notification-comments"><strong>${notification.approverName}:</strong> ${notification.approverComments}</div>` : ''}
+                    <div class="notification-meta">
+                        <div class="notification-meta-item"><i class="fas fa-calendar"></i> ${new Date(notification.createdAt).toLocaleDateString('en-SG')}</div>
+                        <div class="notification-meta-item"><i class="fas fa-user"></i> From: ${notification.approverName}</div>
+                    </div>
+                    <div class="notification-actions">
+                        <button class="notification-btn notification-btn-view" onclick="markAsReadAndView('${notification._id}')">Mark as Read</button>
+                        <button class="notification-btn notification-btn-delete" onclick="deleteNotification('${notification._id}')">Delete</button>
                     </div>
                 </div>
-            `;
-        }
+            </div>
+        `).join('');
+    }
 
-        // Helpers
-        function setLoading(isLoading) {
-            state.loading = isLoading;
-            if (isLoading) render(); // Show loading immediately
-            else render(); // Render data/error when done
-        }
+    // Standard Success Popup Logic
+    function closeSuccessPopup() { document.getElementById('successPopup').classList.remove('show'); }
 
-        function setFilter(filterType) {
-            state.filter = filterType;
-            
-            // Update buttons
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                if (btn.textContent.toLowerCase() === filterType || 
-                   (filterType === 'all' && btn.textContent === 'All')) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
+    // Initialize Page
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. Name fix: initializePage triggers updateUserInfo() from common.js
+        EcoJourney.initializePage('notifications');
+        
+        // 2. Extra trigger to ensure topbar names/initials are correct immediately
+        EcoJourney.updateUserInfo();
+
+        // 3. Load notifications
+        loadNotifications();
+        setInterval(loadNotifications, 30000); // Check every 30s
+
+        // 4. Logout fix: Ensure button uses the EcoJourney.logout central helper
+        const logoutBtn = document.getElementById('logout-btn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                EcoJourney.logout();
             });
-            
-            render();
         }
-
-        function filterNotifications() {
-            let list = [...state.notifications];
-            
-            // Sort by newest first
-            list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-            if (state.filter === 'all') return list;
-            if (state.filter === 'unread') return list.filter(n => !n.read);
-            
-            return list.filter(n => n.type === state.filter);
-        }
-
-        function updateUnreadBadge() {
-            const unreadCount = state.notifications.filter(n => !n.read).length;
-            const badge = document.getElementById('nav-badge');
-            if (badge) {
-                if (unreadCount > 0) {
-                    badge.textContent = unreadCount;
-                    badge.style.display = 'inline-block';
-                } else {
-                    badge.style.display = 'none';
-                }
-            }
-        }
-
-        function refreshData() {
-            loadNotifications(false);
-        }
-
-        function escapeHtml(text) {
-            if (!text) return '';
-            return text
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
-        function getTimeAgo(date) {
-            const seconds = Math.floor((new Date() - date) / 1000);
-            let interval = seconds / 31536000;
-            if (interval > 1) return Math.floor(interval) + " years ago";
-            interval = seconds / 2592000;
-            if (interval > 1) return Math.floor(interval) + " months ago";
-            interval = seconds / 86400;
-            if (interval > 1) return Math.floor(interval) + " days ago";
-            interval = seconds / 3600;
-            if (interval > 1) return Math.floor(interval) + " hours ago";
-            interval = seconds / 60;
-            if (interval > 1) return Math.floor(interval) + " mins ago";
-            return "Just now";
-        }
-
-        // Actions
-        async function markAsRead(id) {
-            try {
-                const token = localStorage.getItem('auth_token');
-                await fetch(`${BASE_API_URL}/api/notifications/${id}/read`, {
-                    method: 'PATCH',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                
-                // Optimistic update
-                const notif = state.notifications.find(n => n._id === id);
-                if (notif) notif.read = true;
-                
-                render();
-                updateUnreadBadge();
-                
-            } catch (error) {
-                console.error('Failed to mark read:', error);
-            }
-        }
-
-        async function markAllRead() {
-            try {
-                const token = localStorage.getItem('auth_token');
-                const response = await fetch(`${BASE_API_URL}/api/notifications/read/all`, {
-                    method: 'PATCH',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                if (response.ok) {
-                    state.notifications.forEach(n => n.read = true);
-                    render();
-                    updateUnreadBadge();
-                    if (EcoJourney.showSuccessPopup) {
-                        EcoJourney.showSuccessPopup('All notifications marked as read');
-                    }
-                }
-            } catch (error) {
-                console.error('Failed to mark all read:', error);
-            }
-        }
-
-        async function deleteNotification(id) {
-            if (!confirm('Are you sure you want to delete this notification?')) return;
-
-            try {
-                const token = localStorage.getItem('auth_token');
-                const response = await fetch(`${BASE_API_URL}/api/notifications/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                if (response.ok) {
-                    state.notifications = state.notifications.filter(n => n._id !== id);
-                    render();
-                    updateUnreadBadge();
-                }
-            } catch (error) {
-                console.error('Failed to delete:', error);
-            }
-        }
-    </script>
+    });
+</script>
 </body>
 </html>
