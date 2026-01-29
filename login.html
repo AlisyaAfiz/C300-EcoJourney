@@ -374,11 +374,6 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    // Validate token received
-                    if (!data.token) {
-                        throw new Error('Server returned no authentication token');
-                    }
-
                     // Store auth data
                     localStorage.setItem(STORAGE_KEY, data.token);
                     localStorage.setItem('current_user', data.user.username); // Keep for compatibility
@@ -402,29 +397,13 @@
                         window.location.href = 'index.html';
                     }, 1000);
                 } else {
-                    // Handle specific error cases
-                    if (response.status === 500) {
-                        throw new Error(data.details || data.message || 'Server error - please contact support');
-                    } else if (response.status === 403) {
-                        throw new Error(data.message || 'Account locked - too many login attempts');
-                    } else if (response.status === 401) {
-                        throw new Error('Invalid username or password');
-                    }
                     throw new Error(data.message || 'Login failed');
                 }
             } catch (error) {
-                console.error('❌ Login error:', error);
+                console.error('Login error:', error);
                 loginAlert.classList.remove('d-none');
                 loginAlert.classList.add('alert-danger');
-                
-                // Provide user-friendly error messages
-                if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-                    loginAlert.textContent = 'Network error - Unable to reach server. Please check your connection and try again.';
-                } else if (error.message.includes('Authentication system not available')) {
-                    loginAlert.textContent = 'Backend server is not properly configured. Please contact support.';
-                } else {
-                    loginAlert.textContent = error.message || 'An error occurred during login. Please try again.';
-                }
+                loginAlert.textContent = error.message || 'An error occurred during login. Please ensure the backend is running.';
                 
                 // Reset button
                 loginBtn.disabled = false;

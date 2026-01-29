@@ -47,14 +47,7 @@ router.post('/register', [
       user: user.toJSON(),
     });
   } catch (error) {
-    console.error('❌ Registration error:', error.message);
-    if (error.message.includes('JWT')) {
-      return res.status(500).json({ 
-        message: 'Authentication system error during registration',
-        details: error.message 
-      });
-    }
-    res.status(500).json({ message: 'Registration failed', error: error.message });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
@@ -114,14 +107,7 @@ router.post('/login', [
       user: user.toJSON(),
     });
   } catch (error) {
-    console.error('❌ Login error:', error.message);
-    if (error.message.includes('JWT')) {
-      return res.status(500).json({ 
-        message: 'Authentication system error during login',
-        details: error.message 
-      });
-    }
-    res.status(500).json({ message: 'Login failed', error: error.message });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
