@@ -20,16 +20,6 @@ router.post('/register', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    // Validate JWT_SECRET before proceeding
-    if (!process.env.JWT_SECRET) {
-      console.error('❌ JWT_SECRET environment variable is not configured');
-      console.error('⚠️  Environment check: Missing required variables for token generation');
-      return res.status(500).json({ 
-        message: 'Server misconfigured: Authentication system not properly initialized',
-        details: 'JWT_SECRET is missing from environment configuration' 
-      });
-    }
-
     const { username, email, password, firstName, lastName } = req.body;
 
     // Check if user already exists
@@ -76,16 +66,6 @@ router.post('/login', [
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
-    }
-
-    // Validate JWT_SECRET before proceeding
-    if (!process.env.JWT_SECRET) {
-      console.error('❌ JWT_SECRET environment variable is not configured');
-      console.error('⚠️  Environment check: Missing required variables for token generation');
-      return res.status(500).json({ 
-        message: 'Server misconfigured: Authentication system not properly initialized',
-        details: 'JWT_SECRET is missing from environment configuration' 
-      });
     }
 
     const { email, username, password } = req.body;
