@@ -316,18 +316,20 @@
                 alert('No content selected for review.');
                 return;
             }
-            
+
             const comments = document.getElementById('review-comments').value.trim();
             if (!comments) {
                 alert('Please provide comments or reasons for your decision.');
                 return;
             }
-            
+
             const isApproved = status === 'approved';
-            const message = isApproved ? 'Content approved successfully!' : 'Content rejected successfully!';
+            const message = isApproved 
+                ? 'Content approved successfully!' 
+                : 'Content rejected successfully!';
             const endpoint = isApproved ? 'approve' : 'reject';
             const contentId = currentReviewContent._id || currentReviewContent.id;
-            
+
             try {
                 const token = localStorage.getItem(EcoJourney.STORAGE_KEY);
                 if (!token) {
@@ -338,7 +340,28 @@
 
                 const url = `${EcoJourney.API_URL}/api/content/${contentId}/${endpoint}`;
                 console.log('Submitting review to:', url);
-                
+
+                // Optimistic UI update - instant feedback
+                const index = allContent.findIndex(c => (c._id || c.id) === contentId);
+                if (index !== -1) {
+                    allContent[index].status = isApproved ? 'Approved' : 'Rejected';
+                    // Optional: store comments locally too
+                    allContent[index].reviewComments = comments;
+                }
+
+                // Re-render list immediately (item disappears from pending queue)
+                renderApprovalsList();
+
+                // Show success feedback right away
+                if (EcoJourney && typeof EcoJourney.showSuccessPopup === 'function') {
+                    EcoJourney.showSuccessPopup(message);
+                } else {
+                    alert(message); // fallback if popup function is missing
+                }
+
+                closeReviewPage();
+
+                // Confirm with backend in background
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
@@ -347,49 +370,33 @@
                     },
                     body: JSON.stringify({ comments })
                 });
-                
+
                 console.log('Response status:', response.status);
-                
-                let responseData;
-                try {
-                    responseData = await response.json();
-                    console.log('Response data:', responseData);
-                } catch (jsonErr) {
-                    console.error('Failed to parse JSON response:', jsonErr);
-                    throw new Error('Invalid response from server');
-                }
-                
+
                 if (!response.ok) {
-                    throw new Error(responseData.message || `Server error ${response.status}`);
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || `Server returned ${response.status}`);
                 }
-                
-                // Success: update local data immediately
+
+                const responseData = await response.json();
+                console.log('Response data:', responseData);
+
+                // Update local data with confirmed backend version
                 if (responseData.content) {
                     const index = allContent.findIndex(c => (c._id || c.id) === contentId);
                     if (index !== -1) {
                         allContent[index] = responseData.content;
                     }
                 }
-                
-                // Re-render list RIGHT NOW (remove approved/rejected item instantly)
+
+                // Final re-render (in case backend returned extra changes)
                 renderApprovalsList();
-                
-                // Show success feedback
-                console.log('[Success] Attempting to show popup with message:', message);
-                if (EcoJourney && typeof EcoJourney.showSuccessPopup === 'function') {
-                    EcoJourney.showSuccessPopup(message);
-                } else {
-                    console.warn('[Popup] EcoJourney.showSuccessPopup not available - using alert fallback');
-                    alert(message);  // fallback so you always see success
-                }
-                
-                closeReviewPage();
-                
-                // Optional light reload in background (1 second delay)
-                setTimeout(() => loadApprovals(), 1000);
+
+                // Optional: refresh full data quietly after short delay
+                setTimeout(() => loadApprovals(), 1500);
 
             } catch (error) {
-                console.error('[Review] Full failure:', error);
+                console.error('Review failed:', error);
                 alert('Review action failed: ' + (error.message || 'Network or server issue'));
             }
         }
