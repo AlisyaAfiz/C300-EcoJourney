@@ -334,35 +334,58 @@
 
                 const url = `${EcoJourney.API_URL}/api/content/${contentId}/${endpoint}`;
                 console.log('Submitting review to:', url);
-                console.log('Content ID:', contentId);
-                console.log('Endpoint:', endpoint);
                 
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + token
+                        'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({ comments })
                 });
                 
                 console.log('Response status:', response.status);
-                const responseData = await response.json();
-                console.log('Response data:', responseData);
                 
-                if (!response.ok) {
-                    throw new Error(responseData.message || 'Review submission failed');
+                let responseData;
+                try {
+                    responseData = await response.json();
+                    console.log('Response data:', responseData);
+                } catch (jsonErr) {
+                    console.error('Failed to parse JSON:', jsonErr);
+                    throw new Error('Invalid response from server');
                 }
                 
-                EcoJourney.showSuccessPopup(message);
+                if (!response.ok) {
+                    throw new Error(responseData.message || `Server error ${response.status}`);
+                }
+                
+                // Success path
+                console.log('[Review] Success - updating UI');
+                
+                // Update local data immediately
+                if (responseData.content) {
+                    const index = allContent.findIndex(c => (c._id || c.id) === contentId);
+                    if (index !== -1) allContent[index] = responseData.content;
+                }
+                
+                // Refresh list NOW (no delay)
+                renderApprovalsList();
+                
+                // Show popup
+                if (EcoJourney && typeof EcoJourney.showSuccessPopup === 'function') {
+                    EcoJourney.showSuccessPopup(message);
+                } else {
+                    alert(message); // fallback if popup function missing
+                }
+                
                 closeReviewPage();
                 
-                // Reload approvals
-                setTimeout(() => loadApprovals(), 1500);
-                
+                // Optional: final safety reload
+                setTimeout(() => loadApprovals(), 1000);
+
             } catch (error) {
-                console.error('Review failed:', error);
-                alert('Review submission failed: ' + error.message);
+                console.error('Review process failed:', error);
+                alert('Review submission failed: ' + (error.message || 'Unknown error'));
             }
         }
         
