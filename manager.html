@@ -312,7 +312,10 @@
         }
         
         async function submitReview(status) {
-            if (!currentReviewContent) return;
+            if (!currentReviewContent) {
+                alert('No content selected for review.');
+                return;
+            }
             
             const comments = document.getElementById('review-comments').value.trim();
             if (!comments) {
@@ -320,8 +323,9 @@
                 return;
             }
             
-            const message = status === 'approved' ? 'Content approved successfully!' : 'Content rejected successfully!';
-            const endpoint = status === 'approved' ? 'approve' : 'reject';
+            const isApproved = status === 'approved';
+            const message = isApproved ? 'Content approved successfully!' : 'Content rejected successfully!';
+            const endpoint = isApproved ? 'approve' : 'reject';
             const contentId = currentReviewContent._id || currentReviewContent.id;
             
             try {
@@ -351,7 +355,7 @@
                     responseData = await response.json();
                     console.log('Response data:', responseData);
                 } catch (jsonErr) {
-                    console.error('Failed to parse JSON:', jsonErr);
+                    console.error('Failed to parse JSON response:', jsonErr);
                     throw new Error('Invalid response from server');
                 }
                 
@@ -359,33 +363,34 @@
                     throw new Error(responseData.message || `Server error ${response.status}`);
                 }
                 
-                // Success path
-                console.log('[Review] Success - updating UI');
-                
-                // Update local data immediately
+                // Success: update local data immediately
                 if (responseData.content) {
                     const index = allContent.findIndex(c => (c._id || c.id) === contentId);
-                    if (index !== -1) allContent[index] = responseData.content;
+                    if (index !== -1) {
+                        allContent[index] = responseData.content;
+                    }
                 }
                 
-                // Refresh list NOW (no delay)
+                // Re-render list RIGHT NOW (remove approved/rejected item instantly)
                 renderApprovalsList();
                 
-                // Show popup
+                // Show success feedback
+                console.log('[Success] Attempting to show popup with message:', message);
                 if (EcoJourney && typeof EcoJourney.showSuccessPopup === 'function') {
                     EcoJourney.showSuccessPopup(message);
                 } else {
-                    alert(message); // fallback if popup function missing
+                    console.warn('[Popup] EcoJourney.showSuccessPopup not available - using alert fallback');
+                    alert(message);  // fallback so you always see success
                 }
                 
                 closeReviewPage();
                 
-                // Optional: final safety reload
+                // Optional light reload in background (1 second delay)
                 setTimeout(() => loadApprovals(), 1000);
 
             } catch (error) {
-                console.error('Review process failed:', error);
-                alert('Review submission failed: ' + (error.message || 'Unknown error'));
+                console.error('[Review] Full failure:', error);
+                alert('Review action failed: ' + (error.message || 'Network or server issue'));
             }
         }
         
