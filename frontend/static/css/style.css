@@ -660,7 +660,7 @@ body {
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #5DA9E9 0%, #27ae60 100%);
+    background: linear-gradient(135deg, #5DA9E9 0%, #30eaaf 100%);
     margin: 0 auto 20px;
     display: flex;
     align-items: center;
@@ -687,7 +687,7 @@ body {
 }
 
 .success-popup-btn {
-    background: linear-gradient(135deg, #5DA9E9 0%, #27ae60 100%);
+    background: linear-gradient(135deg, #5DA9E9 0%, #30eaaf 100%);
     color: white;
     border: none;
     padding: 12px 40px;
@@ -862,7 +862,7 @@ body {
 }
 
 .btn-primary:hover {
-    background: #27ae60;
+    background: #30eaaf;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
 }
