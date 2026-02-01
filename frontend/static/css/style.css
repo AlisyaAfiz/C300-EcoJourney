@@ -625,7 +625,7 @@ body {
     justify-content: flex-end;
 }
 
-/* Custom Success Popup */
+/* Success Popup Styles */
 .success-popup-overlay {
     position: fixed;
     top: 0;

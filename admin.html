@@ -225,18 +225,19 @@
                         </div>
                         <div class="mb-3">
                             <label for="role" class="form-label">Role</label>
-                            <select class="form-select" id="role" name="role" required>
-                                <option value="content_producer">Content Producer</option>
-                                <option value="content_manager">Content Manager</option>
-                                <option value="admin">Admin</option>
+                            <select class="form-control" id="role" name="role" required>
+                                <option value="user">User</option>
+                                <option value="producer">Producer</option>
+                                <option value="manager">Manager</option>
+                                <option value="administrator">Administrator</option>
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="phone" class="form-label">Phone (Optional)</label>
-                            <input type="text" class="form-control" id="phone" name="phone">
+                            <label for="phone" class="form-label">Phone</label>
+                            <input type="tel" class="form-control" id="phone" name="phone">
                         </div>
                         <div class="mb-3">
-                            <label for="organization" class="form-label">Organization (Optional)</label>
+                            <label for="organization" class="form-label">Organization</label>
                             <input type="text" class="form-control" id="organization" name="organization">
                         </div>
                     </form>
@@ -419,6 +420,15 @@
                 console.error('Fetch error:', err);  // Debug log
                 alert('An error occurred while adding the user.');
             }
+        });
+        
+        // Change button text based on form completion
+        document.getElementById('addUserForm').addEventListener('input', () => {
+            const form = document.getElementById('addUserForm');
+            const btn = document.getElementById('addUserBtn');
+            const requiredFields = form.querySelectorAll('input[required], select[required]');
+            const allFilled = Array.from(requiredFields).every(field => field.value.trim() !== '');
+            btn.textContent = allFilled ? 'Add' : 'Add User';
         });
         
         // Initialize
