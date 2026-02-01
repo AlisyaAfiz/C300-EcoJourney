@@ -94,7 +94,7 @@ body {
 
 .nav-link.active {
     background-color: #30eaaf;
-    color: white;
+    color: #24256e;
 }
 
 .sidebar-footer {
@@ -233,7 +233,7 @@ body {
 }
 
 .stat-icon.success {
-    background: #5DA9E9;
+    background: #42f75a;
 }
 
 .stat-icon.warning {
