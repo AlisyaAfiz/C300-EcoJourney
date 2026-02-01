@@ -161,7 +161,7 @@ body {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: #5DA9E9;
+    background: #24256e;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -233,7 +233,7 @@ body {
 }
 
 .stat-icon.success {
-    background: #42f75a;
+    background: #42cb54;
 }
 
 .stat-icon.warning {
