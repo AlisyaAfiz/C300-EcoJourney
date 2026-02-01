@@ -387,14 +387,29 @@
                 console.log('Response status:', response.status);  // Debug log
                 
                 if (response.ok) {
-                    // Show the success popup
-                    document.getElementById('successPopupMessage').textContent = 'User created successfully!';
+                    // Dynamically add the new user to the list
+                    const userList = document.querySelector('#admin-users .card-body');
+                    const newUserItem = document.createElement('div');
+                    newUserItem.className = 'content-item';
+                    newUserItem.innerHTML = `
+                        <div>
+                            <div class="content-title">${userData.firstName} ${userData.lastName}</div>
+                            <div class="content-meta">${userData.email} | ${userData.role.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}</div>
+                        </div>
+                        <span class="badge badge-success">Active</span>
+                    `;
+                    userList.appendChild(newUserItem);
+                    
+                    // Reset the form
+                    document.getElementById('addUserForm').reset();
+                    
+                    // Show the success popup with updated message
+                    document.getElementById('successPopupMessage').textContent = 'User successfully added!';
                     document.getElementById('successPopup').style.display = 'flex';
+                    
                     // Close modal
                     const modal = bootstrap.Modal.getInstance(document.getElementById('addUserModal'));
                     if (modal) modal.hide();
-                    // Refresh user list by reloading the page (simple and reliable)
-                    setTimeout(() => window.location.reload(), 800);
                 } else {
                     const error = await response.json();
                     console.error('Error response:', error);  // Debug log
@@ -402,7 +417,7 @@
                 }
             } catch (err) {
                 console.error('Fetch error:', err);  // Debug log
-                alert('An error occurred while creating the user.');
+                alert('An error occurred while adding the user.');
             }
         });
         
