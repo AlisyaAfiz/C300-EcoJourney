@@ -279,11 +279,15 @@
             // Show selected tab
             document.getElementById('admin-' + tabName).style.display = 'block';
             
-            // Update active link
+            // Update active link (robustly find the clicked tab)
             document.querySelectorAll('.nav-tabs .nav-link').forEach(link => {
                 link.classList.remove('active');
             });
-            event?.target.classList.add('active');
+            let activeLink = null;
+            if (event) {
+                activeLink = event.currentTarget || (event.target && event.target.closest ? event.target.closest('.nav-link') : null);
+            }
+            if (activeLink) activeLink.classList.add('active');
         }
         
         // Add User functionality

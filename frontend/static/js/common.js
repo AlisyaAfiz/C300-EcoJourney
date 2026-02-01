@@ -93,8 +93,22 @@ function renderSidebar(activePage) {
             console.log('[Sidebar] Showing Administration for admin');
         }
     }
+    // Ensure approvals is hidden for admin explicitly (defensive)
+    if (role === 'admin' && navApprovals) {
+        navApprovals.style.display = 'none';
+        console.log('[Sidebar] Ensuring Approvals hidden for admin');
+    }
     
     console.log('[Sidebar] ✓ Role-based visibility applied for role:', role);
+
+    // Ensure logout works even on pages that don't call initializePage()
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.onclick = function (e) {
+            e.preventDefault();
+            logout();
+        };
+    }
 }
 
 // Update User Info in Topbar
