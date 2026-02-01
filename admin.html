@@ -226,10 +226,9 @@
                         <div class="mb-3">
                             <label for="role" class="form-label">Role</label>
                             <select class="form-control" id="role" name="role" required>
-                                <option value="user">User</option>
-                                <option value="producer">Producer</option>
-                                <option value="manager">Manager</option>
                                 <option value="administrator">Administrator</option>
+                                <option value="producer">Producer</option>
+                                <option value="content_manager">Content Manager</option>
                             </select>
                         </div>
                         <div class="mb-3">
@@ -356,6 +355,10 @@
             
             console.log('Add User button clicked');  // Debug log
             
+            const btn = document.getElementById('addUserBtn');
+            btn.textContent = 'Adding...';
+            btn.disabled = true;
+            
             const formData = new FormData(document.getElementById('addUserForm'));
             const userData = {
                 username: formData.get('username'),
@@ -388,6 +391,8 @@
                 console.log('Response status:', response.status);  // Debug log
                 
                 if (response.ok) {
+                    btn.textContent = 'User Added!';
+                    
                     // Dynamically add the new user to the list
                     const userList = document.querySelector('#admin-users .card-body');
                     const newUserItem = document.createElement('div');
@@ -408,17 +413,25 @@
                     document.getElementById('successPopupMessage').textContent = 'User successfully added!';
                     document.getElementById('successPopup').style.display = 'flex';
                     
-                    // Close modal
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('addUserModal'));
-                    if (modal) modal.hide();
+                    // Close modal after a short delay
+                    setTimeout(() => {
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('addUserModal'));
+                        if (modal) modal.hide();
+                        btn.textContent = 'Add User';
+                        btn.disabled = false;
+                    }, 1500);
                 } else {
                     const error = await response.json();
                     console.error('Error response:', error);  // Debug log
                     alert('Error: ' + (error.errors ? error.errors.map(e => e.msg).join(', ') : error.error));
+                    btn.textContent = 'Add User';
+                    btn.disabled = false;
                 }
             } catch (err) {
                 console.error('Fetch error:', err);  // Debug log
                 alert('An error occurred while adding the user.');
+                btn.textContent = 'Add User';
+                btn.disabled = false;
             }
         });
         
