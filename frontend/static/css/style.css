@@ -23,7 +23,7 @@ body {
     height: 100vh;
     width: 250px;
     padding: 20px;
-    background: #029461;
+    background: #0b52cd;
     color: white;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
     position: fixed;
@@ -44,7 +44,7 @@ body {
     margin-bottom: 5px;
     font-size: 22px;
     margin: 0;
-    color: #5DA9E9;
+    color: #ffffff;
     white-space: nowrap;
 }
 
@@ -88,12 +88,12 @@ body {
 
 .nav-link:hover {
     background-color: rgba(46, 204, 113, 0.2);
-    color: #5DA9E9;
+    color: #30eaaf;
     transform: translateX(5px);
 }
 
 .nav-link.active {
-    background-color: #5DA9E9;
+    background-color: #30eaaf;
     color: white;
 }
 
