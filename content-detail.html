@@ -37,7 +37,7 @@
                     <p id="description" class="fs-5 text-muted" style="white-space: pre-wrap;"></p>
                     
                     <div class="mt-5 d-flex gap-4">
-                        <div><strong>Category:</strong> <span id="category" class="badge bg-success fs-6"></span></div>
+                        <div><strong>Category:</strong> <span id="category" class="badge fs-6"></span></div>
                         <div><strong>Last Modified:</strong> <span id="date" class="text-secondary"></span></div>
                     </div>
                 </div>
@@ -71,6 +71,17 @@
                 minute: '2-digit',
                 hour12: true
             });
+        }
+
+        function getCategoryStyles(category) {
+            const styles = {
+                'environmental': { background: '#d4edda', color: '#155724', headerColor: '#155724' },
+                'social': { background: '#d1ecf1', color: '#0c5460', headerColor: '#0c5460' },
+                'governance': { background: '#fff3cd', color: '#856404', headerColor: '#856404' },
+                'economic': { background: '#f8d7da', color: '#721c24', headerColor: '#721c24' },
+                'other': { background: '#d4edda', color: '#155724', headerColor: '#2ecc71' }
+            };
+            return styles[category] || { background: '#d4edda', color: '#155724', headerColor: '#16601d' };
         }
 
         async function loadProject() {
@@ -121,7 +132,17 @@
         function renderData(data) {
             document.getElementById('title').textContent = data.title;
             document.getElementById('description').textContent = data.description || "No description provided.";
-            document.getElementById('category').textContent = data.category;
+            
+            const categoryElement = document.getElementById('category');
+            const category = data.category;
+            categoryElement.textContent = category;
+            
+            const categoryStyles = getCategoryStyles(category);
+            categoryElement.style.backgroundColor = categoryStyles.background;
+            categoryElement.style.color = categoryStyles.color;
+            
+            // Set header background based on category
+            document.querySelector('.hero-section').style.background = `linear-gradient(135deg, ${categoryStyles.headerColor} 0%, ${categoryStyles.background} 100%)`;
             
             // Use updatedAt from MongoDB for modified date
             const displayDate = data.updatedAt || data.createdAt || data.date || null;
