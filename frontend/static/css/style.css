@@ -23,7 +23,7 @@ body {
     height: 100vh;
     width: 250px;
     padding: 20px;
-    background: #237D32;
+    background: #0f4418;
     color: white;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
     position: fixed;
@@ -44,7 +44,7 @@ body {
     margin-bottom: 5px;
     font-size: 22px;
     margin: 0;
-    color: #2ecc71;
+    color: #5DA9E9;
     white-space: nowrap;
 }
 
@@ -88,12 +88,12 @@ body {
 
 .nav-link:hover {
     background-color: rgba(46, 204, 113, 0.2);
-    color: #2ecc71;
+    color: #5DA9E9;
     transform: translateX(5px);
 }
 
 .nav-link.active {
-    background-color: #2ecc71;
+    background-color: #5DA9E9;
     color: white;
 }
 
@@ -161,7 +161,7 @@ body {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: #2ecc71;
+    background: #5DA9E9;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -209,7 +209,7 @@ body {
     gap: 20px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
-    border-left: 4px solid #2ecc71;
+    border-left: 4px solid #5DA9E9;
 }
 
 .stat-card:hover {
@@ -233,7 +233,7 @@ body {
 }
 
 .stat-icon.success {
-    background: #2ecc71;
+    background: #5DA9E9;
 }
 
 .stat-icon.warning {
@@ -269,7 +269,7 @@ body {
 }
 
 .card-header {
-    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    background: linear-gradient(135deg, #5DA9E9 0%, #27ae60 100%);
     color: white;
     padding: 20px;
     border: none;
@@ -383,7 +383,7 @@ body {
 }
 
 .detail-header {
-    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    background: linear-gradient(135deg, #5DA9E9 0%, #27ae60 100%);
     color: white;
     padding: 30px;
     border-radius: 12px;
@@ -515,7 +515,7 @@ body {
 .preview-badge {
     display: inline-block;
     background: white;
-    color: #2ecc71;
+    color: #5DA9E9;
     padding: 8px 20px;
     border-radius: 20px;
     font-weight: 600;
@@ -574,7 +574,7 @@ body {
 
 .preview-meta-item i {
     font-size: 24px;
-    color: #2ecc71;
+    color: #5DA9E9;
     margin-bottom: 5px;
 }
 
@@ -660,7 +660,7 @@ body {
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    background: linear-gradient(135deg, #5DA9E9 0%, #27ae60 100%);
     margin: 0 auto 20px;
     display: flex;
     align-items: center;
@@ -687,7 +687,7 @@ body {
 }
 
 .success-popup-btn {
-    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    background: linear-gradient(135deg, #5DA9E9 0%, #27ae60 100%);
     color: white;
     border: none;
     padding: 12px 40px;
@@ -852,7 +852,7 @@ body {
 
 /* Buttons */
 .btn-primary {
-    background: #2ecc71;
+    background: #5DA9E9;
     border: none;
     border-radius: 8px;
     padding: 10px 20px;
@@ -881,12 +881,12 @@ body {
 }
 
 .nav-tabs .nav-link:hover {
-    color: #2ecc71;
+    color: #5DA9E9;
 }
 
 .nav-tabs .nav-link.active {
-    color: #2ecc71;
-    border-bottom-color: #2ecc71;
+    color: #5DA9E9;
+    border-bottom-color: #5DA9E9;
     background: none;
 }
 
