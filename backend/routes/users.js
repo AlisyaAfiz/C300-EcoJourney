@@ -4,6 +4,32 @@ const User = require('../models/User');
 const { authMiddleware, adminOnly } = require('../middleware/auth');
 const { body, validationResult } = require('express-validator');
 
+// Create user (admin only)
+router.post('/', authMiddleware, adminOnly, [
+  body('username').notEmpty(),
+  body('email').isEmail(),
+  body('password').isLength({ min: 6 }),
+  body('firstName').notEmpty(),
+  body('lastName').notEmpty(),
+  body('role').isIn(['admin','content_producer','content_manager'])
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+
+    const { username, email, password, firstName, lastName, role, phone, organization } = req.body;
+
+    const existing = await User.findOne({ $or: [{ username }, { email }] });
+    if (existing) return res.status(400).json({ message: 'User already exists' });
+
+    const user = new User({ username, email, password, firstName, lastName, role, phone, organization });
+    await user.save();
+    res.status(201).json({ id: user._id, username: user.username, email: user.email, role: user.role });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 // Get user profile
 router.get('/profile', authMiddleware, async (req, res) => {
   try {
