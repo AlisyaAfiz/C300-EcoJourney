@@ -636,7 +636,7 @@ body {
     display: none; /* Hidden by default */
     justify-content: center;
     align-items: center;
-    z-index: 1050; /* High z-index to appear above modals */
+    z-index: 2000; /* High z-index to appear above Bootstrap modals */
 }
 
 .success-popup {
