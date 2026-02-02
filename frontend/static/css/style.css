@@ -639,6 +639,10 @@ body {
     z-index: 2000; /* High z-index to appear above Bootstrap modals */
 }
 
+.success-popup-overlay.show {
+    display: flex;
+}
+
 .success-popup {
     background: white;
     border-radius: 8px;

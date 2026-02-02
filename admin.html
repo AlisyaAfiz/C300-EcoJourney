@@ -373,6 +373,14 @@
                 organization: formData.get('organization')
             };
 
+            // Normalize role values to backend-expected values
+            // Frontend select uses: 'administrator', 'producer', 'content_manager'
+            const roleMap = {
+                'administrator': 'admin',
+                'producer': 'content_producer',
+                'content_manager': 'content_manager'
+            };
+            userData.role = roleMap[userData.role] || userData.role;
             console.log('User data:', userData);  // Debug log
             
             try {
